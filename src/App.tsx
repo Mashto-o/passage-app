@@ -1,13 +1,38 @@
+import { ArrowRight } from 'lucide-react'
+import { Button } from './components'
+
 function App() {
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center gap-md p-lg">
-      <h1 className="text-display-xl text-neutral-900">Passage</h1>
-      <p className="text-body-md text-neutral-500">Onest font, body-md token</p>
-      <div className="bg-primary-500 text-neutral-0 p-md rounded-lg text-body-sm">
-        Primary button style
-      </div>
-      <div className="bg-danger-100 text-danger-700 p-sm rounded-xs text-caption-md">
-        Danger state
+    <div className="min-h-screen bg-neutral-100 flex items-start justify-center py-xl">
+      <div className="max-w-sm w-full mx-auto px-lg py-xl bg-neutral-0 flex flex-col gap-sm rounded-lg">
+
+        <p className="text-caption-sm text-neutral-500">primary</p>
+        <Button variant="primary" label="Primary button" fullWidth />
+
+        <p className="text-caption-sm text-neutral-500">secondary</p>
+        <Button variant="secondary" label="Secondary button" fullWidth />
+
+        <p className="text-caption-sm text-neutral-500">ghost</p>
+        <Button variant="ghost" label="Ghost button" fullWidth />
+
+        <p className="text-caption-sm text-neutral-500">link</p>
+        <Button variant="link" label="Link button" fullWidth />
+
+        <p className="text-caption-sm text-neutral-500">destructive</p>
+        <Button variant="destructive" label="Destructive button" fullWidth />
+
+        <p className="text-caption-sm text-neutral-500">primary · icon right</p>
+        <Button
+          variant="primary"
+          label="Continue"
+          icon={<ArrowRight size={16} />}
+          iconPosition="right"
+          fullWidth
+        />
+
+        <p className="text-caption-sm text-neutral-500">disabled</p>
+        <Button variant="primary" label="Primary button" fullWidth disabled />
+
       </div>
     </div>
   )
