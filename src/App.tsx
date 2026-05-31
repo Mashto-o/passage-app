@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import WheelchairManual   from './assets/illustrations/wheelchair-manual.svg?react'
@@ -62,6 +62,23 @@ function App() {
   return (
     <div className="min-h-screen bg-neutral-100 flex items-start justify-center py-xl">
       <div className="max-w-sm w-full mx-auto px-lg flex flex-col gap-sm">
+
+        {/* ── ReviewCards ── */}
+        <ReviewCard
+          authorName="Kateryna"
+          mobilityIcon={<WheelchairManual width={22} height={22} />}
+          timestamp="1 week ago"
+          reviewText="Smooth ramp at the entrance. Aisles inside are wide enough for an active chair."
+        />
+        <ReviewCard
+          authorName="Yurii"
+          mobilityIcon={<Cane width={22} height={22} />}
+          timestamp="3 days ago"
+          reviewText="The lift was working but quite narrow. Manageable with a manual chair."
+        />
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
 
         {/* ── SelectionCards ── */}
         {mobilityCards.map(({ id, icon, label, subtitle }) => (
