@@ -5,5 +5,7 @@
 @layer base {
   body {
     font-family: 'Onest', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }

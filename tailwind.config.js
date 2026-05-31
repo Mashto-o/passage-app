@@ -98,25 +98,25 @@ export default {
         'ring-pulse': 'ring-pulse 2.5s ease-in-out infinite',
       },
 
-      // ── FONT SIZE + LINE HEIGHT ───────────────
-      // Format: [fontSize, { lineHeight, fontWeight }]
+      // ── FONT SIZE + LINE HEIGHT + WEIGHT + TRACKING ──
+      // A single text-{name} class applies all four values.
       fontSize: {
-        'display-xl':  ['40px', { lineHeight: '1.2'  }],
-        'display-lg':  ['32px', { lineHeight: '1.25' }],
-        'display-md':  ['24px', { lineHeight: '1.3'  }],
+        'display-xl':  ['40px', { lineHeight: '1.2',  fontWeight: '500', letterSpacing: '-0.02em' }],
+        'display-lg':  ['32px', { lineHeight: '1.25', fontWeight: '500', letterSpacing: '-0.02em' }],
+        'display-md':  ['24px', { lineHeight: '1.3',  fontWeight: '500', letterSpacing: '-0.02em' }],
 
-        'heading-lg':  ['22px', { lineHeight: '1.3'  }],
-        'heading-md':  ['18px', { lineHeight: '1.4'  }],
-        'heading-sm':  ['16px', { lineHeight: '1.4'  }],
-        'heading-xsm': ['14px', { lineHeight: '1.4'  }],
+        'heading-lg':  ['22px', { lineHeight: '1.3',  fontWeight: '500', letterSpacing: '-0.01em' }],
+        'heading-md':  ['18px', { lineHeight: '1.4',  fontWeight: '500', letterSpacing: '-0.01em' }],
+        'heading-sm':  ['16px', { lineHeight: '1.4',  fontWeight: '600', letterSpacing: '0em'     }],
+        'heading-xsm': ['14px', { lineHeight: '1.4',  fontWeight: '600', letterSpacing: '0em'     }],
 
-        'body-lg':     ['17px', { lineHeight: '1.5'  }],
-        'body-md':     ['16px', { lineHeight: '1.5'  }],
-        'body-sm':     ['14px', { lineHeight: '1.5'  }],
-        'body-sb':     ['14px', { lineHeight: '1.5'  }],
+        'body-lg':     ['17px', { lineHeight: '1.5',  fontWeight: '400', letterSpacing: '0em'     }],
+        'body-md':     ['16px', { lineHeight: '1.5',  fontWeight: '400', letterSpacing: '0em'     }],
+        'body-sm':     ['14px', { lineHeight: '1.5',  fontWeight: '400', letterSpacing: '0em'     }],
+        'body-sb':     ['14px', { lineHeight: '1.5',  fontWeight: '600', letterSpacing: '0em'     }],
 
-        'caption-md':  ['14px', { lineHeight: '1.4'  }],
-        'caption-sm':  ['12px', { lineHeight: '1.4'  }],
+        'caption-md':  ['14px', { lineHeight: '1.4',  fontWeight: '500', letterSpacing: '0.04em'  }],
+        'caption-sm':  ['12px', { lineHeight: '1.4',  fontWeight: '500', letterSpacing: '0.01em'  }],
       },
 
     },

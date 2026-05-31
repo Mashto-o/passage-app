@@ -10,7 +10,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const base =
   'inline-flex items-center justify-center gap-xs h-2xl rounded-xxl px-md ' +
-  'text-heading-sm font-semibold transition-colors ' +
+  'text-heading-sm transition-colors ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2'
 
 const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
