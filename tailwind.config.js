@@ -87,6 +87,17 @@ export default {
         'caption-sm':  '0.01em',
       },
 
+      // ── ANIMATIONS ───────────────────────────
+      keyframes: {
+        'ring-pulse': {
+          '0%, 100%': { opacity: '1' },
+          '50%':      { opacity: '0.5' },
+        },
+      },
+      animation: {
+        'ring-pulse': 'ring-pulse 2.5s ease-in-out infinite',
+      },
+
       // ── FONT SIZE + LINE HEIGHT ───────────────
       // Format: [fontSize, { lineHeight, fontWeight }]
       fontSize: {
