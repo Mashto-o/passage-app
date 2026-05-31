@@ -9,3 +9,6 @@ export type { SelectionCardProps } from './SelectionCard'
 
 export { ReviewCard } from './ReviewCard'
 export type { ReviewCardProps } from './ReviewCard'
+
+export { PreferenceCard } from './PreferenceCard'
+export type { PreferenceCardProps } from './PreferenceCard'

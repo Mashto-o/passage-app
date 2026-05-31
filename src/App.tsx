@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import WheelchairManual   from './assets/illustrations/wheelchair-manual.svg?react'
@@ -10,6 +10,19 @@ import Cane               from './assets/illustrations/cane.svg?react'
 import Stroller           from './assets/illustrations/stroller.svg?react'
 import Prosthesis         from './assets/illustrations/prosthesis.svg?react'
 
+import DoorWidth90        from './assets/icons/door-width-90.svg?react'
+import DoorWidth100       from './assets/icons/door-width-100.svg?react'
+import DoorWidth120       from './assets/icons/door-width-120.svg?react'
+import SlopeNone          from './assets/icons/slope-none.svg?react'
+import SlopeModerate      from './assets/icons/slope-moderate.svg?react'
+import SlopeSteep         from './assets/icons/slope-steep.svg?react'
+import StairsAvoided      from './assets/icons/stairs-avoided.svg?react'
+import StairsSingle       from './assets/icons/stairs-single.svg?react'
+import StairsMultiple     from './assets/icons/stairs-multiple.svg?react'
+import SurfaceCobblestone from './assets/icons/surface-cobblestone.svg?react'
+import SurfaceUneven      from './assets/icons/surface-uneven.svg?react'
+import SurfaceSmooth      from './assets/icons/surface-smooth.svg?react'
+
 const badgeVariants: AccessibilityBadgeProps['variant'][] = [
   'accessible',
   'inaccessible',
@@ -18,46 +31,20 @@ const badgeVariants: AccessibilityBadgeProps['variant'][] = [
 ]
 
 const mobilityCards = [
-  {
-    id:       'wheelchair-manual',
-    icon:     <WheelchairManual width={32} height={32} />,
-    label:    'Manual wheelchair',
-    subtitle: 'Standard self-propelled chair',
-  },
-  {
-    id:       'wheelchair-electric',
-    icon:     <WheelchairElectric width={32} height={32} />,
-    label:    'Electric wheelchair',
-    subtitle: 'Motorised chair',
-  },
-  {
-    id:       'no-wheelchair',
-    icon:     <NoWheelchair width={32} height={32} />,
-    label:    'Walking',
-    subtitle: 'No mobility aid needed',
-  },
-  {
-    id:       'cane',
-    icon:     <Cane width={32} height={32} />,
-    label:    'Cane or crutches',
-    subtitle: 'Walking with support',
-  },
-  {
-    id:       'stroller',
-    icon:     <Stroller width={32} height={32} />,
-    label:    'Stroller',
-    subtitle: 'Pushchair or pram',
-  },
-  {
-    id:       'prosthesis',
-    icon:     <Prosthesis width={32} height={32} />,
-    label:    'Prosthesis',
-    subtitle: 'Prosthetic limb user',
-  },
+  { id: 'wheelchair-manual',   icon: <WheelchairManual   width={32} height={32} />, label: 'Manual wheelchair',  subtitle: 'Standard self-propelled chair' },
+  { id: 'wheelchair-electric', icon: <WheelchairElectric width={32} height={32} />, label: 'Electric wheelchair', subtitle: 'Motorised chair'                },
+  { id: 'no-wheelchair',       icon: <NoWheelchair       width={32} height={32} />, label: 'Walking',             subtitle: 'No mobility aid needed'         },
+  { id: 'cane',                icon: <Cane               width={32} height={32} />, label: 'Cane or crutches',    subtitle: 'Walking with support'           },
+  { id: 'stroller',            icon: <Stroller           width={32} height={32} />, label: 'Stroller',            subtitle: 'Pushchair or pram'              },
+  { id: 'prosthesis',          icon: <Prosthesis         width={32} height={32} />, label: 'Prosthesis',          subtitle: 'Prosthetic limb user'           },
 ]
 
 function App() {
-  const [selectedCard, setSelectedCard] = useState<string | null>(null)
+  const [selectedCard,    setSelectedCard]    = useState<string | null>(null)
+  const [selectedDoor,    setSelectedDoor]    = useState<string | null>(null)
+  const [selectedSlope,   setSelectedSlope]   = useState<string | null>(null)
+  const [selectedStairs,  setSelectedStairs]  = useState<string | null>(null)
+  const [selectedSurface, setSelectedSurface] = useState<string | null>(null)
 
   return (
     <div className="min-h-screen bg-neutral-100 flex items-start justify-center py-xl">
@@ -76,6 +63,54 @@ function App() {
           timestamp="3 days ago"
           reviewText="The lift was working but quite narrow. Manageable with a manual chair."
         />
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── PreferenceCards ── */}
+        <div className="flex flex-col gap-lg">
+
+          {/* Group 1 — Door width */}
+          <div className="flex flex-col gap-sm">
+            <p className="text-body-sm text-neutral-500">Minimum door width</p>
+            <div className="flex flex-row items-stretch gap-xs">
+              <PreferenceCard icon={<DoorWidth90  width={36} height={36} />} label="< 90 cm"   selected={selectedDoor === '90'}  onClick={() => setSelectedDoor('90')}  />
+              <PreferenceCard icon={<DoorWidth100 width={36} height={36} />} label="90–100 cm" selected={selectedDoor === '100'} onClick={() => setSelectedDoor('100')} />
+              <PreferenceCard icon={<DoorWidth120 width={36} height={36} />} label="> 100 cm"  selected={selectedDoor === '120'} onClick={() => setSelectedDoor('120')} />
+            </div>
+          </div>
+
+          {/* Group 2 — Slope tolerance (worst → best) */}
+          <div className="flex flex-col gap-sm">
+            <p className="text-body-sm text-neutral-500">Slope tolerance</p>
+            <div className="flex flex-row items-stretch gap-xs">
+              <PreferenceCard icon={<SlopeSteep    width={36} height={36} />} label="Steep"    selected={selectedSlope === 'steep'}    onClick={() => setSelectedSlope('steep')}    />
+              <PreferenceCard icon={<SlopeModerate width={36} height={36} />} label="Moderate" selected={selectedSlope === 'moderate'} onClick={() => setSelectedSlope('moderate')} />
+              <PreferenceCard icon={<SlopeNone     width={36} height={36} />} label="Flat only" selected={selectedSlope === 'none'}    onClick={() => setSelectedSlope('none')}     />
+            </div>
+          </div>
+
+          {/* Group 3 — Stairs (worst → best) */}
+          <div className="flex flex-col gap-sm">
+            <p className="text-body-sm text-neutral-500">Stairs</p>
+            <div className="flex flex-row items-stretch gap-xs">
+              <PreferenceCard icon={<StairsMultiple width={36} height={36} />} label="Multiple"    selected={selectedStairs === 'multiple'} onClick={() => setSelectedStairs('multiple')} />
+              <PreferenceCard icon={<StairsSingle   width={36} height={36} />} label="Single step" selected={selectedStairs === 'single'}   onClick={() => setSelectedStairs('single')}   />
+              <PreferenceCard icon={<StairsAvoided  width={36} height={36} />} label="Ramp only"   selected={selectedStairs === 'avoided'}  onClick={() => setSelectedStairs('avoided')}  />
+            </div>
+          </div>
+
+          {/* Group 4 — Surface (worst → best) */}
+          <div className="flex flex-col gap-sm">
+            <p className="text-body-sm text-neutral-500">Surface type</p>
+            <div className="flex flex-row items-stretch gap-xs">
+              <PreferenceCard icon={<SurfaceCobblestone width={36} height={36} />} label="Cobblestone"     selected={selectedSurface === 'cobblestone'} onClick={() => setSelectedSurface('cobblestone')} />
+              <PreferenceCard icon={<SurfaceUneven      width={36} height={36} />} label="Uneven pavement" selected={selectedSurface === 'uneven'}      onClick={() => setSelectedSurface('uneven')}      />
+              <PreferenceCard icon={<SurfaceSmooth      width={36} height={36} />} label="Flat only"       selected={selectedSurface === 'smooth'}      onClick={() => setSelectedSurface('smooth')}      />
+            </div>
+          </div>
+
+        </div>
 
         {/* ── Divider ── */}
         <div className="h-px bg-neutral-200 my-sm" />
@@ -141,7 +176,7 @@ function App() {
 
         {/* ── AccessibilityBadge sm ── */}
         <p className="text-caption-sm text-neutral-500">accessibility badge · sm</p>
-        <div className="flex gap-lg items-start justify-center">
+        <div className="flex gap-lg items-start justify-center pb-xl">
           {badgeVariants.map((v) => (
             <div key={v} className="flex flex-col items-center gap-xs">
               <AccessibilityBadge variant={v} size="sm" />
