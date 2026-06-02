@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import WheelchairManual   from './assets/illustrations/wheelchair-manual.svg?react'
@@ -40,11 +40,12 @@ const mobilityCards = [
 ]
 
 function App() {
-  const [selectedCard,    setSelectedCard]    = useState<string | null>(null)
-  const [selectedDoor,    setSelectedDoor]    = useState<string | null>(null)
-  const [selectedSlope,   setSelectedSlope]   = useState<string | null>(null)
-  const [selectedStairs,  setSelectedStairs]  = useState<string | null>(null)
-  const [selectedSurface, setSelectedSurface] = useState<string | null>(null)
+  const [selectedCard,          setSelectedCard]          = useState<string | null>(null)
+  const [selectedDoor,          setSelectedDoor]          = useState<string | null>(null)
+  const [selectedSlope,         setSelectedSlope]         = useState<string | null>(null)
+  const [selectedStairs,        setSelectedStairs]        = useState<string | null>(null)
+  const [selectedSurface,       setSelectedSurface]       = useState<string | null>(null)
+  const [selectedAccessibility, setSelectedAccessibility] = useState<string | null>(null)
 
   return (
     <div className="min-h-screen bg-neutral-100 flex items-start justify-center py-xl">
@@ -158,6 +159,31 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── AccessibilityCards ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">accessibility filter cards</p>
+          <div className="flex flex-row gap-xs">
+            <AccessibilityCard
+              accessibility="accessible"
+              selected={selectedAccessibility === 'accessible'}
+              onClick={() => setSelectedAccessibility(selectedAccessibility === 'accessible' ? null : 'accessible')}
+            />
+            <AccessibilityCard
+              accessibility="partiallyAccessible"
+              selected={selectedAccessibility === 'partiallyAccessible'}
+              onClick={() => setSelectedAccessibility(selectedAccessibility === 'partiallyAccessible' ? null : 'partiallyAccessible')}
+            />
+            <AccessibilityCard
+              accessibility="inaccessible"
+              selected={selectedAccessibility === 'inaccessible'}
+              onClick={() => setSelectedAccessibility(selectedAccessibility === 'inaccessible' ? null : 'inaccessible')}
+            />
+          </div>
         </div>
 
         {/* ── Divider ── */}
