@@ -33,3 +33,6 @@ export type { DividerProps } from './Divider'
 
 export { Dropdown } from './Dropdown'
 export type { DropdownProps } from './Dropdown'
+
+export { TextInput } from './TextInput'
+export type { TextInputProps } from './TextInput'

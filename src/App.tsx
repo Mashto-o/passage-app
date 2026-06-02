@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -54,6 +54,8 @@ function App() {
   const [selectedSurface,       setSelectedSurface]       = useState<string | null>(null)
   const [selectedAccessibility, setSelectedAccessibility] = useState<string | null>(null)
   const [selectedPhotos,        setSelectedPhotos]        = useState<Set<string>>(new Set())
+  const [fromValue,             setFromValue]             = useState('')
+  const [toValue,               setToValue]               = useState('')
 
   const togglePhoto = (id: string) =>
     setSelectedPhotos(prev => {
@@ -174,6 +176,26 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── TextInputs ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">text input</p>
+          <TextInput
+            label="From"
+            placeholder="Current location"
+            value={fromValue}
+            onChange={setFromValue}
+          />
+          <TextInput
+            label="To"
+            placeholder="Search destination"
+            value={toValue}
+            onChange={setToValue}
+          />
         </div>
 
         {/* ── Divider ── */}
