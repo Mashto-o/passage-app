@@ -39,3 +39,6 @@ export type { TextInputProps } from './TextInput'
 
 export { RouteDestination } from './RouteDestination'
 export type { RouteDestinationProps } from './RouteDestination'
+
+export { CommentInput } from './CommentInput'
+export type { CommentInputProps } from './CommentInput'
