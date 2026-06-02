@@ -36,3 +36,6 @@ export type { DropdownProps } from './Dropdown'
 
 export { TextInput } from './TextInput'
 export type { TextInputProps } from './TextInput'
+
+export { RouteDestination } from './RouteDestination'
+export type { RouteDestinationProps } from './RouteDestination'

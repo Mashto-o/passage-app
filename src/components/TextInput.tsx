@@ -37,7 +37,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         className={[
           'w-full px-[12px] py-[8px] rounded-[24px] border bg-neutral-0',
           'text-body-sm text-neutral-900 placeholder:text-neutral-400',
-          focused ? 'border-primary-500' : 'border-neutral-300',
+          focused ? 'border-primary-500' : 'border-neutral-200',
           'transition-colors duration-200 focus-visible:outline-none',
         ].join(' ')}
       />
