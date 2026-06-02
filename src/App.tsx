@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -174,6 +174,26 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── PlacePhotoCards ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">place photo cards</p>
+          <div className="flex flex-row gap-xs">
+            <PlacePhotoCard
+              location="Outside"
+              updatedAt="1 week ago"
+            />
+            <PlacePhotoCard
+              src="https://placehold.co/165x165"
+              alt="Place photo"
+              location="Inside"
+              updatedAt="3 days ago"
+            />
+          </div>
         </div>
 
         {/* ── Divider ── */}

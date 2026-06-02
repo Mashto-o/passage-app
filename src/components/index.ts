@@ -18,3 +18,6 @@ export type { AccessibilityCardProps } from './AccessibilityCard'
 
 export { PhotoCard } from './PhotoCard'
 export type { PhotoCardProps } from './PhotoCard'
+
+export { PlacePhotoCard } from './PlacePhotoCard'
+export type { PlacePhotoCardProps } from './PlacePhotoCard'
