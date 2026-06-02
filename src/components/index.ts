@@ -24,3 +24,6 @@ export type { PlacePhotoCardProps } from './PlacePhotoCard'
 
 export { Chip } from './Chip'
 export type { ChipProps } from './Chip'
+
+export { StatusBadge } from './StatusBadge'
+export type { StatusBadgeProps } from './StatusBadge'
