@@ -15,3 +15,6 @@ export type { PreferenceCardProps } from './PreferenceCard'
 
 export { AccessibilityCard } from './AccessibilityCard'
 export type { AccessibilityCardProps } from './AccessibilityCard'
+
+export { PhotoCard } from './PhotoCard'
+export type { PhotoCardProps } from './PhotoCard'
