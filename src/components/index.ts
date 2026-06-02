@@ -21,3 +21,6 @@ export type { PhotoCardProps } from './PhotoCard'
 
 export { PlacePhotoCard } from './PlacePhotoCard'
 export type { PlacePhotoCardProps } from './PlacePhotoCard'
+
+export { Chip } from './Chip'
+export type { ChipProps } from './Chip'

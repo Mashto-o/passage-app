@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard } from './components'
+import { ArrowRight, Star, AlertTriangle } from 'lucide-react'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -174,6 +174,24 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── Chips ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col items-start gap-sm">
+          <p className="text-caption-sm text-neutral-500">primary · no icon</p>
+          <Chip variant="primary" label="Outside" />
+
+          <p className="text-caption-sm text-neutral-500">primary · with icon</p>
+          <Chip variant="primary" label="Accessible" icon={<Star size={13} />} />
+
+          <p className="text-caption-sm text-neutral-500">secondary · no icon</p>
+          <Chip variant="secondary" label="Inside" />
+
+          <p className="text-caption-sm text-neutral-500">secondary · with icon</p>
+          <Chip variant="secondary" label="Caution" icon={<AlertTriangle size={13} />} />
         </div>
 
         {/* ── Divider ── */}
