@@ -2,10 +2,12 @@ import React from 'react'
 import { Check, X, AlertTriangle, HelpCircle } from 'lucide-react'
 
 export interface AccessibilityBadgeProps {
-  variant: 'accessible' | 'inaccessible' | 'partial' | 'unknown'
+  variant: 'accessible' | 'inaccessible' | 'partial' | 'partiallyAccessible' | 'unknown'
   size?: 'md' | 'sm'
   className?: string
 }
+
+type CanonicalVariant = 'accessible' | 'inaccessible' | 'partial' | 'unknown'
 
 type VariantConfig = {
   outerBg:   string
@@ -15,7 +17,7 @@ type VariantConfig = {
   Icon: React.ComponentType<{ size: number; className?: string; 'aria-hidden'?: boolean }>
 }
 
-const variantConfig: Record<AccessibilityBadgeProps['variant'], VariantConfig> = {
+const variantConfig: Record<CanonicalVariant, VariantConfig> = {
   accessible: {
     outerBg:   'bg-[rgba(31,168,91,0.2)]',
     innerBg:   'bg-success-500',
@@ -53,7 +55,8 @@ export const AccessibilityBadge: React.FC<AccessibilityBadgeProps> = ({
   size = 'md',
   className = '',
 }) => {
-  const { outerBg, innerBg, ariaLabel, Icon, iconClass } = variantConfig[variant]
+  const canonical: CanonicalVariant = variant === 'partiallyAccessible' ? 'partial' : variant
+  const { outerBg, innerBg, ariaLabel, Icon, iconClass } = variantConfig[canonical]
   const { outerSize, innerSize, iconSize } = sizeConfig[size]
 
   return (
