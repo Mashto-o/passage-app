@@ -27,3 +27,6 @@ export type { ChipProps } from './Chip'
 
 export { StatusBadge } from './StatusBadge'
 export type { StatusBadgeProps } from './StatusBadge'
+
+export { Divider } from './Divider'
+export type { DividerProps } from './Divider'
