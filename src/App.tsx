@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider } from './components'
+import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -174,6 +174,44 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── Dropdowns ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col items-start gap-sm">
+          <p className="text-caption-sm text-neutral-500">default · closed</p>
+          <Dropdown
+            label="4 stations"
+            items={['1 station', '2 stations', '3 stations', '4 stations']}
+          />
+
+          <p className="text-caption-sm text-neutral-500">default · open</p>
+          <Dropdown
+            label="4 stations"
+            items={['1 station', '2 stations', '3 stations', '4 stations']}
+            defaultOpen
+          />
+
+          <p className="text-caption-sm text-neutral-500">warning · closed</p>
+          <Dropdown
+            label="3 barriers"
+            items={['Steep slope', 'Narrow doorway', 'Cobblestone']}
+            icon={<TrafficCone size={16} />}
+            bgColor="bg-warning-100"
+            textColor="text-warning-500"
+          />
+
+          <p className="text-caption-sm text-neutral-500">warning · open</p>
+          <Dropdown
+            label="3 barriers"
+            items={['Steep slope', 'Narrow doorway', 'Cobblestone']}
+            icon={<TrafficCone size={16} />}
+            bgColor="bg-warning-100"
+            textColor="text-warning-500"
+            defaultOpen
+          />
         </div>
 
         {/* ── Divider ── */}

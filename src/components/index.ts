@@ -30,3 +30,6 @@ export type { StatusBadgeProps } from './StatusBadge'
 
 export { Divider } from './Divider'
 export type { DividerProps } from './Divider'
+
+export { Dropdown } from './Dropdown'
+export type { DropdownProps } from './Dropdown'
