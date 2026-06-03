@@ -45,3 +45,6 @@ export type { CommentInputProps } from './CommentInput'
 
 export { NavBar } from './NavBar'
 export type { NavBarProps } from './NavBar'
+
+export { OnboardingProgress } from './OnboardingProgress'
+export type { OnboardingProgressProps } from './OnboardingProgress'

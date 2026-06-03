@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -184,6 +184,24 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── OnboardingProgress ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">step 1 of 4</p>
+          <OnboardingProgress currentStep={1} totalSteps={4} />
+
+          <p className="text-caption-sm text-neutral-500">step 2 of 4</p>
+          <OnboardingProgress currentStep={2} totalSteps={4} />
+
+          <p className="text-caption-sm text-neutral-500">step 3 of 4</p>
+          <OnboardingProgress currentStep={3} totalSteps={4} />
+
+          <p className="text-caption-sm text-neutral-500">step 4 of 4</p>
+          <OnboardingProgress currentStep={4} totalSteps={4} />
         </div>
 
         {/* ── Divider ── */}
