@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -186,6 +186,41 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── PlaceListItem ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">0 barriers · with score + extra badge</p>
+          <PlaceListItem
+            name="Pharmacy Liky"
+            address="vul. Khreschyatyk 22"
+            distance="300 m"
+            barrierCount={0}
+            accessibilityScore="80% Accessible"
+            onClick={() => {}}
+          />
+
+          <p className="text-caption-sm text-neutral-500">1–3 barriers · with score</p>
+          <PlaceListItem
+            name="Kyiv Train Station"
+            address="pl. Vokzalna 1"
+            distance="1.2 km"
+            barrierCount={2}
+            accessibilityScore="60% Accessible"
+            onClick={() => {}}
+          />
+
+          <p className="text-caption-sm text-neutral-500">4+ barriers · no score</p>
+          <PlaceListItem
+            name="Central Market"
+            address="vul. Baseyna 5"
+            distance="800 m"
+            barrierCount={5}
+            accessibilityScore="30% Accessible"
+          />
         </div>
 
         {/* ── Divider ── */}

@@ -51,3 +51,6 @@ export type { OnboardingProgressProps } from './OnboardingProgress'
 
 export { RadioButton } from './RadioButton'
 export type { RadioButtonProps } from './RadioButton'
+
+export { PlaceListItem } from './PlaceListItem'
+export type { PlaceListItemProps } from './PlaceListItem'
