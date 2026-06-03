@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -58,6 +58,8 @@ function App() {
   const [toValue,               setToValue]               = useState('')
   const [routeFrom,             setRouteFrom]             = useState('Current location')
   const [routeTo,               setRouteTo]               = useState('Destination')
+  const [radio1,                setRadio1]                = useState(false)
+  const [radio2,                setRadio2]                = useState(true)
   const [navTab1,               setNavTab1]               = useState<'discover' | 'map' | 'profile'>('discover')
   const [navTab2,               setNavTab2]               = useState<'discover' | 'map' | 'profile'>('map')
   const [navTab3,               setNavTab3]               = useState<'discover' | 'map' | 'profile'>('profile')
@@ -184,6 +186,20 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── RadioButton ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col items-start gap-sm">
+          <p className="text-caption-sm text-neutral-500">default</p>
+          <RadioButton selected={radio1} onClick={() => setRadio1(v => !v)} />
+
+          <p className="text-caption-sm text-neutral-500">selected</p>
+          <RadioButton selected={radio2} onClick={() => setRadio2(v => !v)} />
+
+
         </div>
 
         {/* ── Divider ── */}

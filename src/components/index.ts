@@ -48,3 +48,6 @@ export type { NavBarProps } from './NavBar'
 
 export { OnboardingProgress } from './OnboardingProgress'
 export type { OnboardingProgressProps } from './OnboardingProgress'
+
+export { RadioButton } from './RadioButton'
+export type { RadioButtonProps } from './RadioButton'
