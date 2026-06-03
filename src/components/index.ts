@@ -42,3 +42,6 @@ export type { RouteDestinationProps } from './RouteDestination'
 
 export { CommentInput } from './CommentInput'
 export type { CommentInputProps } from './CommentInput'
+
+export { NavBar } from './NavBar'
+export type { NavBarProps } from './NavBar'

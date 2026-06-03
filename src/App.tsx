@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -58,6 +58,9 @@ function App() {
   const [toValue,               setToValue]               = useState('')
   const [routeFrom,             setRouteFrom]             = useState('Current location')
   const [routeTo,               setRouteTo]               = useState('Destination')
+  const [navTab1,               setNavTab1]               = useState<'discover' | 'map' | 'profile'>('discover')
+  const [navTab2,               setNavTab2]               = useState<'discover' | 'map' | 'profile'>('map')
+  const [navTab3,               setNavTab3]               = useState<'discover' | 'map' | 'profile'>('profile')
   const [comment1,              setComment1]              = useState('')
   const [comment2,              setComment2]              = useState('Smooth ramp at the entrance. Aisles are wide enough.')
   const [comment3,              setComment3]              = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in repr')
@@ -181,6 +184,21 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── NavBar ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">active: discover</p>
+          <NavBar activeTab={navTab1} onTabChange={setNavTab1} />
+
+          <p className="text-caption-sm text-neutral-500">active: map</p>
+          <NavBar activeTab={navTab2} onTabChange={setNavTab2} />
+
+          <p className="text-caption-sm text-neutral-500">active: profile</p>
+          <NavBar activeTab={navTab3} onTabChange={setNavTab3} />
         </div>
 
         {/* ── Divider ── */}
