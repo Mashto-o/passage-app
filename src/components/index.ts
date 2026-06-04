@@ -54,3 +54,6 @@ export type { RadioButtonProps } from './RadioButton'
 
 export { PlaceListItem } from './PlaceListItem'
 export type { PlaceListItemProps } from './PlaceListItem'
+
+export { RouteTimeline } from './RouteTimeline'
+export type { RouteTimelineProps, RouteSegment, TransportSegment, WalkingSegment, MobilityAid } from './RouteTimeline'
