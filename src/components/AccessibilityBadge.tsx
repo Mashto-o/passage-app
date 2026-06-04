@@ -4,6 +4,8 @@ import { Check, X, AlertTriangle, HelpCircle } from 'lucide-react'
 export interface AccessibilityBadgeProps {
   variant: 'accessible' | 'inaccessible' | 'partial' | 'partiallyAccessible' | 'unknown'
   size?: 'md' | 'sm'
+  icon?: React.ReactNode
+  pulse?: boolean
   className?: string
 }
 
@@ -53,6 +55,7 @@ const sizeConfig = {
 export const AccessibilityBadge: React.FC<AccessibilityBadgeProps> = ({
   variant,
   size = 'md',
+  icon,
   className = '',
 }) => {
   const canonical: CanonicalVariant = variant === 'partiallyAccessible' ? 'partial' : variant
@@ -66,11 +69,13 @@ export const AccessibilityBadge: React.FC<AccessibilityBadgeProps> = ({
       className={`flex items-center justify-center shrink-0 overflow-hidden rounded-full ${outerSize} ${outerBg}${className ? ` ${className}` : ''}`}
     >
       <div className={`flex items-center justify-center shrink-0 rounded-full ${innerSize} ${innerBg}`}>
-        <Icon
-          size={iconSize}
-          aria-hidden={true}
-          className={`text-neutral-0${iconClass ? ` ${iconClass}` : ''}`}
-        />
+        {icon ?? (
+          <Icon
+            size={iconSize}
+            aria-hidden={true}
+            className={`text-neutral-0${iconClass ? ` ${iconClass}` : ''}`}
+          />
+        )}
       </div>
     </div>
   )

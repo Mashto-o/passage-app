@@ -17,7 +17,7 @@ type Place = {
   id: string
   name: string
   address: string
-  category: 'hospital' | 'restaurant' | 'landmark' | 'shelter'
+  category: 'hospital' | 'restaurant' | 'landmark' | 'shelter' | 'supermarket' | 'park' | 'bank'
   coordinates: [number, number]
   accessibilityScore: number
   barrierCount: number
@@ -25,10 +25,28 @@ type Place = {
 }
 
 const PLACES: Place[] = [
-  { id: '1', name: 'Pharmacy Liky',       address: 'vul. Khreschyatyk 22',         category: 'hospital',   coordinates: [30.518, 50.452], accessibilityScore: 90, barrierCount: 0, distance: '300 m'  },
-  { id: '2', name: 'Kyiv City Museum',    address: 'vul. Khreschyatyk 15',         category: 'landmark',   coordinates: [30.526, 50.448], accessibilityScore: 70, barrierCount: 2, distance: '500 m'  },
-  { id: '3', name: 'Puzata Hata',         address: 'vul. Baseyna 5',               category: 'restaurant', coordinates: [30.512, 50.445], accessibilityScore: 60, barrierCount: 3, distance: '800 m'  },
-  { id: '4', name: 'Shelter Point',       address: 'vul. Velyka Vasylkivska 12',   category: 'shelter',    coordinates: [30.528, 50.442], accessibilityScore: 80, barrierCount: 1, distance: '1.2 km' },
+  // Hospitals / Pharmacies
+  { id: '1',  name: 'Pharmacy Liky',              address: 'vul. Khreschyatyk 22',          category: 'hospital',     coordinates: [30.5238, 50.4494], accessibilityScore: 90, barrierCount: 0, distance: '300 m'  },
+  { id: '2',  name: 'Oleksandrivska Hospital',    address: 'bulv. Tarasa Shevchenka 17',    category: 'hospital',     coordinates: [30.5106, 50.4478], accessibilityScore: 55, barrierCount: 4, distance: '1.1 km' },
+  // Restaurants / Cafés
+  { id: '3',  name: 'Puzata Hata',                address: 'vul. Baseyna 5',                category: 'restaurant',   coordinates: [30.5189, 50.4432], accessibilityScore: 60, barrierCount: 3, distance: '800 m'  },
+  { id: '4',  name: 'Veterano Pizza',             address: 'vul. Horodetskoho 10',          category: 'restaurant',   coordinates: [30.5271, 50.4468], accessibilityScore: 75, barrierCount: 1, distance: '600 m'  },
+  { id: '5',  name: 'Zhyva Kava',                 address: 'vul. Velyka Vasylkivska 45',    category: 'restaurant',   coordinates: [30.5223, 50.4385], accessibilityScore: 65, barrierCount: 2, distance: '1.4 km' },
+  // Landmarks / Museums
+  { id: '6',  name: 'Kyiv City Museum',           address: 'vul. Khreschyatyk 15',          category: 'landmark',     coordinates: [30.5214, 50.4501], accessibilityScore: 70, barrierCount: 2, distance: '500 m'  },
+  { id: '7',  name: 'National Museum of History', address: 'vul. Volodymyrska 2',           category: 'landmark',     coordinates: [30.5136, 50.4547], accessibilityScore: 45, barrierCount: 5, distance: '1.3 km' },
+  { id: '8',  name: 'Pinchuk Art Centre',         address: 'vul. Velyka Vasylkivska 1',     category: 'landmark',     coordinates: [30.5241, 50.4447], accessibilityScore: 85, barrierCount: 1, distance: '900 m'  },
+  // Shelters
+  { id: '9',  name: 'Shelter Maidan',             address: 'Maidan Nezalezhnosti 1',        category: 'shelter',      coordinates: [30.5234, 50.4504], accessibilityScore: 80, barrierCount: 1, distance: '200 m'  },
+  { id: '10', name: 'Shelter Lukyanivska',         address: 'vul. Oleny Telihy 3',           category: 'shelter',      coordinates: [30.4986, 50.4612], accessibilityScore: 50, barrierCount: 3, distance: '2.1 km' },
+  // Supermarkets
+  { id: '11', name: 'Silpo Khreschyatyk',         address: 'vul. Khreschyatyk 44',          category: 'supermarket',  coordinates: [30.5198, 50.4471], accessibilityScore: 88, barrierCount: 0, distance: '700 m'  },
+  { id: '12', name: 'Novus Lukyanivska',           address: 'vul. Turhenievska 38',          category: 'supermarket',  coordinates: [30.5012, 50.4598], accessibilityScore: 72, barrierCount: 2, distance: '1.9 km' },
+  // Parks
+  { id: '13', name: 'Shevchenko Park',             address: 'bulv. Tarasa Shevchenka 1',    category: 'park',         coordinates: [30.5134, 50.4453], accessibilityScore: 78, barrierCount: 2, distance: '1.0 km' },
+  { id: '14', name: 'Mariinsky Park',              address: 'vul. Hrushevskoho 5',          category: 'park',         coordinates: [30.5385, 50.4489], accessibilityScore: 62, barrierCount: 3, distance: '1.6 km' },
+  // Bank
+  { id: '15', name: 'PrivatBank Central',          address: 'vul. Hrushevskogo 1d',         category: 'bank',         coordinates: [30.5301, 50.4512], accessibilityScore: 83, barrierCount: 1, distance: '400 m'  },
 ]
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -39,42 +57,48 @@ function scoreVariant(score: number): 'positive' | 'warning' | 'negative' {
   return 'negative'
 }
 
-function badgeVariant(score: number): 'accessible' | 'partial' | 'inaccessible' {
+function getAccessibilityVariant(score: number): 'accessible' | 'partial' | 'inaccessible' {
   if (score >= 80) return 'accessible'
   if (score >= 40) return 'partial'
   return 'inaccessible'
 }
 
-// ── Category marker icons ──────────────────────────────────────────────────
+const markerColors = {
+  accessible:   { outer: 'bg-success-500/20',  inner: 'bg-success-500',  ping: 'bg-success-500'  },
+  partial:      { outer: 'bg-warning-500/20',   inner: 'bg-warning-500',  ping: 'bg-warning-500'  },
+  inaccessible: { outer: 'bg-danger-500/20',    inner: 'bg-danger-500',   ping: 'bg-danger-500'   },
+}
 
-function CategoryIcon({ category }: { category: Place['category'] }) {
+// ── Category icon helper ───────────────────────────────────────────────────
+
+function getCategoryIcon(category: Place['category'], size: number) {
   const cls = 'text-neutral-0'
-  if (category === 'hospital')   return <Hospital  size={12} strokeWidth={1} className={cls} aria-hidden />
-  if (category === 'restaurant') return <Utensils  size={12} strokeWidth={1} className={cls} aria-hidden />
-  if (category === 'landmark')   return <Landmark  size={12} strokeWidth={1} className={cls} aria-hidden />
-  return <ShelterIcon width={12} height={12} stroke="currentColor" strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'hospital')    return <Hospital     size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'restaurant')  return <Utensils     size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'landmark')    return <Landmark     size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'supermarket') return <ShoppingCart size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'park')        return <Trees        size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'bank')        return <Landmark     size={size} strokeWidth={1} className={cls} aria-hidden />
+  return <ShelterIcon width={size} height={size} stroke="currentColor" strokeWidth={1} className={cls} aria-hidden />
 }
 
 // ── Marker badge ───────────────────────────────────────────────────────────
 
 function PlaceMarker({ place, selected }: { place: Place; selected: boolean }) {
-  const outerSize  = selected ? 'w-[36px] h-[36px]' : 'w-[28px] h-[28px]'
-  const innerSize  = selected ? 'w-[28px] h-[28px]' : 'w-[22px] h-[22px]'
+  const size      = selected ? 'md' : 'sm'
+  const iconSize  = selected ? 16 : 12
+  const { ping }  = markerColors[getAccessibilityVariant(place.accessibilityScore)]
 
   return (
     <div className="relative flex items-center justify-center">
       {selected && (
-        <span className="absolute w-[48px] h-[48px] rounded-full bg-success-500 opacity-20 animate-ping" />
+        <span className={`absolute w-[48px] h-[48px] rounded-full ${ping} opacity-20 animate-ping`} />
       )}
-      <div
-        role="img"
-        aria-label={place.name}
-        className={`flex items-center justify-center shrink-0 rounded-full bg-success-500/20 ${outerSize}`}
-      >
-        <div className={`flex items-center justify-center shrink-0 rounded-full bg-success-500 ${innerSize}`}>
-          <CategoryIcon category={place.category} />
-        </div>
-      </div>
+      <AccessibilityBadge
+        variant={getAccessibilityVariant(place.accessibilityScore)}
+        size={size}
+        icon={getCategoryIcon(place.category, iconSize)}
+      />
     </div>
   )
 }
@@ -201,7 +225,11 @@ export const MapScreen: React.FC = () => {
 
               {/* Badges */}
               <div className="flex items-center gap-xs">
-                <AccessibilityBadge variant={badgeVariant(selectedPlace.accessibilityScore)} size="sm" />
+                <AccessibilityBadge
+                  variant={getAccessibilityVariant(selectedPlace.accessibilityScore)}
+                  size="sm"
+                  icon={getCategoryIcon(selectedPlace.category, 12)}
+                />
                 <StatusBadge variant={scoreVariant(selectedPlace.accessibilityScore)} label={`${selectedPlace.accessibilityScore}% Accessible`} />
               </div>
 
@@ -213,8 +241,8 @@ export const MapScreen: React.FC = () => {
 
               {/* Address + barriers */}
               <div className="flex items-center justify-between">
-                <span className="text-caption-sm text-neutral-500 flex-1">{selectedPlace.address}</span>
-                <span className="text-caption-sm text-neutral-500">{selectedPlace.barrierCount} barriers</span>
+                <span className="text-body-sm text-neutral-500 flex-1">{selectedPlace.address}</span>
+                <span className="text-body-sm text-neutral-500">{selectedPlace.barrierCount} barriers</span>
               </div>
             </div>
 
