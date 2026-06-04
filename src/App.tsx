@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { Onboarding1 } from './screens/Onboarding1'
+import { Onboarding2 } from './screens/Onboarding2'
+import { Onboarding3 } from './screens/Onboarding3'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
 import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl, Toggle, ToggleButton, SearchBar, TransportSwitcher } from './components'
 import type { TransportMode } from './components'
@@ -84,6 +87,9 @@ function App() {
       next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
+
+  // ── Temporarily render screen for review ─────────────────────
+  return <Onboarding3 />
 
   return (
     <div className="min-h-screen bg-neutral-100 flex items-start justify-center py-xl">
