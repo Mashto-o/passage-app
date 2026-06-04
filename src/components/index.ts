@@ -60,3 +60,6 @@ export type { RouteTimelineProps, RouteSegment, TransportSegment, WalkingSegment
 
 export { NavigationCard } from './NavigationCard'
 export type { NavigationCardProps, Direction } from './NavigationCard'
+
+export { MediaInputButton } from './MediaInputButton'
+export type { MediaInputButtonProps } from './MediaInputButton'
