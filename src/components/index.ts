@@ -63,3 +63,6 @@ export type { NavigationCardProps, Direction } from './NavigationCard'
 
 export { MediaInputButton } from './MediaInputButton'
 export type { MediaInputButtonProps } from './MediaInputButton'
+
+export { SortControl } from './SortControl'
+export type { SortControlProps } from './SortControl'
