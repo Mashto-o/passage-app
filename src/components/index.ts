@@ -72,3 +72,6 @@ export type { ToggleProps } from './Toggle'
 
 export { ToggleButton } from './ToggleButton'
 export type { ToggleButtonProps } from './ToggleButton'
+
+export { SearchBar } from './SearchBar'
+export type { SearchBarProps } from './SearchBar'

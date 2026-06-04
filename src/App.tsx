@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl, Toggle, ToggleButton } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl, Toggle, ToggleButton, SearchBar } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -58,6 +58,8 @@ function App() {
   const [toValue,               setToValue]               = useState('')
   const [routeFrom,             setRouteFrom]             = useState('Current location')
   const [routeTo,               setRouteTo]               = useState('Destination')
+  const [search1,               setSearch1]               = useState('')
+  const [search2,               setSearch2]               = useState('Pharmacy')
   const [toggleBtn1,            setToggleBtn1]            = useState<'yes' | 'no' | null>(null)
   const [toggleBtn2,            setToggleBtn2]            = useState<'yes' | 'no' | null>('yes')
   const [toggleBtn3,            setToggleBtn3]            = useState<'yes' | 'no' | null>('no')
@@ -191,6 +193,18 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── SearchBar ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
+          <p className="text-caption-sm text-neutral-500">default · empty</p>
+          <SearchBar value={search1} onChange={setSearch1} placeholder="Search places..." />
+
+          <p className="text-caption-sm text-neutral-500">with value · click to see focused state</p>
+          <SearchBar value={search2} onChange={setSearch2} placeholder="Search places..." />
         </div>
 
         {/* ── Divider ── */}
