@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, PhotoCard, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 
@@ -19,6 +20,7 @@ const barriers: { id: string; src: string; label: string }[] = [
 ]
 
 export const Onboarding3: React.FC = () => {
+  const navigate = useNavigate()
   const [selected, setSelected] = useState<string[]>([])
 
   const toggle = (id: string) =>
@@ -27,7 +29,7 @@ export const Onboarding3: React.FC = () => {
     )
 
   const handleNext = () => {
-    console.log('Next', selected)
+    navigate('/onboarding/4')
   }
 
   return (

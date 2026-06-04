@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, SelectionCard, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 
@@ -18,13 +19,14 @@ type MobilityAid =
   | 'no-aid'
 
 export const Onboarding2: React.FC = () => {
+  const navigate = useNavigate()
   const [selected, setSelected] = useState<MobilityAid | null>(null)
 
   const toggle = (id: MobilityAid) =>
     setSelected(prev => (prev === id ? null : id))
 
   const handleNext = () => {
-    console.log('Next', selected)
+    navigate('/onboarding/3')
   }
 
   return (
@@ -62,8 +64,8 @@ export const Onboarding2: React.FC = () => {
         <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
           Wheelchair
         </span>
-        <div className="flex flex-row gap-md">
-          <div className="flex-1">
+        <div className="flex flex-row items-stretch gap-md">
+          <div className="w-[calc(50%-8px)]">
             <SelectionCard
               icon={<WheelchairManual width={32} height={32} />}
               label="Manual"
@@ -72,7 +74,7 @@ export const Onboarding2: React.FC = () => {
               onClick={() => toggle('wheelchair-manual')}
             />
           </div>
-          <div className="flex-1">
+          <div className="w-[calc(50%-8px)]">
             <SelectionCard
               icon={<WheelchairElectric width={32} height={32} />}
               label="Electric"
@@ -90,8 +92,8 @@ export const Onboarding2: React.FC = () => {
           Other
         </span>
         <div className="flex flex-col gap-xs">
-          <div className="flex gap-xs">
-            <div className="flex-1">
+          <div className="flex items-stretch gap-xs">
+            <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<Cane width={32} height={32} />}
                 label="Cane"
@@ -100,18 +102,18 @@ export const Onboarding2: React.FC = () => {
                 onClick={() => toggle('cane')}
               />
             </div>
-            <div className="flex-1">
+            <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<Prosthesis width={32} height={32} />}
-                label="Prosthesis"
+                label="Limb aid"
                 subtitle=""
                 selected={selected === 'prosthesis'}
                 onClick={() => toggle('prosthesis')}
               />
             </div>
           </div>
-          <div className="flex gap-xs">
-            <div className="flex-1">
+          <div className="flex items-stretch gap-xs">
+            <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<Stroller width={32} height={32} />}
                 label="Stroller"
@@ -120,7 +122,7 @@ export const Onboarding2: React.FC = () => {
                 onClick={() => toggle('stroller')}
               />
             </div>
-            <div className="flex-1">
+            <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<NoWheelchair width={32} height={32} />}
                 label="No aid"

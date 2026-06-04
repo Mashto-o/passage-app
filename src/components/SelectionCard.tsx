@@ -18,7 +18,7 @@ export const SelectionCard: React.FC<SelectionCardProps> = ({
   className = '',
 }) => {
   const containerClasses = [
-    'w-full min-h-[88px] p-md rounded-xl',
+    'w-full h-full min-h-[88px] p-md rounded-xl',
     'flex items-center gap-md text-left',
     'border transition-all duration-200 ease-in-out',
     'active:scale-[0.98]',
