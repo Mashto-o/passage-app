@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl, Toggle } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl, Toggle, ToggleButton } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -58,6 +58,9 @@ function App() {
   const [toValue,               setToValue]               = useState('')
   const [routeFrom,             setRouteFrom]             = useState('Current location')
   const [routeTo,               setRouteTo]               = useState('Destination')
+  const [toggleBtn1,            setToggleBtn1]            = useState<'yes' | 'no' | null>(null)
+  const [toggleBtn2,            setToggleBtn2]            = useState<'yes' | 'no' | null>('yes')
+  const [toggleBtn3,            setToggleBtn3]            = useState<'yes' | 'no' | null>('no')
   const [toggle1,               setToggle1]               = useState(false)
   const [toggle2,               setToggle2]               = useState(true)
   const [radio1,                setRadio1]                = useState(false)
@@ -188,6 +191,21 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── ToggleButton ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col items-start gap-sm">
+          <p className="text-caption-sm text-neutral-500">nothing selected</p>
+          <ToggleButton value={toggleBtn1} onChange={setToggleBtn1} />
+
+          <p className="text-caption-sm text-neutral-500">yes selected</p>
+          <ToggleButton value={toggleBtn2} onChange={setToggleBtn2} />
+
+          <p className="text-caption-sm text-neutral-500">no selected</p>
+          <ToggleButton value={toggleBtn3} onChange={setToggleBtn3} />
         </div>
 
         {/* ── Divider ── */}

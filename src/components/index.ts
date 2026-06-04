@@ -69,3 +69,6 @@ export type { SortControlProps } from './SortControl'
 
 export { Toggle } from './Toggle'
 export type { ToggleProps } from './Toggle'
+
+export { ToggleButton } from './ToggleButton'
+export type { ToggleButtonProps } from './ToggleButton'
