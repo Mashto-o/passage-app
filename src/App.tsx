@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
-import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl } from './components'
+import { Button, AccessibilityBadge, SelectionCard, ReviewCard, PreferenceCard, AccessibilityCard, PhotoCard, PlacePhotoCard, Chip, StatusBadge, Divider, Dropdown, TextInput, RouteDestination, CommentInput, NavBar, OnboardingProgress, RadioButton, PlaceListItem, RouteTimeline, NavigationCard, MediaInputButton, SortControl, Toggle } from './components'
 import type { AccessibilityBadgeProps } from './components'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
@@ -58,6 +58,8 @@ function App() {
   const [toValue,               setToValue]               = useState('')
   const [routeFrom,             setRouteFrom]             = useState('Current location')
   const [routeTo,               setRouteTo]               = useState('Destination')
+  const [toggle1,               setToggle1]               = useState(false)
+  const [toggle2,               setToggle2]               = useState(true)
   const [radio1,                setRadio1]                = useState(false)
   const [radio2,                setRadio2]                = useState(true)
   const [navTab1,               setNavTab1]               = useState<'discover' | 'map' | 'profile'>('discover')
@@ -186,6 +188,18 @@ function App() {
 
           <p className="text-caption-sm text-neutral-500">disabled</p>
           <Button variant="primary" label="Primary button" fullWidth disabled />
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-neutral-200 my-sm" />
+
+        {/* ── Toggle ── */}
+        <div className="bg-neutral-0 rounded-lg p-md flex flex-col items-start gap-sm">
+          <p className="text-caption-sm text-neutral-500">off</p>
+          <Toggle value={toggle1} onChange={setToggle1} />
+
+          <p className="text-caption-sm text-neutral-500">on</p>
+          <Toggle value={toggle2} onChange={setToggle2} />
         </div>
 
         {/* ── Divider ── */}
