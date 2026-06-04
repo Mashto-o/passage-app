@@ -57,3 +57,6 @@ export type { PlaceListItemProps } from './PlaceListItem'
 
 export { RouteTimeline } from './RouteTimeline'
 export type { RouteTimelineProps, RouteSegment, TransportSegment, WalkingSegment, MobilityAid } from './RouteTimeline'
+
+export { NavigationCard } from './NavigationCard'
+export type { NavigationCardProps, Direction } from './NavigationCard'
