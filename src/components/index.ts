@@ -75,3 +75,6 @@ export type { ToggleButtonProps } from './ToggleButton'
 
 export { SearchBar } from './SearchBar'
 export type { SearchBarProps } from './SearchBar'
+
+export { TransportSwitcher } from './TransportSwitcher'
+export type { TransportSwitcherProps, TransportMode } from './TransportSwitcher'
