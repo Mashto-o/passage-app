@@ -9,7 +9,7 @@ import {
 import ShelterIcon from '../assets/icons/shelter.svg?react'
 import {
   SearchBar, Chip, AccessibilityBadge, NavBar,
-  PlaceListItem, SortControl, Divider, PlacePopupCard,
+  PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
 } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
@@ -161,6 +161,10 @@ const CHIPS: { key: CategoryKey; label: string; icon: React.ReactNode }[] = [
   { key: 'pharmacy',   label: 'Pharmacy',    icon: <Pill         size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
 ]
 
+// ── Sort options ───────────────────────────────────────────────────────────
+
+const PLACE_SORT_OPTIONS = ['Most accessible first', 'Nearest first', 'Recently verified']
+
 // ── Bottom sheet snap positions ────────────────────────────────────────────
 
 type SnapPoint = 'half' | 'full' | 'closed'
@@ -169,6 +173,13 @@ const SNAP: Record<SnapPoint, string> = {
   half:   'top-[45%]',
   full:   'top-[8%]',
   closed: 'top-[110%]',
+}
+
+// Numeric heights matching the CSS snap positions (1 - topFraction) * vh
+const SNAP_HEIGHT: Record<SnapPoint, number> = {
+  half:   window.innerHeight * 0.55,
+  full:   window.innerHeight * 0.92,
+  closed: 0,
 }
 
 // ── Screen ─────────────────────────────────────────────────────────────────
@@ -180,6 +191,8 @@ export const MapScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null)
   const [sheetSnap, setSheetSnap]        = useState<SnapPoint>('closed')
   const [sheetVisible, setSheetVisible]  = useState(false)
+  const [sortSheetOpen, setSortSheetOpen] = useState(false)
+  const [sortValue, setSortValue]        = useState('Most accessible first')
 
   // touch tracking refs
   const touchStartY  = useRef(0)
@@ -383,7 +396,7 @@ export const MapScreen: React.FC = () => {
           {/* Sheet header */}
           <div className="px-lg flex flex-col gap-sm shrink-0">
             <span className="text-display-md text-neutral-900">{sheetTitle}</span>
-            <SortControl value="Most accessible" onPress={() => console.log('sort')} />
+            <SortControl value={sortValue} onPress={() => setSortSheetOpen(true)} />
           </div>
 
           {/* Place list */}
@@ -441,6 +454,16 @@ export const MapScreen: React.FC = () => {
       <div className="absolute bottom-lg left-lg right-lg z-40">
         <NavBar activeTab="map" onTabChange={() => {}} />
       </div>
+
+      {/* ── Sort sheet ──────────────────────────────────────────────── */}
+      <SortSheet
+        isOpen={sortSheetOpen}
+        options={PLACE_SORT_OPTIONS}
+        value={sortValue}
+        onChange={(val) => setSortValue(val)}
+        onClose={() => setSortSheetOpen(false)}
+        height={SNAP_HEIGHT[sheetSnap]}
+      />
 
     </div>
   )

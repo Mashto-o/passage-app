@@ -25,10 +25,10 @@ export const SortControl: React.FC<SortControlProps> = ({
         .filter(Boolean)
         .join(' ')}
     >
-      <span className="text-body-sm text-neutral-900">Sort by</span>
+      <span className="text-body-md text-neutral-900">Sort by</span>
 
       <div className="flex items-center gap-[8px]">
-        <span className="text-body-sb text-neutral-900 text-right">{value}</span>
+        <span className="text-heading-sm text-neutral-900 text-right">{value}</span>
         <ChevronRight size={20} strokeWidth={1.5} className="text-neutral-900 shrink-0" />
       </div>
     </button>

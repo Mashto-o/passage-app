@@ -70,6 +70,9 @@ export type { MediaInputButtonProps } from './MediaInputButton'
 export { SortControl } from './SortControl'
 export type { SortControlProps } from './SortControl'
 
+export { SortSheet } from './SortSheet'
+export type { SortSheetProps } from './SortSheet'
+
 export { Toggle } from './Toggle'
 export type { ToggleProps } from './Toggle'
 
