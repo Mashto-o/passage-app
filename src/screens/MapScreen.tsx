@@ -330,7 +330,7 @@ export const MapScreen: React.FC = () => {
           ].join(' ')}
           aria-label="Filter"
         >
-          <Funnel size={20} aria-hidden />
+          <Funnel size={20} strokeWidth={1.5} aria-hidden />
         </button>
       </div>
 
@@ -354,11 +354,19 @@ export const MapScreen: React.FC = () => {
         })}
       </div>
 
+      {/* ── Bottom sheet backdrop ───────────────────────────────────── */}
+      {sheetVisible && (
+        <div
+          className="fixed inset-0 z-[45] bg-transparent"
+          onClick={() => closeSheet()}
+        />
+      )}
+
       {/* ── Bottom sheet ────────────────────────────────────────────── */}
       {sheetVisible && (
         <div
           className={[
-            'fixed left-0 right-0 bottom-0 z-30',
+            'fixed left-0 right-0 bottom-0 z-[50]',
             'bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] shadow-2xl',
             'flex flex-col',
             'transition-all duration-300 ease-out',
@@ -402,6 +410,14 @@ export const MapScreen: React.FC = () => {
             )}
           </div>
         </div>
+      )}
+
+      {/* ── Popup backdrop ──────────────────────────────────────────── */}
+      {selectedPlace && (
+        <div
+          className="fixed inset-0 z-[55] bg-transparent"
+          onClick={handleClosePopup}
+        />
       )}
 
       {/* ── Place popup card ────────────────────────────────────────── */}

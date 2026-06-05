@@ -42,7 +42,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
   return (
     <div
       className={[
-        'fixed bottom-[125px] left-lg right-lg z-10',
+        'fixed bottom-[125px] left-lg right-lg z-[60]',
         'transition-transform duration-300 ease-out',
         visible ? 'translate-y-0' : 'translate-y-[calc(100%+125px)]',
       ].join(' ')}
