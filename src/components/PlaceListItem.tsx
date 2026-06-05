@@ -2,6 +2,7 @@ import React from 'react'
 import { TrafficCone } from 'lucide-react'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
+import { getCategoryIcon } from '../utils/categoryIcon'
 
 
 export interface PlaceListItemProps {
@@ -10,6 +11,7 @@ export interface PlaceListItemProps {
   distance: string
   barrierCount: number
   accessibilityScore: number
+  category: string
   onClick?: () => void
   className?: string
 }
@@ -53,6 +55,7 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   distance,
   barrierCount,
   accessibilityScore,
+  category,
   onClick,
   className = '',
 }) => {
@@ -83,7 +86,7 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
 
         {/* Badge row — full width */}
         <div className="flex items-center gap-[10px] overflow-hidden flex-nowrap w-full">
-          <AccessibilityBadge variant={a11yVariant} size="sm" />
+          <AccessibilityBadge variant={a11yVariant} size="sm" icon={getCategoryIcon(category, 12)} />
 
           <StatusBadge
             variant={statusVariant}

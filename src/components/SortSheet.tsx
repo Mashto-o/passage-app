@@ -42,11 +42,11 @@ export const SortSheet: React.FC<SortSheetProps> = ({
         onClick={onClose}
       />
 
-      {/* Sheet */}
+      {/* SortSheet: width matches bottom sheet in MapScreen. Update both together if width changes. */}
       <div
         className={[
-          'fixed bottom-0 left-1/2 -translate-x-1/2',
-          'w-[402px] bg-neutral-0',
+          'fixed bottom-0 left-0 right-0',
+          'bg-neutral-0',
           'rounded-tl-[48px] rounded-tr-[48px]',
           'z-[50] flex flex-col items-center px-[24px]',
           'transition-transform duration-300 ease-in-out',
