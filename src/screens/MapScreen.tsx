@@ -4,12 +4,12 @@ import type { MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import {
   Funnel, Toilet, Utensils, Hospital, Pill, ShoppingCart,
-  Trees, Landmark, X, Bookmark, Share2,
+  Trees, Landmark,
 } from 'lucide-react'
 import ShelterIcon from '../assets/icons/shelter.svg?react'
 import {
-  SearchBar, Chip, AccessibilityBadge, StatusBadge, Button, NavBar,
-  PlaceListItem, SortControl, Divider,
+  SearchBar, Chip, AccessibilityBadge, NavBar,
+  PlaceListItem, SortControl, Divider, PlacePopupCard,
 } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
@@ -405,102 +405,21 @@ export const MapScreen: React.FC = () => {
       )}
 
       {/* ── Place popup card ────────────────────────────────────────── */}
-      <div
-        className={[
-          'fixed bottom-[125px] left-lg right-lg z-10',
-          'transition-transform duration-300 ease-out',
-          selectedPlace ? 'translate-y-0' : 'translate-y-[calc(100%+125px)]',
-        ].join(' ')}
-      >
-        {selectedPlace && (
-          <div className="bg-neutral-0 rounded-[32px] pt-sm px-md pb-md flex flex-col gap-sm shadow-lg">
-
-            {/* Close button row */}
-            <div className="flex justify-end mb-xs">
-              <button
-                type="button"
-                onClick={handleClosePopup}
-                className={[
-                  'flex items-center justify-center',
-                  'w-[32px] h-[32px] rounded-full',
-                  'text-neutral-900',
-                  'transition-colors duration-200',
-                  'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-                ].join(' ')}
-                aria-label="Close"
-              >
-                <X size={20} aria-hidden />
-              </button>
-            </div>
-
-            {/* Photo */}
-            <img
-              src="https://placehold.co/354x120"
-              alt={selectedPlace.name}
-              className="h-[120px] w-full rounded-xl object-cover bg-neutral-100"
-            />
-
-            {/* Info section */}
-            <div className="flex flex-col gap-xs pt-xs">
-              <div className="flex items-center gap-xs">
-                <AccessibilityBadge
-                  variant={getAccessibilityVariant(selectedPlace.accessibilityScore)}
-                  size="sm"
-                  icon={getCategoryIcon(selectedPlace.category, 12)}
-                />
-                <StatusBadge variant={scoreVariant(selectedPlace.accessibilityScore)} label={`${selectedPlace.accessibilityScore}% Accessible`} />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-heading-sm text-neutral-900 flex-1">{selectedPlace.name}</span>
-                <span className="text-body-sb text-neutral-900">{selectedPlace.distance}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-body-sm text-neutral-500 flex-1">{selectedPlace.address}</span>
-                <span className="text-body-sm text-neutral-500">{selectedPlace.barrierCount} barriers</span>
-              </div>
-            </div>
-
-            {/* Action row */}
-            <div className="flex items-center gap-xs">
-              <div className="flex-1">
-                <Button
-                  variant="primary"
-                  label="Build a route"
-                  fullWidth
-                  onClick={() => console.log('Build a route', selectedPlace)}
-                />
-              </div>
-              <button
-                type="button"
-                className={[
-                  'flex items-center justify-center shrink-0',
-                  'w-[48px] h-[48px] rounded-full',
-                  'bg-neutral-0 border border-neutral-200 text-neutral-700',
-                  'transition-colors duration-200',
-                  'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-                ].join(' ')}
-                aria-label="Bookmark"
-              >
-                <Bookmark size={20} aria-hidden />
-              </button>
-              <button
-                type="button"
-                className={[
-                  'flex items-center justify-center shrink-0',
-                  'w-[48px] h-[48px] rounded-full',
-                  'bg-neutral-0 border border-neutral-200 text-neutral-700',
-                  'transition-colors duration-200',
-                  'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-                ].join(' ')}
-                aria-label="Share"
-              >
-                <Share2 size={20} aria-hidden />
-              </button>
-            </div>
-
-          </div>
-        )}
-      </div>
+      <PlacePopupCard
+        visible={!!selectedPlace}
+        name={selectedPlace?.name ?? ''}
+        address={selectedPlace?.address ?? ''}
+        distance={selectedPlace?.distance ?? ''}
+        barrierCount={selectedPlace?.barrierCount ?? 0}
+        accessibilityScore={selectedPlace?.accessibilityScore ?? 0}
+        accessibilityVariant={getAccessibilityVariant(selectedPlace?.accessibilityScore ?? 0)}
+        scoreVariant={scoreVariant(selectedPlace?.accessibilityScore ?? 0)}
+        categoryIcon={selectedPlace ? getCategoryIcon(selectedPlace.category, 12) : undefined}
+        onClose={handleClosePopup}
+        onRoute={() => console.log('Build a route', selectedPlace)}
+        onBookmark={() => console.log('Bookmark', selectedPlace)}
+        onShare={() => console.log('Share', selectedPlace)}
+      />
 
       {/* ── NavBar ──────────────────────────────────────────────────── */}
       <div className="absolute bottom-lg left-lg right-lg z-40">

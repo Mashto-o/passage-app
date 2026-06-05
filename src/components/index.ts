@@ -55,6 +55,9 @@ export type { RadioButtonProps } from './RadioButton'
 export { PlaceListItem } from './PlaceListItem'
 export type { PlaceListItemProps } from './PlaceListItem'
 
+export { PlacePopupCard } from './PlacePopupCard'
+export type { PlacePopupCardProps } from './PlacePopupCard'
+
 export { RouteTimeline } from './RouteTimeline'
 export type { RouteTimelineProps, RouteSegment, TransportSegment, WalkingSegment, MobilityAid } from './RouteTimeline'
 
