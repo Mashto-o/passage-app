@@ -12,6 +12,7 @@ export interface PlaceListItemProps {
   barrierCount: number
   accessibilityScore: number
   category: string
+  verifiedAt: Date
   onClick?: () => void
   className?: string
 }
@@ -49,6 +50,25 @@ const toAccessibilityVariant = (variant: string): 'accessible' | 'partial' | 'in
   return 'unknown'
 }
 
+function formatVerifiedAt(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  const diffWeeks = Math.floor(diffDays / 7)
+  const diffMonths = Math.floor(diffDays / 30)
+
+  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffDays < 7) return `${diffDays}d ago`
+  if (diffWeeks < 5) return `${diffWeeks}w ago`
+  if (diffMonths < 12) {
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+  }
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })
+}
+
 export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   name,
   address,
@@ -56,6 +76,7 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   barrierCount,
   accessibilityScore,
   category,
+  verifiedAt,
   onClick,
   className = '',
 }) => {
@@ -85,7 +106,7 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
       <div className="flex flex-col gap-[8px] w-full">
 
         {/* Badge row — full width */}
-        <div className="flex items-center gap-[10px] overflow-hidden flex-nowrap w-full">
+        <div className="flex items-center gap-[10px]">
           <AccessibilityBadge variant={a11yVariant} size="sm" icon={getCategoryIcon(category, 12)} />
 
           <StatusBadge
@@ -118,8 +139,8 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
             <span className="text-body-sb text-neutral-900 text-right whitespace-nowrap">
               {distance}
             </span>
-            <span className="text-body-sm text-neutral-500 text-right whitespace-nowrap">
-              {barrierCount} barriers
+            <span className="text-body-sm text-neutral-400 text-right whitespace-nowrap">
+              {formatVerifiedAt(verifiedAt)}
             </span>
           </div>
         </div>{/* end info row */}

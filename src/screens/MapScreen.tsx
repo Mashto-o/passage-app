@@ -422,6 +422,7 @@ export const MapScreen: React.FC = () => {
                     barrierCount={place.barrierCount}
                     accessibilityScore={place.accessibilityScore}
                     category={place.category}
+                    verifiedAt={place.verifiedAt}
                   />
                   {idx < filteredPlaces.length - 1 && (
                     <div className="py-md">
