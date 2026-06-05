@@ -2,16 +2,18 @@ import React from 'react'
 
 export interface ChipProps {
   label: string
-  variant?: 'primary' | 'secondary' | 'neutral'
+  variant?: 'primary' | 'secondary' | 'neutral' | 'active'
   size?: 'sm' | 'md'
   icon?: React.ReactNode
   className?: string
+  onClick?: () => void
 }
 
 const variantConfig = {
-  primary:   { container: 'bg-primary-100 text-primary-500',                          },
-  secondary: { container: 'bg-accent-100 text-accent-500',                            },
-  neutral:   { container: 'bg-neutral-0 border border-neutral-200 text-neutral-700',  },
+  primary:   { container: 'bg-primary-100 text-primary-500',                                       },
+  active:    { container: 'bg-primary-500 text-neutral-0 border border-primary-500',               },
+  secondary: { container: 'bg-accent-100 text-accent-500',                                         },
+  neutral:   { container: 'bg-neutral-0 border border-neutral-200 text-neutral-700',               },
 }
 
 export const Chip: React.FC<ChipProps> = ({
@@ -20,14 +22,18 @@ export const Chip: React.FC<ChipProps> = ({
   size = 'sm',
   icon,
   className = '',
+  onClick,
 }) => {
   const { container } = variantConfig[variant]
+  const Tag = onClick ? 'button' : 'div'
 
   return (
-    <div
+    <Tag
+      {...(onClick ? { type: 'button' as const, onClick } : {})}
       className={[
         'flex items-center gap-[8px] px-[8px] py-[4px] rounded-[24px]',
         container,
+        onClick ? 'cursor-pointer transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none' : '',
         className,
       ]
         .filter(Boolean)
@@ -44,6 +50,6 @@ export const Chip: React.FC<ChipProps> = ({
       ].join(' ')}>
         {label}
       </span>
-    </div>
+    </Tag>
   )
 }

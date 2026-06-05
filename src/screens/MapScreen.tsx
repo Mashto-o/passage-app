@@ -1,14 +1,15 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 import Map, { Marker } from 'react-map-gl/mapbox'
 import type { MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import {
-  Funnel, Droplets, Utensils, Hospital, Pill, ShoppingCart,
+  Funnel, Toilet, Utensils, Hospital, Pill, ShoppingCart,
   Trees, Landmark, X, Bookmark, Share2,
 } from 'lucide-react'
 import ShelterIcon from '../assets/icons/shelter.svg?react'
 import {
   SearchBar, Chip, AccessibilityBadge, StatusBadge, Button, NavBar,
+  PlaceListItem, SortControl, Divider,
 } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
@@ -17,7 +18,7 @@ type Place = {
   id: string
   name: string
   address: string
-  category: 'hospital' | 'restaurant' | 'landmark' | 'shelter' | 'supermarket' | 'park' | 'bank'
+  category: 'hospital' | 'restaurant' | 'landmark' | 'shelter' | 'supermarket' | 'park' | 'bank' | 'toilet' | 'pharmacy' 
   coordinates: [number, number]
   accessibilityScore: number
   barrierCount: number
@@ -25,28 +26,67 @@ type Place = {
 }
 
 const PLACES: Place[] = [
-  // Hospitals / Pharmacies
-  { id: '1',  name: 'Pharmacy Liky',              address: 'vul. Khreschyatyk 22',          category: 'hospital',     coordinates: [30.5238, 50.4494], accessibilityScore: 90, barrierCount: 0, distance: '300 m'  },
-  { id: '2',  name: 'Oleksandrivska Hospital',    address: 'bulv. Tarasa Shevchenka 17',    category: 'hospital',     coordinates: [30.5106, 50.4478], accessibilityScore: 55, barrierCount: 4, distance: '1.1 km' },
-  // Restaurants / Cafés
-  { id: '3',  name: 'Puzata Hata',                address: 'vul. Baseyna 5',                category: 'restaurant',   coordinates: [30.5189, 50.4432], accessibilityScore: 60, barrierCount: 3, distance: '800 m'  },
-  { id: '4',  name: 'Veterano Pizza',             address: 'vul. Horodetskoho 10',          category: 'restaurant',   coordinates: [30.5271, 50.4468], accessibilityScore: 75, barrierCount: 1, distance: '600 m'  },
-  { id: '5',  name: 'Zhyva Kava',                 address: 'vul. Velyka Vasylkivska 45',    category: 'restaurant',   coordinates: [30.5223, 50.4385], accessibilityScore: 65, barrierCount: 2, distance: '1.4 km' },
-  // Landmarks / Museums
-  { id: '6',  name: 'Kyiv City Museum',           address: 'vul. Khreschyatyk 15',          category: 'landmark',     coordinates: [30.5214, 50.4501], accessibilityScore: 70, barrierCount: 2, distance: '500 m'  },
-  { id: '7',  name: 'National Museum of History', address: 'vul. Volodymyrska 2',           category: 'landmark',     coordinates: [30.5136, 50.4547], accessibilityScore: 45, barrierCount: 5, distance: '1.3 km' },
-  { id: '8',  name: 'Pinchuk Art Centre',         address: 'vul. Velyka Vasylkivska 1',     category: 'landmark',     coordinates: [30.5241, 50.4447], accessibilityScore: 85, barrierCount: 1, distance: '900 m'  },
   // Shelters
-  { id: '9',  name: 'Shelter Maidan',             address: 'Maidan Nezalezhnosti 1',        category: 'shelter',      coordinates: [30.5234, 50.4504], accessibilityScore: 80, barrierCount: 1, distance: '200 m'  },
-  { id: '10', name: 'Shelter Lukyanivska',         address: 'vul. Oleny Telihy 3',           category: 'shelter',      coordinates: [30.4986, 50.4612], accessibilityScore: 50, barrierCount: 3, distance: '2.1 km' },
+  { id: 's1',  name: 'Shelter Maidan',                   address: 'Maidan Nezalezhnosti 1',          category: 'shelter',     coordinates: [30.5234, 50.4504], accessibilityScore: 80, barrierCount: 1, distance: '200 m'  },
+  { id: 's2',  name: 'Shelter Lukyanivska',               address: 'vul. Oleny Telihy 3',             category: 'shelter',     coordinates: [30.4986, 50.4612], accessibilityScore: 50, barrierCount: 3, distance: '2.1 km' },
+  { id: 's3',  name: 'Shelter Pechersk',                  address: 'vul. Lavrska 15',                 category: 'shelter',     coordinates: [30.5574, 50.4338], accessibilityScore: 65, barrierCount: 2, distance: '1.8 km' },
+  { id: 's4',  name: 'Shelter Podil',                     address: 'vul. Sahaidachnoho 10',           category: 'shelter',     coordinates: [30.5189, 50.4634], accessibilityScore: 72, barrierCount: 2, distance: '1.5 km' },
+  { id: 's5',  name: 'Shelter Obolon',                    address: 'prosp. Obolonsky 1',              category: 'shelter',     coordinates: [30.4978, 50.5012], accessibilityScore: 88, barrierCount: 0, distance: '3.2 km' },
+  { id: 's6',  name: 'Shelter Sviatoshyn',                address: 'vul. Peremohy 90',                category: 'shelter',     coordinates: [30.3912, 50.4567], accessibilityScore: 45, barrierCount: 4, distance: '4.1 km' },
+  // Hospitals / Pharmacies
+  { id: 'h1',  name: 'Pharmacy Liky',                     address: 'vul. Khreschyatyk 22',            category: 'hospital',    coordinates: [30.5238, 50.4494], accessibilityScore: 90, barrierCount: 0, distance: '300 m'  },
+  { id: 'h2',  name: 'Oleksandrivska Hospital',           address: 'bulv. Tarasa Shevchenka 17',      category: 'hospital',    coordinates: [30.5106, 50.4478], accessibilityScore: 55, barrierCount: 4, distance: '1.1 km' },
+  { id: 'h3',  name: 'Kyiv City Clinical Hospital 1',     address: 'vul. Heroyiv Dnipra 37',          category: 'hospital',    coordinates: [30.4889, 50.5023], accessibilityScore: 62, barrierCount: 3, distance: '3.5 km' },
+  { id: 'h4',  name: 'Pharmacy 911',                      address: 'vul. Baseyna 12',                 category: 'hospital',    coordinates: [30.5201, 50.4445], accessibilityScore: 85, barrierCount: 1, distance: '800 m'  },
+  { id: 'h5',  name: 'Dobrobut Clinic',                   address: 'vul. Velyka Vasylkivska 55',      category: 'hospital',    coordinates: [30.5178, 50.4356], accessibilityScore: 91, barrierCount: 0, distance: '1.6 km' },
+  { id: 'h6',  name: 'Pharmacy D.S.',                     address: 'prosp. Peremohy 12',              category: 'hospital',    coordinates: [30.4934, 50.4521], accessibilityScore: 70, barrierCount: 2, distance: '2.0 km' },
+  // Restaurants / Cafés
+  { id: 'r1',  name: 'Puzata Hata',                       address: 'vul. Baseyna 5',                  category: 'restaurant',  coordinates: [30.5189, 50.4432], accessibilityScore: 60, barrierCount: 3, distance: '800 m'  },
+  { id: 'r2',  name: 'Veterano Pizza',                    address: 'vul. Horodetskoho 10',            category: 'restaurant',  coordinates: [30.5271, 50.4468], accessibilityScore: 75, barrierCount: 1, distance: '600 m'  },
+  { id: 'r3',  name: 'Zhyva Kava',                        address: 'vul. Velyka Vasylkivska 45',      category: 'restaurant',  coordinates: [30.5223, 50.4385], accessibilityScore: 65, barrierCount: 2, distance: '1.4 km' },
+  { id: 'r4',  name: 'Kanapa Restaurant',                 address: 'vul. Andriivsky Uzviz 19',        category: 'restaurant',  coordinates: [30.5134, 50.4589], accessibilityScore: 42, barrierCount: 5, distance: '1.9 km' },
+  { id: 'r5',  name: 'Pervak',                            address: 'vul. Rohnidynska 2',              category: 'restaurant',  coordinates: [30.5156, 50.4423], accessibilityScore: 78, barrierCount: 1, distance: '1.0 km' },
+  { id: 'r6',  name: 'Spotykach',                         address: 'vul. Volodymyrska 16',            category: 'restaurant',  coordinates: [30.5145, 50.4534], accessibilityScore: 35, barrierCount: 6, distance: '1.3 km' },
+  // Landmarks / Museums
+  { id: 'l1',  name: 'Kyiv City Museum',                  address: 'vul. Khreschyatyk 15',            category: 'landmark',    coordinates: [30.5214, 50.4501], accessibilityScore: 70, barrierCount: 2, distance: '500 m'  },
+  { id: 'l2',  name: 'National Museum of History',        address: 'vul. Volodymyrska 2',             category: 'landmark',    coordinates: [30.5136, 50.4547], accessibilityScore: 45, barrierCount: 5, distance: '1.3 km' },
+  { id: 'l3',  name: 'Pinchuk Art Centre',                address: 'vul. Velyka Vasylkivska 1',       category: 'landmark',    coordinates: [30.5241, 50.4447], accessibilityScore: 85, barrierCount: 1, distance: '900 m'  },
+  { id: 'l4',  name: 'Museum of Western & Oriental Art',  address: 'vul. Tereshchenkivska 15',        category: 'landmark',    coordinates: [30.5123, 50.4456], accessibilityScore: 38, barrierCount: 6, distance: '1.1 km' },
+  { id: 'l5',  name: 'Mystetskyi Arsenal',                address: 'vul. Lavrska 10-12',              category: 'landmark',    coordinates: [30.5534, 50.4367], accessibilityScore: 82, barrierCount: 1, distance: '2.2 km' },
+  { id: 'l6',  name: 'National Art Museum',               address: 'vul. Hrushevskoho 6',             category: 'landmark',    coordinates: [30.5312, 50.4478], accessibilityScore: 58, barrierCount: 3, distance: '1.0 km' },
   // Supermarkets
-  { id: '11', name: 'Silpo Khreschyatyk',         address: 'vul. Khreschyatyk 44',          category: 'supermarket',  coordinates: [30.5198, 50.4471], accessibilityScore: 88, barrierCount: 0, distance: '700 m'  },
-  { id: '12', name: 'Novus Lukyanivska',           address: 'vul. Turhenievska 38',          category: 'supermarket',  coordinates: [30.5012, 50.4598], accessibilityScore: 72, barrierCount: 2, distance: '1.9 km' },
+  { id: 'sm1', name: 'Silpo Khreschyatyk',                address: 'vul. Khreschyatyk 44',            category: 'supermarket', coordinates: [30.5198, 50.4471], accessibilityScore: 88, barrierCount: 0, distance: '700 m'  },
+  { id: 'sm2', name: 'Novus Lukyanivska',                  address: 'vul. Turhenievska 38',            category: 'supermarket', coordinates: [30.5012, 50.4598], accessibilityScore: 72, barrierCount: 2, distance: '1.9 km' },
+  { id: 'sm3', name: 'ATB Podil',                          address: 'vul. Sahaidachnoho 25',           category: 'supermarket', coordinates: [30.5201, 50.4645], accessibilityScore: 55, barrierCount: 3, distance: '2.0 km' },
+  { id: 'sm4', name: 'Fora Pechersk',                      address: 'vul. Instytutska 18',             category: 'supermarket', coordinates: [30.5389, 50.4423], accessibilityScore: 80, barrierCount: 1, distance: '1.5 km' },
+  { id: 'sm5', name: 'Metro Cash & Carry',                 address: 'vul. Akademika Palladin 44',      category: 'supermarket', coordinates: [30.4312, 50.4234], accessibilityScore: 91, barrierCount: 0, distance: '5.1 km' },
+  { id: 'sm6', name: 'Velika Kyshenya',                    address: 'prosp. Peremohy 34',              category: 'supermarket', coordinates: [30.4756, 50.4512], accessibilityScore: 63, barrierCount: 3, distance: '2.8 km' },
   // Parks
-  { id: '13', name: 'Shevchenko Park',             address: 'bulv. Tarasa Shevchenka 1',    category: 'park',         coordinates: [30.5134, 50.4453], accessibilityScore: 78, barrierCount: 2, distance: '1.0 km' },
-  { id: '14', name: 'Mariinsky Park',              address: 'vul. Hrushevskoho 5',          category: 'park',         coordinates: [30.5385, 50.4489], accessibilityScore: 62, barrierCount: 3, distance: '1.6 km' },
-  // Bank
-  { id: '15', name: 'PrivatBank Central',          address: 'vul. Hrushevskogo 1d',         category: 'bank',         coordinates: [30.5301, 50.4512], accessibilityScore: 83, barrierCount: 1, distance: '400 m'  },
+  { id: 'p1',  name: 'Shevchenko Park',                    address: 'bulv. Tarasa Shevchenka 1',       category: 'park',        coordinates: [30.5134, 50.4453], accessibilityScore: 78, barrierCount: 2, distance: '1.0 km' },
+  { id: 'p2',  name: 'Mariinsky Park',                     address: 'vul. Hrushevskoho 5',             category: 'park',        coordinates: [30.5385, 50.4489], accessibilityScore: 62, barrierCount: 3, distance: '1.6 km' },
+  { id: 'p3',  name: 'Hydropark',                          address: 'Hydropark Island',                category: 'park',        coordinates: [30.5912, 50.4634], accessibilityScore: 48, barrierCount: 4, distance: '3.8 km' },
+  { id: 'p4',  name: 'Feofania Park',                      address: 'vul. Akademika Zabolotnoho 21',   category: 'park',        coordinates: [30.4823, 50.3934], accessibilityScore: 55, barrierCount: 3, distance: '6.2 km' },
+  { id: 'p5',  name: 'Syretsky Park',                      address: 'vul. Syretska 1',                 category: 'park',        coordinates: [30.4923, 50.4812], accessibilityScore: 83, barrierCount: 1, distance: '2.9 km' },
+  { id: 'p6',  name: 'Babyn Yar Park',                     address: 'vul. Melnikova 44',               category: 'park',        coordinates: [30.4489, 50.4712], accessibilityScore: 70, barrierCount: 2, distance: '3.5 km' },
+  // Banks
+  { id: 'b1',  name: 'PrivatBank Central',                 address: 'vul. Hrushevskoho 1d',            category: 'bank',        coordinates: [30.5301, 50.4512], accessibilityScore: 83, barrierCount: 1, distance: '400 m'  },
+  { id: 'b2',  name: 'Oschadbank Maidan',                  address: 'Maidan Nezalezhnosti 2',          category: 'bank',        coordinates: [30.5223, 50.4502], accessibilityScore: 75, barrierCount: 2, distance: '250 m'  },
+  { id: 'b3',  name: 'Monobank Office',                    address: 'vul. Baseyna 7',                  category: 'bank',        coordinates: [30.5189, 50.4441], accessibilityScore: 92, barrierCount: 0, distance: '850 m'  },
+  { id: 'b4',  name: 'Raiffeisen Bank',                    address: 'vul. Lesi Ukrainky 9',            category: 'bank',        coordinates: [30.5423, 50.4378], accessibilityScore: 68, barrierCount: 2, distance: '1.7 km' },
+  { id: 'b5',  name: 'PUMB Bank',                          address: 'vul. Volodymyrska 48',            category: 'bank',        coordinates: [30.5112, 50.4512], accessibilityScore: 55, barrierCount: 3, distance: '1.2 km' },
+  { id: 'b6',  name: 'Ukrsibbank',                         address: 'prosp. Peremohy 22',              category: 'bank',        coordinates: [30.4845, 50.4523], accessibilityScore: 78, barrierCount: 1, distance: '2.3 km' },
+  // Toilets
+  { id: 't1', name: 'Public Toilet Maidan', address: 'Maidan Nezalezhnosti', category: 'toilet', coordinates: [30.5221, 50.4503], accessibilityScore: 85, barrierCount: 1, distance: '150 m' },
+  { id: 't2', name: 'Public Toilet Shevchenko Park', address: 'bulv. Tarasa Shevchenka', category: 'toilet', coordinates: [30.5129, 50.4461], accessibilityScore: 82, barrierCount: 1, distance: '1.1 km' },
+  { id: 't3', name: 'Public Toilet Besarabska', address: 'Besarabska pl. 1', category: 'toilet', coordinates: [30.5201, 50.4445], accessibilityScore: 55, barrierCount: 3, distance: '800 m' },
+  { id: 't4', name: 'Public Toilet Podil', address: 'Kontraktova pl. 4', category: 'toilet', coordinates: [30.5167, 50.4634], accessibilityScore: 40, barrierCount: 4, distance: '2.0 km' },
+  { id: 't5', name: 'Public Toilet Olimpiyska', address: 'vul. Velyka Vasylkivska 55', category: 'toilet', coordinates: [30.5212, 50.4334], accessibilityScore: 35, barrierCount: 5, distance: '1.8 km' },
+  //Pharmacies
+  { id: 'ph1', name: 'Pharmacy Liky Plus', address: 'vul. Baseyna 14', category: 'pharmacy', coordinates: [30.5195, 50.4442], accessibilityScore: 92, barrierCount: 0, distance: '750 m' },
+  { id: 'ph2', name: 'Apteka Dobrogo Dnya', address: 'vul. Khreschyatyk 30', category: 'pharmacy', coordinates: [30.5229, 50.4488], accessibilityScore: 88, barrierCount: 0, distance: '400 m' },
+  { id: 'ph3', name: 'Pharmacy 36.6', address: 'vul. Volodymyrska 20', category: 'pharmacy', coordinates: [30.5141, 50.4523], accessibilityScore: 63, barrierCount: 2, distance: '1.2 km' },
+  { id: 'ph4', name: 'Tabletka Pharmacy', address: 'prosp. Peremohy 18', category: 'pharmacy', coordinates: [30.4912, 50.4534], accessibilityScore: 48, barrierCount: 4, distance: '2.6 km' },
+  { id: 'ph5', name: 'D.S. Pharmacy Pechersk', address: 'vul. Lavrska 8', category: 'pharmacy', coordinates: [30.5512, 50.4356], accessibilityScore: 71, barrierCount: 2, distance: '2.1 km' },
 ]
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -79,6 +119,8 @@ function getCategoryIcon(category: Place['category'], size: number) {
   if (category === 'supermarket') return <ShoppingCart size={size} strokeWidth={1} className={cls} aria-hidden />
   if (category === 'park')        return <Trees        size={size} strokeWidth={1} className={cls} aria-hidden />
   if (category === 'bank')        return <Landmark     size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'toilet')   return <Toilet   size={size} strokeWidth={1} className={cls} aria-hidden />
+  if (category === 'pharmacy')   return <Pill   size={size} strokeWidth={1} className={cls} aria-hidden />
   return <ShelterIcon width={size} height={size} stroke="currentColor" strokeWidth={1} className={cls} aria-hidden />
 }
 
@@ -103,24 +145,143 @@ function PlaceMarker({ place, selected }: { place: Place; selected: boolean }) {
   )
 }
 
+// ── Category chip definitions ──────────────────────────────────────────────
+
+type CategoryKey = Place['category']
+
+const CHIPS: { key: CategoryKey; label: string; icon: React.ReactNode }[] = [
+  { key: 'shelter',     label: 'Shelter',     icon: <ShelterIcon  width={14} height={14} stroke="currentColor" strokeWidth={1} aria-hidden /> },
+  { key: 'hospital',   label: 'Hospital',    icon: <Hospital     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'restaurant', label: 'Restaurant',  icon: <Utensils     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'landmark',   label: 'Landmark',    icon: <Landmark     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'supermarket',label: 'Supermarket', icon: <ShoppingCart size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'park',       label: 'Park',        icon: <Trees        size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'bank',       label: 'Bank',        icon: <Landmark     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'toilet',     label: 'Toilet',      icon: <Toilet       size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
+  { key: 'pharmacy',   label: 'Pharmacy',    icon: <Pill         size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
+]
+
+// ── Bottom sheet snap positions ────────────────────────────────────────────
+
+type SnapPoint = 'half' | 'full' | 'closed'
+
+const SNAP: Record<SnapPoint, string> = {
+  half:   'top-[45%]',
+  full:   'top-[8%]',
+  closed: 'top-[110%]',
+}
+
 // ── Screen ─────────────────────────────────────────────────────────────────
 
 export const MapScreen: React.FC = () => {
   const mapRef                            = useRef<MapRef>(null)
   const [search, setSearch]              = useState('')
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
+  const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null)
+  const [sheetSnap, setSheetSnap]        = useState<SnapPoint>('closed')
+  const [sheetVisible, setSheetVisible]  = useState(false)
 
+  // touch tracking refs
+  const touchStartY  = useRef(0)
+  const touchStartSnap = useRef<SnapPoint>('half')
+
+  // ── Debounced search ──────────────────────────────────────────────
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleSearchChange = useCallback((val: string) => {
+    setSearch(val)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      if (val.trim().length > 0) {
+        setActiveCategory(null)
+        setSelectedPlace(null)
+        setSheetVisible(true)
+        setSheetSnap('half')
+      } else if (!activeCategory) {
+        closeSheet()
+      }
+    }, 300)
+  }, [activeCategory])
+
+  useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current) }, [])
+
+  // ── Sheet helpers ─────────────────────────────────────────────────
+  const openSheet = (snap: SnapPoint = 'half') => {
+    setSheetVisible(true)
+    setSheetSnap(snap)
+  }
+
+  const closeSheet = () => {
+    setSheetSnap('closed')
+    setTimeout(() => {
+      setSheetVisible(false)
+      setActiveCategory(null)
+      setSearch('')
+    }, 300)
+  }
+
+  // ── Chip click ────────────────────────────────────────────────────
+  const handleChipClick = (key: CategoryKey) => {
+    if (activeCategory === key) {
+      closeSheet()
+    } else {
+      setActiveCategory(key)
+      setSelectedPlace(null)
+      openSheet('half')
+    }
+  }
+
+  // ── Marker click ──────────────────────────────────────────────────
   const handleMarkerClick = (place: Place) => {
-    setSelectedPlace(place)
-    mapRef.current?.getMap().flyTo({
-      center: place.coordinates,
-      zoom: 16,
-      duration: 600,
-      offset: [0, -150],
-    })
+    const doFly = () => {
+      setSelectedPlace(place)
+      mapRef.current?.getMap().flyTo({
+        center: place.coordinates,
+        zoom: 16,
+        duration: 600,
+        offset: [0, -150],
+      })
+    }
+
+    if (sheetVisible) {
+      closeSheet()
+      setTimeout(doFly, 150)
+    } else {
+      doFly()
+    }
   }
 
   const handleClosePopup = () => setSelectedPlace(null)
+
+  // ── Touch handlers ────────────────────────────────────────────────
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current    = e.touches[0].clientY
+    touchStartSnap.current = sheetSnap
+  }
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const delta = e.changedTouches[0].clientY - touchStartY.current
+    const THRESHOLD = 80
+    if (touchStartSnap.current === 'half') {
+      if (delta < -THRESHOLD) setSheetSnap('full')
+      else if (delta > THRESHOLD) closeSheet()
+    } else if (touchStartSnap.current === 'full') {
+      if (delta > THRESHOLD) setSheetSnap('half')
+    }
+  }
+
+  // ── Filtered places ───────────────────────────────────────────────
+  const filteredPlaces = PLACES.filter(p => {
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      return p.name.toLowerCase().includes(q) || p.category.includes(q)
+    }
+    return activeCategory ? p.category === activeCategory : false
+  })
+
+  const sheetTitle = activeCategory
+    ? CHIPS.find(c => c.key === activeCategory)?.label ?? activeCategory
+    : `Results for "${search}"`
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -132,6 +293,7 @@ export const MapScreen: React.FC = () => {
         initialViewState={{ longitude: 30.5234, latitude: 50.4501, zoom: 14 }}
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
+        onClick={() => { if (sheetVisible) closeSheet() }}
       >
         {PLACES.map(place => (
           <Marker
@@ -139,7 +301,7 @@ export const MapScreen: React.FC = () => {
             longitude={place.coordinates[0]}
             latitude={place.coordinates[1]}
             anchor="center"
-            onClick={() => handleMarkerClick(place)}
+            onClick={e => { e.originalEvent.stopPropagation(); handleMarkerClick(place) }}
           >
             <PlaceMarker place={place} selected={selectedPlace?.id === place.id} />
           </Marker>
@@ -151,7 +313,7 @@ export const MapScreen: React.FC = () => {
         <div className="flex-1">
           <SearchBar
             value={search}
-            onChange={setSearch}
+            onChange={handleSearchChange}
             placeholder="Search places..."
           />
         </div>
@@ -174,20 +336,78 @@ export const MapScreen: React.FC = () => {
 
       {/* ── Category chips ──────────────────────────────────────────── */}
       <div className="absolute top-[124px] left-lg right-0 z-10 flex flex-row flex-nowrap gap-xs overflow-x-auto [&::-webkit-scrollbar]:hidden">
-        <Chip variant="neutral" size="md" label="Shelter"     className="shrink-0" icon={<ShelterIcon  width={14} height={14} stroke="currentColor" strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Toilet"      className="shrink-0" icon={<Droplets     size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Restaurant"  className="shrink-0" icon={<Utensils     size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Hospital"    className="shrink-0" icon={<Hospital     size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Pharmacy"    className="shrink-0" icon={<Pill         size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Supermarket" className="shrink-0" icon={<ShoppingCart size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Park"        className="shrink-0" icon={<Trees        size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
-        <Chip variant="neutral" size="md" label="Bank"        className="shrink-0" icon={<Landmark     size={14} strokeWidth={1} className="text-neutral-700" aria-hidden />} />
+        {CHIPS.map(({ key, label, icon }: { key: CategoryKey; label: string; icon: React.ReactNode }) => {
+          const active = activeCategory === key
+          return (
+            <Chip
+              key={key}
+              size="md"
+              label={label}
+              variant={active ? 'active' : 'neutral'}
+              className="shrink-0 cursor-pointer"
+              icon={React.cloneElement(icon as React.ReactElement, {
+                className: active ? 'text-neutral-0' : 'text-neutral-700',
+              })}
+              onClick={() => handleChipClick(key)}
+            />
+          )
+        })}
       </div>
+
+      {/* ── Bottom sheet ────────────────────────────────────────────── */}
+      {sheetVisible && (
+        <div
+          className={[
+            'fixed left-0 right-0 bottom-0 z-30',
+            'bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] shadow-2xl',
+            'flex flex-col',
+            'transition-all duration-300 ease-out',
+            SNAP[sheetSnap],
+          ].join(' ')}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {/* Drag handle */}
+          <div className="flex justify-center py-lg shrink-0">
+            <div className="w-[40px] h-[3px] bg-neutral-400 rounded-full" />
+          </div>
+
+          {/* Sheet header */}
+          <div className="px-lg flex flex-col gap-sm shrink-0">
+            <span className="text-display-md text-neutral-900">{sheetTitle}</span>
+            <SortControl value="Most accessible" onPress={() => console.log('sort')} />
+          </div>
+
+          {/* Place list */}
+          <div className="overflow-y-auto flex-1 pb-[144px] px-lg mt-[34px]">
+            {filteredPlaces.length === 0 ? (
+              <p className="py-xl text-body-md text-neutral-500">No places found.</p>
+            ) : (
+              filteredPlaces.map((place, idx) => (
+                <React.Fragment key={place.id}>
+                  <PlaceListItem
+                    name={place.name}
+                    address={place.address}
+                    distance={place.distance}
+                    barrierCount={place.barrierCount}
+                    accessibilityScore={place.accessibilityScore}
+                  />
+                  {idx < filteredPlaces.length - 1 && (
+                    <div className="py-md">
+                      <Divider />
+                    </div>
+                  )}
+                </React.Fragment>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Place popup card ────────────────────────────────────────── */}
       <div
         className={[
-          'fixed bottom-[133px] left-lg right-lg z-10',
+          'fixed bottom-[125px] left-lg right-lg z-10',
           'transition-transform duration-300 ease-out',
           selectedPlace ? 'translate-y-0' : 'translate-y-[calc(100%+125px)]',
         ].join(' ')}
@@ -209,7 +429,7 @@ export const MapScreen: React.FC = () => {
                 ].join(' ')}
                 aria-label="Close"
               >
-                <X size={18} aria-hidden />
+                <X size={20} aria-hidden />
               </button>
             </div>
 
@@ -222,8 +442,6 @@ export const MapScreen: React.FC = () => {
 
             {/* Info section */}
             <div className="flex flex-col gap-xs pt-xs">
-
-              {/* Badges */}
               <div className="flex items-center gap-xs">
                 <AccessibilityBadge
                   variant={getAccessibilityVariant(selectedPlace.accessibilityScore)}
@@ -232,14 +450,10 @@ export const MapScreen: React.FC = () => {
                 />
                 <StatusBadge variant={scoreVariant(selectedPlace.accessibilityScore)} label={`${selectedPlace.accessibilityScore}% Accessible`} />
               </div>
-
-              {/* Name + distance */}
               <div className="flex items-center justify-between">
                 <span className="text-heading-sm text-neutral-900 flex-1">{selectedPlace.name}</span>
                 <span className="text-body-sb text-neutral-900">{selectedPlace.distance}</span>
               </div>
-
-              {/* Address + barriers */}
               <div className="flex items-center justify-between">
                 <span className="text-body-sm text-neutral-500 flex-1">{selectedPlace.address}</span>
                 <span className="text-body-sm text-neutral-500">{selectedPlace.barrierCount} barriers</span>
@@ -256,14 +470,12 @@ export const MapScreen: React.FC = () => {
                   onClick={() => console.log('Build a route', selectedPlace)}
                 />
               </div>
-
               <button
                 type="button"
                 className={[
                   'flex items-center justify-center shrink-0',
                   'w-[48px] h-[48px] rounded-full',
-                  'bg-neutral-0 border border-neutral-200',
-                  'text-neutral-700',
+                  'bg-neutral-0 border border-neutral-200 text-neutral-700',
                   'transition-colors duration-200',
                   'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                 ].join(' ')}
@@ -271,14 +483,12 @@ export const MapScreen: React.FC = () => {
               >
                 <Bookmark size={20} aria-hidden />
               </button>
-
               <button
                 type="button"
                 className={[
                   'flex items-center justify-center shrink-0',
                   'w-[48px] h-[48px] rounded-full',
-                  'bg-neutral-0 border border-neutral-200',
-                  'text-neutral-700',
+                  'bg-neutral-0 border border-neutral-200 text-neutral-700',
                   'transition-colors duration-200',
                   'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                 ].join(' ')}
@@ -293,7 +503,7 @@ export const MapScreen: React.FC = () => {
       </div>
 
       {/* ── NavBar ──────────────────────────────────────────────────── */}
-      <div className="absolute bottom-lg left-lg right-lg z-20">
+      <div className="absolute bottom-lg left-lg right-lg z-40">
         <NavBar activeTab="map" onTabChange={() => {}} />
       </div>
 
