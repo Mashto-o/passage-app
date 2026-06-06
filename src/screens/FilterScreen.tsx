@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Zap, UserPlus } from 'lucide-react'
 import { Button, AccessibilityBadge, Toggle } from '../components'
 import { useFilterContext } from '../context/FilterContext'
@@ -16,6 +16,8 @@ const sectionLabel = 'font-medium text-[14px] leading-[1.4] tracking-[0.56px] up
 
 export const FilterScreen: React.FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from ?? 'map'
   const { filterState, toggleAccessibility, setAvoidLifts, setHasCompanion, handleReset } = useFilterContext()
 
   const ACCESSIBILITY_OPTIONS: {
@@ -35,7 +37,18 @@ export const FilterScreen: React.FC = () => {
 
         {/* ── Header ──────────────────────────────────────────────── */}
         <div className="flex flex-col gap-[12px]">
-          <Button variant="back" onClick={() => navigate(-1)}>Back</Button>
+          <Button
+            variant="back"
+            onClick={() => {
+              if (from === 'search') {
+                navigate('/map', { state: { returnToSearch: true } })
+              } else {
+                navigate(-1)
+              }
+            }}
+          >
+            Back
+          </Button>
 
           <div className="flex items-center justify-between">
             <span className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">

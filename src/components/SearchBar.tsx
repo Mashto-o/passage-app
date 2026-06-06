@@ -6,6 +6,9 @@ export interface SearchBarProps {
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  onFocus?: () => void
+  onBlur?: () => void
+  leftSlot?: React.ReactNode
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -13,6 +16,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onChange,
   placeholder,
   className = '',
+  onFocus,
+  onBlur,
+  leftSlot,
 }) => {
   const [focused, setFocused] = useState(false)
 
@@ -28,21 +34,23 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         .filter(Boolean)
         .join(' ')}
     >
-      <Search
-        size={24}
-        strokeWidth={1.5}
-        className={[
-          'shrink-0 transition-colors duration-200',
-          focused ? 'text-primary-500' : 'text-neutral-400',
-        ].join(' ')}
-      />
+      {leftSlot ?? (
+        <Search
+          size={24}
+          strokeWidth={1.5}
+          className={[
+            'shrink-0 transition-colors duration-200',
+            focused ? 'text-primary-500' : 'text-neutral-400',
+          ].join(' ')}
+        />
+      )}
       <input
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onFocus={() => { setFocused(true); onFocus?.() }}
+        onBlur={() => { setFocused(false); onBlur?.() }}
         className="flex-1 text-body-md text-neutral-900 placeholder:text-neutral-400 bg-transparent border-none outline-none"
       />
     </div>

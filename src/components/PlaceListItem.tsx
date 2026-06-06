@@ -1,5 +1,5 @@
 import React from 'react'
-import { TrafficCone } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
 import { getCategoryIcon } from '../utils/categoryIcon'
@@ -9,10 +9,10 @@ export interface PlaceListItemProps {
   name: string
   address: string
   distance: string
-  barrierCount: number
   accessibilityScore: number
   category: string
   verifiedAt: Date
+  isLiftDependent: boolean
   onClick?: () => void
   className?: string
 }
@@ -73,10 +73,10 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   name,
   address,
   distance,
-  barrierCount,
   accessibilityScore,
   category,
   verifiedAt,
+  isLiftDependent,
   onClick,
   className = '',
 }) => {
@@ -114,11 +114,14 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
             label={`${accessibilityScore}% Accessible`}
           />
 
-          <StatusBadge
-            variant={statusVariant}
-            label={`${barrierCount} barriers`}
-            icon={<TrafficCone size={16} className={iconClass} />}
-          />
+          {isLiftDependent && (
+            <div className="flex items-center gap-[8px] px-[8px] py-[4px] bg-warning-100 rounded-[24px]">
+              <Zap size={16} strokeWidth={1.5} className="text-warning-500 shrink-0" />
+              <span className="text-[14px] font-regular leading-[1.4] tracking-[0.12px] text-warning-500 whitespace-nowrap">
+                Lift-dependent
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Info row */}
