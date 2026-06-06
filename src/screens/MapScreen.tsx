@@ -1,10 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Map, { Marker } from 'react-map-gl/mapbox'
 import type { MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Funnel, Hospital, Utensils, Landmark, ShoppingCart, Trees, Toilet, Pill } from 'lucide-react'
 import ShelterIcon from '../assets/icons/shelter.svg?react'
 import { getCategoryIcon } from '../utils/categoryIcon'
+import type { FilterState } from '../context/FilterContext'
+import { useFilterContext } from '../context/FilterContext'
 import {
   SearchBar, Chip, AccessibilityBadge, NavBar,
   PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
@@ -112,6 +115,17 @@ function sortPlaces(places: Place[], sortValue: string): Place[] {
   }
 }
 
+// ── Filter helper ──────────────────────────────────────────────────────────
+
+function filterPlaces(places: Place[], filter: FilterState): Place[] {
+  return places.filter((place) => {
+    const variant = getAccessibilityVariant(place.accessibilityScore)
+    if (!filter.accessibility.has(variant)) return false
+    // avoidLifts and hasCompanion: wired to state, filtering logic pending place-level data
+    return true
+  })
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function scoreVariant(score: number): 'positive' | 'warning' | 'negative' {
@@ -194,6 +208,7 @@ const SNAP_HEIGHT: Record<SnapPoint, number> = {
 // ── Screen ─────────────────────────────────────────────────────────────────
 
 export const MapScreen: React.FC = () => {
+  const navigate                          = useNavigate()
   const mapRef                            = useRef<MapRef>(null)
   const [search, setSearch]              = useState('')
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
@@ -202,6 +217,7 @@ export const MapScreen: React.FC = () => {
   const [sheetVisible, setSheetVisible]  = useState(false)
   const [sortSheetOpen, setSortSheetOpen] = useState(false)
   const [sortValue, setSortValue]        = useState('Most accessible first')
+  const { filterState }                  = useFilterContext()
 
   // touch tracking refs
   const touchStartY  = useRef(0)
@@ -275,6 +291,13 @@ export const MapScreen: React.FC = () => {
 
   const handleClosePopup = () => setSelectedPlace(null)
 
+  // ── Close popup if selected place is filtered out ─────────────────
+  useEffect(() => {
+    if (selectedPlace && !filterPlaces(PLACES, filterState).find(p => p.id === selectedPlace.id)) {
+      setSelectedPlace(null)
+    }
+  }, [filterState, selectedPlace])
+
   // ── Touch handlers ────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartY.current    = e.touches[0].clientY
@@ -301,6 +324,8 @@ export const MapScreen: React.FC = () => {
     return activeCategory ? p.category === activeCategory : false
   })
 
+  const displayPlaces = sortPlaces(filterPlaces(filteredPlaces, filterState), sortValue)
+
   const sheetTitle = activeCategory
     ? CHIPS.find(c => c.key === activeCategory)?.label ?? activeCategory
     : `Results for "${search}"`
@@ -317,7 +342,7 @@ export const MapScreen: React.FC = () => {
         mapStyle="mapbox://styles/mapbox/streets-v12"
         onClick={() => { if (sheetVisible) closeSheet() }}
       >
-        {PLACES.map(place => (
+        {filterPlaces(PLACES, filterState).map(place => (
           <Marker
             key={place.id}
             longitude={place.coordinates[0]}
@@ -351,6 +376,7 @@ export const MapScreen: React.FC = () => {
             'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
           ].join(' ')}
           aria-label="Filter"
+          onClick={() => navigate('/filter')}
         >
           <Funnel size={20} strokeWidth={1.5} aria-hidden />
         </button>
@@ -410,10 +436,10 @@ export const MapScreen: React.FC = () => {
 
           {/* Place list */}
           <div className="overflow-y-auto flex-1 pb-[144px] px-lg mt-[34px]">
-            {filteredPlaces.length === 0 ? (
+            {displayPlaces.length === 0 ? (
               <p className="py-xl text-body-md text-neutral-500">No places found.</p>
             ) : (
-              sortPlaces(filteredPlaces, sortValue).map((place, idx) => (
+              displayPlaces.map((place, idx) => (
                 <React.Fragment key={place.id}>
                   <PlaceListItem
                     name={place.name}
@@ -424,7 +450,7 @@ export const MapScreen: React.FC = () => {
                     category={place.category}
                     verifiedAt={place.verifiedAt}
                   />
-                  {idx < filteredPlaces.length - 1 && (
+                  {idx < displayPlaces.length - 1 && (
                     <div className="py-md">
                       <Divider />
                     </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import { AccessibilityBadge } from './AccessibilityBadge'
 
 export interface AccessibilityCardProps {
-  accessibility: 'accessible' | 'partiallyAccessible' | 'inaccessible'
+  accessibility: 'accessible' | 'partiallyAccessible' | 'inaccessible' | 'unknown'
   selected?: boolean
   onClick?: () => void
   className?: string
@@ -11,7 +11,7 @@ export interface AccessibilityCardProps {
 const config: Record<
   AccessibilityCardProps['accessibility'],
   {
-    badgeVariant: 'accessible' | 'partial' | 'inaccessible'
+    badgeVariant: 'accessible' | 'partial' | 'inaccessible' | 'unknown'
     label: string
     selectedBg: string
     selectedBorder: string
@@ -34,6 +34,12 @@ const config: Record<
     label: 'Inaccessible',
     selectedBg: 'bg-danger-100',
     selectedBorder: 'border-danger-500',
+  },
+  unknown: {
+    badgeVariant: 'unknown',
+    label: 'Unknown',
+    selectedBg: 'bg-neutral-100',
+    selectedBorder: 'border-neutral-400',
   },
 }
 
