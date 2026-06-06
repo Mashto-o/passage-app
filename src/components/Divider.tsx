@@ -5,5 +5,5 @@ export interface DividerProps {
 }
 
 export const Divider: React.FC<DividerProps> = ({ className = '' }) => (
-  <div className={`h-px w-full bg-neutral-200 overflow-hidden ${className}`} />
+  <div className={`w-full border-t border-neutral-200 ${className}`} />
 )

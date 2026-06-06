@@ -13,6 +13,7 @@ export interface PlaceListItemProps {
   category: string
   verifiedAt: Date
   isLiftDependent: boolean
+  onPress?: () => void
   onClick?: () => void
   className?: string
 }
@@ -77,6 +78,7 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   category,
   verifiedAt,
   isLiftDependent,
+  onPress,
   onClick,
   className = '',
 }) => {
@@ -85,11 +87,13 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   const statusVariant = toStatusVariant(variant)
   const a11yVariant   = toAccessibilityVariant(variant)
 
-  const Tag = onClick ? 'button' : 'div'
-  const interactiveProps = onClick
+  const handler = onPress ?? onClick
+  const Tag = handler ? 'button' : 'div'
+  const interactiveProps = handler
     ? {
         type: 'button' as const,
-        onClick,
+        onClick: handler,
+        'aria-label': `View details for ${name}`,
         className: [
           'flex flex-col gap-[24px] w-full text-left',
           'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',

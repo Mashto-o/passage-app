@@ -11,11 +11,12 @@ import { useFilterContext } from '../context/FilterContext'
 import {
   SearchBar, Chip, AccessibilityBadge, NavBar,
   PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
+  PlaceDetailSheet,
 } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
 
-type Place = {
+export type Place = {
   id: string
   name: string
   address: string
@@ -28,7 +29,7 @@ type Place = {
   isLiftDependent: boolean
 }
 
-const PLACES: Place[] = [
+export const PLACES: Place[] = [
   // Shelters
   { id: 's1',  name: 'Shelter Maidan',                   address: 'Maidan Nezalezhnosti 1',          category: 'shelter',     coordinates: [30.5234, 50.4504], accessibilityScore: 80, barrierCount: 1, distance: '200 m',  verifiedAt: new Date('2026-06-05T18:00:00'), isLiftDependent: false },
   { id: 's2',  name: 'Shelter Lukyanivska',               address: 'vul. Oleny Telihy 3',             category: 'shelter',     coordinates: [30.4986, 50.4612], accessibilityScore: 50, barrierCount: 3, distance: '2.1 km', verifiedAt: new Date('2026-05-22T09:00:00'), isLiftDependent: false },
@@ -147,7 +148,7 @@ function scoreVariant(score: number): 'positive' | 'warning' | 'negative' {
   return 'negative'
 }
 
-function getAccessibilityVariant(score: number): 'accessible' | 'partial' | 'inaccessible' {
+export function getAccessibilityVariant(score: number): 'accessible' | 'partial' | 'inaccessible' {
   if (score >= 80) return 'accessible'
   if (score >= 40) return 'partial'
   return 'inaccessible'
@@ -232,6 +233,8 @@ export const MapScreen: React.FC = () => {
   const [sheetVisible, setSheetVisible]  = useState(false)
   const [sortSheetOpen, setSortSheetOpen] = useState(false)
   const [sortValue, setSortValue]        = useState('Most accessible first')
+  const [selectedPlaceForDetail, setSelectedPlaceForDetail] = useState<Place | null>(null)
+  const [placeDetailOpen, setPlaceDetailOpen] = useState(false)
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -468,6 +471,10 @@ export const MapScreen: React.FC = () => {
                   category={place.category}
                   verifiedAt={place.verifiedAt}
                   isLiftDependent={place.isLiftDependent}
+                  onPress={() => {
+                    setSelectedPlaceForDetail(place)
+                    setPlaceDetailOpen(true)
+                  }}
                 />
                 {idx < searchResults.length - 1 && (
                   <div className="py-md">
@@ -527,6 +534,10 @@ export const MapScreen: React.FC = () => {
                     category={place.category}
                     verifiedAt={place.verifiedAt}
                     isLiftDependent={place.isLiftDependent}
+                  onPress={() => {
+                    setSelectedPlaceForDetail(place)
+                    setPlaceDetailOpen(true)
+                  }}
                   />
                   {idx < displayPlaces.length - 1 && (
                     <div className="py-md">
@@ -560,7 +571,12 @@ export const MapScreen: React.FC = () => {
         scoreVariant={scoreVariant(selectedPlace?.accessibilityScore ?? 0)}
         categoryIcon={selectedPlace ? getCategoryIcon(selectedPlace.category, 12) : undefined}
         onClose={handleClosePopup}
-        onRoute={() => console.log('Build a route', selectedPlace)}
+        onRoute={() => {
+          if (selectedPlace) {
+            setSelectedPlaceForDetail(selectedPlace)
+            setPlaceDetailOpen(true)
+          }
+        }}
         onBookmark={() => console.log('Bookmark', selectedPlace)}
         onShare={() => console.log('Share', selectedPlace)}
       />
@@ -578,6 +594,16 @@ export const MapScreen: React.FC = () => {
         onChange={(val) => setSortValue(val)}
         onClose={() => setSortSheetOpen(false)}
         height={SNAP_HEIGHT[sheetSnap]}
+      />
+
+      {/* ── Place detail sheet ──────────────────────────────────────── */}
+      <PlaceDetailSheet
+        place={selectedPlaceForDetail}
+        isOpen={placeDetailOpen}
+        onClose={() => {
+          setPlaceDetailOpen(false)
+          setSelectedPlaceForDetail(null)
+        }}
       />
 
     </div>
