@@ -11,7 +11,7 @@ import { useFilterContext } from '../context/FilterContext'
 import {
   SearchBar, Chip, AccessibilityBadge, NavBar,
   PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
-  PlaceDetailSheet,
+  PlaceDetailSheet, RoutePlanningSheet, RouteDestination,
 } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
@@ -235,6 +235,9 @@ export const MapScreen: React.FC = () => {
   const [sortValue, setSortValue]        = useState('Most accessible first')
   const [selectedPlaceForDetail, setSelectedPlaceForDetail] = useState<Place | null>(null)
   const [placeDetailOpen, setPlaceDetailOpen] = useState(false)
+  const [routePlanningOpen, setRoutePlanningOpen] = useState(false)
+  const [routeDestinationName, setRouteDestinationName] = useState('')
+  const [routeSwapped, setRouteSwapped] = useState(false)
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -384,66 +387,81 @@ export const MapScreen: React.FC = () => {
         </Map>
       )}
 
-      {/* ── Search + filter bar ─────────────────────────────────────── */}
-      <div className="absolute top-[56px] left-lg right-lg z-[10] flex items-center gap-xs">
-        <div className="flex-1">
-          <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onFocus={handleSearchFocus}
-            placeholder="Search places..."
-            leftSlot={searchActive ? (
-              <button
-                onClick={() => {
-                  setSearchQuery('')
-                  setSearchActive(false)
-                }}
-                className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                aria-label="Back to map"
-              >
-                <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
-              </button>
-            ) : undefined}
+      {/* ── Search / route destination bar ──────────────────────────── */}
+      {routePlanningOpen ? (
+        <div className="absolute top-[56px] left-[24px] right-[24px] z-[20]">
+          <RouteDestination
+            from={routeSwapped ? routeDestinationName : 'Current location'}
+            to={routeSwapped ? 'Current location' : routeDestinationName}
+            onFromChange={() => {}}
+            onToChange={() => {}}
+            onSwap={() => setRouteSwapped(prev => !prev)}
           />
         </div>
-
-        <button
-          type="button"
-          className={[
-            'flex items-center justify-center shrink-0',
-            'w-[48px] h-[48px] rounded-xl',
-            'bg-neutral-0 border border-neutral-200',
-            'text-neutral-500',
-            'transition-colors duration-200',
-            'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-          ].join(' ')}
-          aria-label="Filter"
-          onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
-        >
-          <Funnel size={20} strokeWidth={1.5} aria-hidden />
-        </button>
-      </div>
-
-      {/* ── Category chips ──────────────────────────────────────────── */}
-      {!searchActive && (
-        <div className="absolute top-[124px] left-lg right-0 z-10 flex flex-row flex-nowrap gap-xs overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {CHIPS.map(({ key, label, icon }: { key: CategoryKey; label: string; icon: React.ReactNode }) => {
-            const active = activeCategory === key
-            return (
-              <Chip
-                key={key}
-                size="md"
-                label={label}
-                variant={active ? 'active' : 'neutral'}
-                className="shrink-0 cursor-pointer"
-                icon={React.cloneElement(icon as React.ReactElement, {
-                  className: active ? 'text-neutral-0' : 'text-neutral-700',
-                })}
-                onClick={() => handleChipClick(key)}
+      ) : (
+        <>
+          {/* ── Search + filter bar ─────────────────────────────────── */}
+          <div className="absolute top-[56px] left-lg right-lg z-[10] flex items-center gap-xs">
+            <div className="flex-1">
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
+                placeholder="Search places..."
+                leftSlot={searchActive ? (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('')
+                      setSearchActive(false)
+                    }}
+                    className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    aria-label="Back to map"
+                  >
+                    <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
+                  </button>
+                ) : undefined}
               />
-            )
-          })}
-        </div>
+            </div>
+
+            <button
+              type="button"
+              className={[
+                'flex items-center justify-center shrink-0',
+                'w-[48px] h-[48px] rounded-xl',
+                'bg-neutral-0 border border-neutral-200',
+                'text-neutral-500',
+                'transition-colors duration-200',
+                'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
+              ].join(' ')}
+              aria-label="Filter"
+              onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
+            >
+              <Funnel size={20} strokeWidth={1.5} aria-hidden />
+            </button>
+          </div>
+
+          {/* ── Category chips ─────────────────────────────────────── */}
+          {!searchActive && !placeDetailOpen && (
+            <div className="absolute top-[124px] left-lg right-0 z-10 flex flex-row flex-nowrap gap-xs overflow-x-auto [&::-webkit-scrollbar]:hidden">
+              {CHIPS.map(({ key, label, icon }: { key: CategoryKey; label: string; icon: React.ReactNode }) => {
+                const active = activeCategory === key
+                return (
+                  <Chip
+                    key={key}
+                    size="md"
+                    label={label}
+                    variant={active ? 'active' : 'neutral'}
+                    className="shrink-0 cursor-pointer"
+                    icon={React.cloneElement(icon as React.ReactElement, {
+                      className: active ? 'text-neutral-0' : 'text-neutral-700',
+                    })}
+                    onClick={() => handleChipClick(key)}
+                  />
+                )
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* ── Search results ──────────────────────────────────────────── */}
@@ -472,6 +490,13 @@ export const MapScreen: React.FC = () => {
                   verifiedAt={place.verifiedAt}
                   isLiftDependent={place.isLiftDependent}
                   onPress={() => {
+                    setSearchQuery(place.name)
+                    setSearchActive(false)
+                    mapRef.current?.getMap().flyTo({
+                      center: place.coordinates,
+                      zoom: 16,
+                      offset: [0, -150],
+                    })
                     setSelectedPlaceForDetail(place)
                     setPlaceDetailOpen(true)
                   }}
@@ -603,6 +628,21 @@ export const MapScreen: React.FC = () => {
         onClose={() => {
           setPlaceDetailOpen(false)
           setSelectedPlaceForDetail(null)
+        }}
+        onBuildRoute={(name) => {
+          setRouteDestinationName(name)
+          setRoutePlanningOpen(true)
+        }}
+      />
+
+      {/* ── Route planning sheet ────────────────────────────────────── */}
+      <RoutePlanningSheet
+        isOpen={routePlanningOpen}
+        destinationName={routeDestinationName}
+        onClose={() => {
+          setRoutePlanningOpen(false)
+          setRouteDestinationName('')
+          setRouteSwapped(false)
         }}
       />
 

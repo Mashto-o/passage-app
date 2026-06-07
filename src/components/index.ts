@@ -86,3 +86,5 @@ export { TransportSwitcher } from './TransportSwitcher'
 export type { TransportSwitcherProps, TransportMode } from './TransportSwitcher'
 
 export { PlaceDetailSheet } from './PlaceDetailSheet'
+
+export { RoutePlanningSheet } from './RoutePlanningSheet'

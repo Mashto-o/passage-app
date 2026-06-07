@@ -7,6 +7,7 @@ export interface RouteDestinationProps {
   to: string
   onFromChange: (value: string) => void
   onToChange: (value: string) => void
+  onSwap?: () => void
   className?: string
 }
 
@@ -15,6 +16,7 @@ export const RouteDestination: React.FC<RouteDestinationProps> = ({
   to,
   onFromChange,
   onToChange,
+  onSwap,
   className = '',
 }) => {
   const handleSwap = () => {
@@ -51,7 +53,10 @@ export const RouteDestination: React.FC<RouteDestinationProps> = ({
       {/* Swap button */}
       <button
         type="button"
-        onClick={handleSwap}
+        onClick={(e) => {
+          e.stopPropagation()
+          onSwap ? onSwap() : handleSwap()
+        }}
         aria-label="Swap origin and destination"
         className={[
           'shrink-0 border border-neutral-200 rounded-[48px] p-[8px]',

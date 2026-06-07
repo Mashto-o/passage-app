@@ -115,11 +115,12 @@ type PlaceDetailSheetProps = {
   place: Place | null
   isOpen: boolean
   onClose: () => void
+  onBuildRoute: (destinationName: string) => void
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpen, onClose }) => {
+export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpen, onClose, onBuildRoute }) => {
   const [entranceOpen, setEntranceOpen] = useState(true)
   const [toiletOpen,   setToiletOpen]   = useState(true)
   const [insideOpen,   setInsideOpen]   = useState(true)
@@ -170,7 +171,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
 
       {/* Sheet */}
       <div
-        className={`fixed left-0 right-0 bottom-0 top-[200px] z-[60] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 right-0 bottom-0 top-[248px] z-[60] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
         style={{ transform: isOpen ? `translateY(${dragDelta}px)` : 'translateY(100%)' }}
@@ -245,7 +246,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     variant="primary"
                     label="Build a route"
                     fullWidth
-                    onClick={() => console.log('Build a route', place.id)}
+                    onClick={() => onBuildRoute(place.name)}
                   />
                 </div>
                 <button
