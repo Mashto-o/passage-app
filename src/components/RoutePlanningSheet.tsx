@@ -188,6 +188,10 @@ function getSegmentIcon(type: RouteSegment['type']) {
   }
 }
 
+function getSegmentWidthPercent(segmentDuration: number, totalDuration: number): number {
+  return Math.max((segmentDuration / totalDuration) * 100, 10) // minimum 10% so icon always fits
+}
+
 // ── Shared helpers for transit / walking cards ─────────────────────────────
 
 const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
@@ -245,35 +249,77 @@ const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
 const TimeRow: React.FC<{ route: Route }> = ({ route }) => (
   <div className="flex items-center justify-between">
     <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.departureTime}</span>
-    <span className="font-medium text-[12px] leading-[1.4] tracking-[0.12px] text-neutral-700">{route.durationMin} min</span>
+    <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">{route.durationMin} min</span>
     <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.arrivalTime}</span>
   </div>
 )
 
-const StandardTimeline: React.FC<{ route: Route }> = ({ route }) => {
-  const isWalkOnly = route.segments.every(s => s.type === 'walk')
-
-  if (isWalkOnly) {
-    return (
-      <div className="bg-primary-100 h-[36px] rounded-[48px] w-full flex items-center justify-center">
-        <Accessibility size={20} strokeWidth={1.5} className="text-primary-500" />
-      </div>
-    )
-  }
+function SegmentTimeline({ route, isCarTab }: { route: Route; isCarTab: boolean }) {
+  const total = route.segments.reduce((sum, s) => sum + s.durationMin, 0)
 
   return (
-    <div className="bg-primary-100 h-[36px] rounded-[48px] w-full relative overflow-hidden flex items-center justify-center gap-[8px] px-[8px]">
+    <div className={`h-[36px] rounded-[48px] w-full flex overflow-hidden ${isCarTab ? 'bg-primary-500' : 'bg-primary-100'}`}>
       {route.segments.map((seg, i) => {
-        if (seg.type === 'walk') {
-          return <Accessibility key={i} size={20} strokeWidth={1.5} className="text-primary-500 shrink-0" />
+        const widthPercent = getSegmentWidthPercent(seg.durationMin, total)
+        const isWalk = seg.type === 'walk'
+        const isShortTransfer = seg.durationMin <= 3 && i > 0
+
+        if (isCarTab) {
+          return (
+            <div
+              key={i}
+              className="flex items-center justify-center"
+              style={{ width: `${widthPercent}%` }}
+            >
+              {!isShortTransfer && (
+                <Car size={20} strokeWidth={1.5} className="text-neutral-0" />
+              )}
+            </div>
+          )
         }
-        const Icon = getSegmentIcon(seg.type)
+
+        if (isWalk) {
+          return (
+            <div
+              key={i}
+              className="flex items-center justify-center bg-primary-100"
+              style={{ width: `${widthPercent}%` }}
+            >
+              {!isShortTransfer && (
+                <Accessibility size={20} strokeWidth={1.5} className="text-primary-500" />
+              )}
+            </div>
+          )
+        }
+
+        const Icon = seg.type === 'bus' ? Bus
+          : seg.type === 'tram' ? TramFront
+          : seg.type === 'metro' ? Train
+          : Car
+
+        const isNarrow = seg.durationMin <= 5
+
         return (
-          <div key={i} className="flex items-center gap-[6px] px-[10px] py-[4px] bg-primary-500 rounded-[48px] shrink-0">
-            <AccessibilityBadge variant={seg.accessible ? 'accessible' : 'inaccessible'} size="sm" />
-            <Icon size={16} strokeWidth={1.5} className="text-neutral-0" />
-            {seg.line && (
-              <span className="text-[14px] font-semibold text-neutral-0 whitespace-nowrap">{seg.line}</span>
+          <div
+            key={i}
+            className="flex items-center justify-center bg-primary-500 rounded-[48px]"
+            style={{ width: `${widthPercent}%` }}
+          >
+            {!isNarrow ? (
+              <div className="flex items-center gap-[6px] px-[8px]">
+                <AccessibilityBadge
+                  variant={seg.accessible ? 'accessible' : 'inaccessible'}
+                  size="sm"
+                />
+                <Icon size={16} strokeWidth={1.5} className="text-neutral-0" />
+                {seg.line && (
+                  <span className="text-[12px] font-semibold text-neutral-0 whitespace-nowrap">
+                    {seg.line}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <Icon size={16} strokeWidth={1.5} className="text-neutral-0" />
             )}
           </div>
         )
@@ -297,7 +343,7 @@ const RouteCard: React.FC<{ route: Route }> = ({ route }) => (
   >
     <BadgeRow route={route} />
     <TimeRow route={route} />
-    <StandardTimeline route={route} />
+    <SegmentTimeline route={route} isCarTab={false} />
   </button>
 )
 
@@ -325,14 +371,12 @@ const StandardRouteCard: React.FC<{ route: Route }> = ({ route }) => (
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-medium text-[12px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
+      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
-    {/* Timeline — Car icon centered */}
-    <div className="bg-primary-100 h-[36px] rounded-[48px] w-full flex items-center justify-center">
-      <Car size={20} strokeWidth={1.5} className="text-primary-500" />
-    </div>
+    {/* Timeline */}
+    <SegmentTimeline route={route} isCarTab={true} />
   </div>
 )
 
@@ -357,13 +401,13 @@ const UklonCard: React.FC<{ route: Route }> = ({ route }) => (
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-medium text-[12px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
+      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
     {/* Timeline — taxi icon centered */}
-    <div className="bg-primary-100 h-[36px] rounded-[48px] w-full flex items-center justify-center">
-      <CarTaxiFront size={20} strokeWidth={1.5} className="text-primary-500" />
+    <div className="bg-primary-500 h-[36px] rounded-[48px] w-full flex items-center justify-center">
+      <CarTaxiFront size={20} strokeWidth={1.5} className="text-neutral-0" />
     </div>
 
     {/* CTA */}
@@ -399,13 +443,13 @@ const SocialTaxiCard: React.FC<{ route: Route }> = ({ route }) => (
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-medium text-[12px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
+      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
     {/* Timeline — taxi icon centered */}
-    <div className="bg-primary-100 h-[36px] rounded-[48px] w-full flex items-center justify-center">
-      <CarTaxiFront size={20} strokeWidth={1.5} className="text-primary-500" />
+    <div className="bg-primary-500 h-[36px] rounded-[48px] w-full flex items-center justify-center">
+      <CarTaxiFront size={20} strokeWidth={1.5} className="text-neutral-0" />
     </div>
 
     {/* CTA */}
@@ -511,6 +555,11 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
           <div className="pt-[8px]">
             <Button variant="back" onClick={onClose}>Back</Button>
           </div>
+
+          {/* Destination heading */}
+          <h2 className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
+            Routes to {destinationName}
+          </h2>
 
           {/* Power outage warning */}
           <div className="flex gap-[12px] items-center p-[16px] bg-warning-100 rounded-[48px] w-full">
