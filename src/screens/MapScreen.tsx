@@ -11,8 +11,9 @@ import { useFilterContext } from '../context/FilterContext'
 import {
   SearchBar, Chip, AccessibilityBadge, NavBar,
   PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
-  PlaceDetailSheet, RoutePlanningSheet, RouteDestination,
+  PlaceDetailSheet, RoutePlanningSheet, RouteDestination, RouteDetailSheet,
 } from '../components'
+import type { Route } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
 
@@ -238,6 +239,8 @@ export const MapScreen: React.FC = () => {
   const [routePlanningOpen, setRoutePlanningOpen] = useState(false)
   const [routeDestinationName, setRouteDestinationName] = useState('')
   const [routeSwapped, setRouteSwapped] = useState(false)
+  const [routeDetailOpen, setRouteDetailOpen] = useState(false)
+  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -325,6 +328,71 @@ export const MapScreen: React.FC = () => {
     }
   }, [])
 
+  // ── Route polyline overlay ────────────────────────────────────────
+  useEffect(() => {
+    const map = mapRef.current?.getMap()
+    if (!map || !selectedRoute || !routeDetailOpen) return
+
+    const addLayers = () => {
+      selectedRoute.coordinates.segments.forEach((seg, i) => {
+        const sourceId = `route-seg-${i}`
+        const layerId  = `route-layer-${i}`
+
+        if (map.getLayer(layerId))  map.removeLayer(layerId)
+        if (map.getSource(sourceId)) map.removeSource(sourceId)
+
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: { type: 'LineString', coordinates: seg.coords },
+            properties: {},
+          },
+        })
+
+        // Colours are hex strings required by Mapbox — Passage token equivalents noted inline
+        const color = seg.type === 'walk'
+          ? '#ebf1ff'  // primary-100
+          : '#361ecb'  // primary-500 (bus, tram, metro, car)
+
+        map.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          layout: { 'line-join': 'round', 'line-cap': 'round' },
+          paint: {
+            'line-color': color,
+            'line-width': seg.type === 'walk' ? 4 : 6,
+            'line-dasharray': seg.type === 'walk' ? [2, 2] : [1],
+          },
+        })
+      })
+
+      const allCoords = selectedRoute.coordinates.segments.flatMap(s => s.coords)
+      const lngs = allCoords.map(c => c[0])
+      const lats = allCoords.map(c => c[1])
+      map.fitBounds(
+        [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+        { padding: { top: 120, bottom: 520, left: 60, right: 60 }, duration: 800, maxZoom: 14 }
+      )
+    }
+
+    if (map.isStyleLoaded()) {
+      addLayers()
+    } else {
+      map.once('load', addLayers)
+    }
+
+    return () => {
+      selectedRoute.coordinates.segments.forEach((_, i) => {
+        const sourceId = `route-seg-${i}`
+        const layerId  = `route-layer-${i}`
+        if (map.getLayer(layerId))  map.removeLayer(layerId)
+        if (map.getSource(sourceId)) map.removeSource(sourceId)
+      })
+    }
+  }, [routeDetailOpen, selectedRoute])
+
   // ── Touch handlers ────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartY.current    = e.touches[0].clientY
@@ -388,7 +456,7 @@ export const MapScreen: React.FC = () => {
       )}
 
       {/* ── Search / route destination bar ──────────────────────────── */}
-      {routePlanningOpen ? (
+      {routePlanningOpen && !routeDetailOpen ? (
         <div className="absolute top-[56px] left-[24px] right-[24px] z-[20]">
           <RouteDestination
             from={routeSwapped ? routeDestinationName : 'Current location'}
@@ -643,6 +711,21 @@ export const MapScreen: React.FC = () => {
           setRoutePlanningOpen(false)
           setRouteDestinationName('')
           setRouteSwapped(false)
+        }}
+        onRouteSelect={(route) => {
+          setSelectedRoute(route)
+          setRouteDetailOpen(true)
+        }}
+      />
+
+      {/* ── Route detail sheet ──────────────────────────────────────── */}
+      <RouteDetailSheet
+        isOpen={routeDetailOpen}
+        route={selectedRoute}
+        destinationName={routeDestinationName}
+        onClose={() => {
+          setRouteDetailOpen(false)
+          setSelectedRoute(null)
         }}
       />
 

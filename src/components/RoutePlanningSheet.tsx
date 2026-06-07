@@ -19,7 +19,14 @@ type RouteSegment = {
   accessible?: boolean
 }
 
-type Route = {
+type RouteCoordinates = {
+  segments: {
+    type: 'walk' | 'bus' | 'tram' | 'metro' | 'car'
+    coords: [number, number][] // [lng, lat]
+  }[]
+}
+
+export type Route = {
   id: string
   distanceKm: number
   barrierCount: number
@@ -28,6 +35,12 @@ type Route = {
   arrivalTime: string
   cardType: 'standard' | 'uklon' | 'social-taxi'
   segments: RouteSegment[]
+  coordinates: RouteCoordinates
+  stationNames?: {
+    boardAt?: string
+    direction?: string
+    alightAt?: string
+  }[]
 }
 
 // ── Static route data ──────────────────────────────────────────────────────
@@ -46,6 +59,16 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'bus', durationMin: 10, line: '103', accessible: true },
       { type: 'walk', durationMin: 3 },
     ],
+    stationNames: [
+      { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Lukyanivska', alightAt: 'Palats Sportu' },
+    ],
+    coordinates: {
+      segments: [
+        { type: 'walk', coords: [[30.5234, 50.4501], [30.5241, 50.4497]] },
+        { type: 'bus',  coords: [[30.5241, 50.4497], [30.5260, 50.4510], [30.5275, 50.4523], [30.5289, 50.4535]] },
+        { type: 'walk', coords: [[30.5289, 50.4535], [30.5298, 50.4541]] },
+      ],
+    },
   },
   {
     id: 'transit-2',
@@ -59,6 +82,16 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'bus', durationMin: 12, line: '15', accessible: true },
       { type: 'metro', durationMin: 16, line: 'M1', accessible: false },
     ],
+    stationNames: [
+      { boardAt: 'Khreschatyk', direction: 'towards Teatralna', alightAt: 'Teatralna' },
+      { boardAt: 'Teatralna', direction: 'towards Universytet', alightAt: 'Universytet' },
+    ],
+    coordinates: {
+      segments: [
+        { type: 'bus',   coords: [[30.5234, 50.4501], [30.5220, 50.4488], [30.5198, 50.4476]] },
+        { type: 'metro', coords: [[30.5198, 50.4476], [30.5170, 50.4460], [30.5145, 50.4445]] },
+      ],
+    },
   },
   {
     id: 'transit-3',
@@ -72,6 +105,15 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'walk', durationMin: 12 },
       { type: 'tram', durationMin: 10, line: '14', accessible: false },
     ],
+    stationNames: [
+      { boardAt: 'Sahaidachnoho', direction: 'towards Kontraktova', alightAt: 'Kontraktova Ploscha' },
+    ],
+    coordinates: {
+      segments: [
+        { type: 'walk', coords: [[30.5234, 50.4501], [30.5210, 50.4530], [30.5190, 50.4558]] },
+        { type: 'tram', coords: [[30.5190, 50.4558], [30.5165, 50.4580], [30.5140, 50.4601]] },
+      ],
+    },
   },
   {
     id: 'transit-4',
@@ -86,6 +128,17 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'bus', durationMin: 18, line: '103', accessible: false },
       { type: 'bus', durationMin: 14, line: '55', accessible: false },
     ],
+    stationNames: [
+      { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Pechersk', alightAt: 'Klovska' },
+      { boardAt: 'Klovska', direction: 'towards Vydubychi', alightAt: 'Slavy Square' },
+    ],
+    coordinates: {
+      segments: [
+        { type: 'walk', coords: [[30.5234, 50.4501], [30.5240, 50.4495]] },
+        { type: 'bus',  coords: [[30.5240, 50.4495], [30.5260, 50.4478], [30.5285, 50.4461], [30.5310, 50.4445]] },
+        { type: 'bus',  coords: [[30.5310, 50.4445], [30.5340, 50.4430], [30.5370, 50.4415], [30.5398, 50.4401]] },
+      ],
+    },
   },
 ]
 
@@ -99,6 +152,11 @@ const CAR_ROUTES: Route[] = [
     arrivalTime: '16:00',
     cardType: 'standard',
     segments: [{ type: 'car', durationMin: 10 }],
+    coordinates: {
+      segments: [
+        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+      ],
+    },
   },
   {
     id: 'car-2',
@@ -109,6 +167,11 @@ const CAR_ROUTES: Route[] = [
     arrivalTime: '16:08',
     cardType: 'standard',
     segments: [{ type: 'car', durationMin: 18 }],
+    coordinates: {
+      segments: [
+        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+      ],
+    },
   },
   {
     id: 'car-uklon',
@@ -119,6 +182,11 @@ const CAR_ROUTES: Route[] = [
     arrivalTime: '16:02',
     cardType: 'uklon',
     segments: [{ type: 'car', durationMin: 12 }],
+    coordinates: {
+      segments: [
+        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+      ],
+    },
   },
   {
     id: 'car-social-taxi',
@@ -129,6 +197,11 @@ const CAR_ROUTES: Route[] = [
     arrivalTime: '16:10',
     cardType: 'social-taxi',
     segments: [{ type: 'car', durationMin: 20 }],
+    coordinates: {
+      segments: [
+        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+      ],
+    },
   },
 ]
 
@@ -142,6 +215,11 @@ const WALKING_ROUTES: Route[] = [
     arrivalTime: '16:02',
     cardType: 'standard',
     segments: [{ type: 'walk', durationMin: 12 }],
+    coordinates: {
+      segments: [
+        { type: 'walk', coords: [[30.5234, 50.4501], [30.5245, 50.4510], [30.5255, 50.4518]] },
+      ],
+    },
   },
   {
     id: 'walk-2',
@@ -152,6 +230,11 @@ const WALKING_ROUTES: Route[] = [
     arrivalTime: '16:10',
     cardType: 'standard',
     segments: [{ type: 'walk', durationMin: 20 }],
+    coordinates: {
+      segments: [
+        { type: 'walk', coords: [[30.5234, 50.4501], [30.5245, 50.4510], [30.5255, 50.4518]] },
+      ],
+    },
   },
 ]
 
@@ -330,10 +413,10 @@ function SegmentTimeline({ route, isCarTab }: { route: Route; isCarTab: boolean 
 
 // ── Transit / walking card ─────────────────────────────────────────────────
 
-const RouteCard: React.FC<{ route: Route }> = ({ route }) => (
+const RouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
   <button
     type="button"
-    onClick={() => console.log('Route selected', route.id)}
+    onClick={() => onSelect(route)}
     className={[
       'flex flex-col gap-[12px] p-[16px]',
       'bg-neutral-0 border border-neutral-200 rounded-[24px] w-full text-left',
@@ -349,8 +432,12 @@ const RouteCard: React.FC<{ route: Route }> = ({ route }) => (
 
 // ── Car tab — own car card ─────────────────────────────────────────────────
 
-const StandardRouteCard: React.FC<{ route: Route }> = ({ route }) => (
-  <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
+const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
+  <button
+    type="button"
+    onClick={() => onSelect(route)}
+    className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0 w-full text-left transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+  >
     {/* Badge row */}
     <div className="flex items-center gap-[10px]">
       <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
@@ -377,12 +464,12 @@ const StandardRouteCard: React.FC<{ route: Route }> = ({ route }) => (
 
     {/* Timeline */}
     <SegmentTimeline route={route} isCarTab={true} />
-  </div>
+  </button>
 )
 
 // ── Car tab — Uklon card ───────────────────────────────────────────────────
 
-const UklonCard: React.FC<{ route: Route }> = ({ route }) => (
+const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
     {/* Top row: distance badge left, Uklon logo right */}
     <div className="flex items-center justify-between">
@@ -415,7 +502,7 @@ const UklonCard: React.FC<{ route: Route }> = ({ route }) => (
       type="button"
       className="w-full h-[48px] rounded-[48px] flex items-center justify-center font-semibold text-[16px] transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       style={{ backgroundColor: UKLON_YELLOW, color: UKLON_BLACK }}
-      onClick={() => console.log('Order Uklon')}
+      onClick={() => onSelect(route)}
     >
       Order Uklon
     </button>
@@ -424,7 +511,7 @@ const UklonCard: React.FC<{ route: Route }> = ({ route }) => (
 
 // ── Car tab — Social Taxi card ─────────────────────────────────────────────
 
-const SocialTaxiCard: React.FC<{ route: Route }> = ({ route }) => (
+const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
     {/* Top row: distance badge left, Social Taxi logo right */}
     <div className="flex items-center justify-between">
@@ -457,7 +544,7 @@ const SocialTaxiCard: React.FC<{ route: Route }> = ({ route }) => (
       type="button"
       className="w-full h-[48px] rounded-[48px] flex items-center justify-center font-semibold text-[16px] transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       style={{ backgroundColor: SOCIAL_TAXI_DARK_BLUE, color: SOCIAL_TAXI_YELLOW }}
-      onClick={() => console.log('Schedule a ride')}
+      onClick={() => onSelect(route)}
     >
       Schedule a ride
     </button>
@@ -478,6 +565,7 @@ type RoutePlanningSheetProps = {
   isOpen: boolean
   destinationName: string
   onClose: () => void
+  onRouteSelect: (route: Route) => void
 }
 
 // ── Sheet ──────────────────────────────────────────────────────────────────
@@ -486,19 +574,25 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   isOpen,
   destinationName,
   onClose,
+  onRouteSelect,
 }) => {
   const [routeSortValue, setRouteSortValue] = useState('Fewest barriers')
   const [routeSortOpen,  setRouteSortOpen]  = useState(false)
   const [activeTab,      setActiveTab]      = useState<'transit' | 'car' | 'walking'>('transit')
   const [dragStartY,     setDragStartY]     = useState(0)
   const [dragDelta,      setDragDelta]      = useState(0)
+  const [sheetHeight,    setSheetHeight]    = useState(600)
   const DRAG_THRESHOLD = 80
 
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRef  = useRef<HTMLDivElement>(null)
+  const sheetRef   = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isOpen && scrollRef.current) {
       scrollRef.current.scrollTop = 0
+    }
+    if (sheetRef.current) {
+      setSheetHeight(sheetRef.current.getBoundingClientRect().height)
     }
   }, [isOpen])
 
@@ -528,6 +622,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
 
       {/* Sheet */}
       <div
+        ref={sheetRef}
         className={`fixed left-0 right-0 bottom-0 top-[248px] z-[70] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
@@ -586,7 +681,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                   CAR_ROUTES.filter(r => r.cardType === 'standard'),
                   routeSortValue
                 ).map(route => (
-                  <StandardRouteCard key={route.id} route={route} />
+                  <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} />
                 ))}
               </div>
 
@@ -595,8 +690,8 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 <SectionLabel>Taxi</SectionLabel>
                 {CAR_ROUTES.filter(r => r.cardType !== 'standard').map(route =>
                   route.cardType === 'uklon'
-                    ? <UklonCard key={route.id} route={route} />
-                    : <SocialTaxiCard key={route.id} route={route} />
+                    ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} />
+                    : <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} />
                 )}
               </div>
 
@@ -604,7 +699,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
           ) : (
             <div className="flex flex-col gap-[24px]">
               {sortRoutes(getActiveRoutes(activeTab), routeSortValue).map((route) => (
-                <RouteCard key={route.id} route={route} />
+                <RouteCard key={route.id} route={route} onSelect={onRouteSelect} />
               ))}
             </div>
           )}
@@ -617,7 +712,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
           value={routeSortValue}
           onChange={(val) => setRouteSortValue(val)}
           onClose={() => setRouteSortOpen(false)}
-          height={600}
+          height={sheetHeight}
         />
       </div>
     </>
