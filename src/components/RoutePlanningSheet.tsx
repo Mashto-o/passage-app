@@ -17,11 +17,13 @@ type RouteSegment = {
   durationMin: number
   line?: string
   accessible?: boolean
+  hasBarriers?: boolean // walk/car segments only — drives warning colour on map
 }
 
 type RouteCoordinates = {
   segments: {
-    type: 'walk' | 'bus' | 'tram' | 'metro' | 'car'
+    type: string
+    hasBarriers?: boolean
     coords: [number, number][] // [lng, lat]
   }[]
 }
@@ -55,18 +57,46 @@ const TRANSIT_ROUTES: Route[] = [
     arrivalTime: '16:05',
     cardType: 'standard',
     segments: [
-      { type: 'walk', durationMin: 2 },
-      { type: 'bus', durationMin: 10, line: '103', accessible: true },
-      { type: 'walk', durationMin: 3 },
+      { type: 'walk', durationMin: 2,  hasBarriers: false },
+      { type: 'bus',  durationMin: 10, line: '103', accessible: true },
+      { type: 'walk', durationMin: 3,  hasBarriers: true },
     ],
     stationNames: [
       { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Lukyanivska', alightAt: 'Palats Sportu' },
     ],
     coordinates: {
       segments: [
-        { type: 'walk', coords: [[30.5234, 50.4501], [30.5241, 50.4497]] },
-        { type: 'bus',  coords: [[30.5241, 50.4497], [30.5260, 50.4510], [30.5275, 50.4523], [30.5289, 50.4535]] },
-        { type: 'walk', coords: [[30.5289, 50.4535], [30.5298, 50.4541]] },
+        {
+          type: 'walk',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5228, 50.4492],
+            [30.5220, 50.4485],
+          ],
+        },
+        {
+          type: 'bus',
+          coords: [
+            [30.5220, 50.4485],
+            [30.5210, 50.4478],
+            [30.5198, 50.4468],
+            [30.5185, 50.4458],
+            [30.5172, 50.4450],
+            [30.5158, 50.4442],
+            [30.5145, 50.4435],
+            [30.5118, 50.4422],
+          ],
+        },
+        {
+          type: 'walk',
+          hasBarriers: true,
+          coords: [
+            [30.5118, 50.4422],
+            [30.5108, 50.4418],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -75,21 +105,51 @@ const TRANSIT_ROUTES: Route[] = [
     distanceKm: 4.8,
     barrierCount: 5,
     departureTime: '15:50',
-    durationMin: 28,
-    arrivalTime: '16:18',
+    durationMin: 32,
+    arrivalTime: '16:22',
     cardType: 'standard',
     segments: [
-      { type: 'bus', durationMin: 12, line: '15', accessible: true },
-      { type: 'metro', durationMin: 16, line: 'M1', accessible: false },
+      { type: 'bus',   durationMin: 12, line: '15',  accessible: true },
+      { type: 'metro', durationMin: 16, line: 'M1',  accessible: false },
+      { type: 'walk',  durationMin: 4,  hasBarriers: true },
     ],
     stationNames: [
       { boardAt: 'Khreschatyk', direction: 'towards Teatralna', alightAt: 'Teatralna' },
-      { boardAt: 'Teatralna', direction: 'towards Universytet', alightAt: 'Universytet' },
+      { boardAt: 'Teatralna',   direction: 'towards Universytet', alightAt: 'Universytet' },
     ],
     coordinates: {
       segments: [
-        { type: 'bus',   coords: [[30.5234, 50.4501], [30.5220, 50.4488], [30.5198, 50.4476]] },
-        { type: 'metro', coords: [[30.5198, 50.4476], [30.5170, 50.4460], [30.5145, 50.4445]] },
+        {
+          type: 'bus',
+          coords: [
+            [30.5234, 50.4501],
+            [30.5248, 50.4498],
+            [30.5262, 50.4494],
+            [30.5275, 50.4489],
+            [30.5289, 50.4483],
+            [30.5301, 50.4476],
+          ],
+        },
+        {
+          type: 'metro',
+          coords: [
+            [30.5301, 50.4476],
+            [30.5312, 50.4461],
+            [30.5318, 50.4445],
+            [30.5321, 50.4428],
+            [30.5318, 50.4412],
+            [30.5118, 50.4422],
+          ],
+        },
+        {
+          type: 'walk',
+          hasBarriers: true,
+          coords: [
+            [30.5118, 50.4422],
+            [30.5108, 50.4418],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -98,20 +158,51 @@ const TRANSIT_ROUTES: Route[] = [
     distanceKm: 2.1,
     barrierCount: 8,
     departureTime: '15:50',
-    durationMin: 22,
-    arrivalTime: '16:12',
+    durationMin: 25,
+    arrivalTime: '16:15',
     cardType: 'standard',
     segments: [
-      { type: 'walk', durationMin: 12 },
+      { type: 'walk', durationMin: 12, hasBarriers: false },
       { type: 'tram', durationMin: 10, line: '14', accessible: false },
+      { type: 'walk', durationMin: 3,  hasBarriers: false },
     ],
     stationNames: [
       { boardAt: 'Sahaidachnoho', direction: 'towards Kontraktova', alightAt: 'Kontraktova Ploscha' },
     ],
     coordinates: {
       segments: [
-        { type: 'walk', coords: [[30.5234, 50.4501], [30.5210, 50.4530], [30.5190, 50.4558]] },
-        { type: 'tram', coords: [[30.5190, 50.4558], [30.5165, 50.4580], [30.5140, 50.4601]] },
+        {
+          type: 'walk',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5225, 50.4518],
+            [30.5215, 50.4535],
+            [30.5205, 50.4552],
+            [30.5198, 50.4568],
+          ],
+        },
+        {
+          type: 'tram',
+          coords: [
+            [30.5198, 50.4568],
+            [30.5188, 50.4552],
+            [30.5175, 50.4535],
+            [30.5161, 50.4518],
+            [30.5145, 50.4501],
+            [30.5128, 50.4485],
+            [30.5115, 50.4468],
+          ],
+        },
+        {
+          type: 'walk',
+          hasBarriers: false,
+          coords: [
+            [30.5115, 50.4468],
+            [30.5106, 50.4441],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -120,23 +211,61 @@ const TRANSIT_ROUTES: Route[] = [
     distanceKm: 7.1,
     barrierCount: 12,
     departureTime: '15:50',
-    durationMin: 35,
-    arrivalTime: '16:25',
+    durationMin: 38,
+    arrivalTime: '16:28',
     cardType: 'standard',
     segments: [
-      { type: 'walk', durationMin: 3 },
-      { type: 'bus', durationMin: 18, line: '103', accessible: false },
-      { type: 'bus', durationMin: 14, line: '55', accessible: false },
+      { type: 'walk', durationMin: 3,  hasBarriers: false },
+      { type: 'bus',  durationMin: 18, line: '103', accessible: false },
+      { type: 'bus',  durationMin: 14, line: '55',  accessible: false },
+      { type: 'walk', durationMin: 3,  hasBarriers: true },
     ],
     stationNames: [
-      { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Pechersk', alightAt: 'Klovska' },
-      { boardAt: 'Klovska', direction: 'towards Vydubychi', alightAt: 'Slavy Square' },
+      { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Pechersk',  alightAt: 'Klovska' },
+      { boardAt: 'Klovska',              direction: 'towards Vydubychi', alightAt: 'Slavy Square' },
     ],
     coordinates: {
       segments: [
-        { type: 'walk', coords: [[30.5234, 50.4501], [30.5240, 50.4495]] },
-        { type: 'bus',  coords: [[30.5240, 50.4495], [30.5260, 50.4478], [30.5285, 50.4461], [30.5310, 50.4445]] },
-        { type: 'bus',  coords: [[30.5310, 50.4445], [30.5340, 50.4430], [30.5370, 50.4415], [30.5398, 50.4401]] },
+        {
+          type: 'walk',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5242, 50.4495],
+            [30.5251, 50.4489],
+          ],
+        },
+        {
+          type: 'bus',
+          coords: [
+            [30.5251, 50.4489],
+            [30.5268, 50.4475],
+            [30.5285, 50.4461],
+            [30.5302, 50.4447],
+            [30.5318, 50.4434],
+            [30.5335, 50.4421],
+          ],
+        },
+        {
+          type: 'bus',
+          coords: [
+            [30.5335, 50.4421],
+            [30.5318, 50.4421],
+            [30.5298, 50.4420],
+            [30.5275, 50.4419],
+            [30.5248, 50.4418],
+            [30.5220, 50.4416],
+          ],
+        },
+        {
+          type: 'walk',
+          hasBarriers: true,
+          coords: [
+            [30.5220, 50.4416],
+            [30.5158, 50.4415],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -151,10 +280,22 @@ const CAR_ROUTES: Route[] = [
     durationMin: 10,
     arrivalTime: '16:00',
     cardType: 'standard',
-    segments: [{ type: 'car', durationMin: 10 }],
+    segments: [{ type: 'car', durationMin: 10, hasBarriers: false }],
     coordinates: {
       segments: [
-        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+        {
+          type: 'car',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5220, 50.4480],
+            [30.5198, 50.4462],
+            [30.5172, 50.4448],
+            [30.5145, 50.4436],
+            [30.5118, 50.4424],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -166,10 +307,25 @@ const CAR_ROUTES: Route[] = [
     durationMin: 18,
     arrivalTime: '16:08',
     cardType: 'standard',
-    segments: [{ type: 'car', durationMin: 18 }],
+    segments: [{ type: 'car', durationMin: 18, hasBarriers: true }],
     coordinates: {
       segments: [
-        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+        {
+          type: 'car',
+          hasBarriers: true,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5255, 50.4488],
+            [30.5278, 50.4472],
+            [30.5298, 50.4455],
+            [30.5312, 50.4440],
+            [30.5298, 50.4428],
+            [30.5265, 50.4420],
+            [30.5198, 50.4416],
+            [30.5145, 50.4415],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -181,10 +337,22 @@ const CAR_ROUTES: Route[] = [
     durationMin: 12,
     arrivalTime: '16:02',
     cardType: 'uklon',
-    segments: [{ type: 'car', durationMin: 12 }],
+    segments: [{ type: 'car', durationMin: 12, hasBarriers: false }],
     coordinates: {
       segments: [
-        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+        {
+          type: 'car',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5220, 50.4480],
+            [30.5198, 50.4462],
+            [30.5172, 50.4448],
+            [30.5145, 50.4436],
+            [30.5118, 50.4424],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -196,10 +364,25 @@ const CAR_ROUTES: Route[] = [
     durationMin: 20,
     arrivalTime: '16:10',
     cardType: 'social-taxi',
-    segments: [{ type: 'car', durationMin: 20 }],
+    segments: [{ type: 'car', durationMin: 20, hasBarriers: true }],
     coordinates: {
       segments: [
-        { type: 'car', coords: [[30.5234, 50.4501], [30.5260, 50.4480], [30.5290, 50.4465]] },
+        {
+          type: 'car',
+          hasBarriers: true,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5255, 50.4488],
+            [30.5278, 50.4472],
+            [30.5298, 50.4455],
+            [30.5312, 50.4440],
+            [30.5298, 50.4428],
+            [30.5265, 50.4420],
+            [30.5198, 50.4416],
+            [30.5145, 50.4415],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -214,10 +397,22 @@ const WALKING_ROUTES: Route[] = [
     durationMin: 12,
     arrivalTime: '16:02',
     cardType: 'standard',
-    segments: [{ type: 'walk', durationMin: 12 }],
+    segments: [{ type: 'walk', durationMin: 12, hasBarriers: false }],
     coordinates: {
       segments: [
-        { type: 'walk', coords: [[30.5234, 50.4501], [30.5245, 50.4510], [30.5255, 50.4518]] },
+        {
+          type: 'walk',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5218, 50.4485],
+            [30.5198, 50.4468],
+            [30.5172, 50.4450],
+            [30.5145, 50.4435],
+            [30.5118, 50.4422],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -229,10 +424,32 @@ const WALKING_ROUTES: Route[] = [
     durationMin: 20,
     arrivalTime: '16:10',
     cardType: 'standard',
-    segments: [{ type: 'walk', durationMin: 20 }],
+    segments: [
+      { type: 'walk', durationMin: 12, hasBarriers: false },
+      { type: 'walk', durationMin: 8,  hasBarriers: true },
+    ],
     coordinates: {
       segments: [
-        { type: 'walk', coords: [[30.5234, 50.4501], [30.5245, 50.4510], [30.5255, 50.4518]] },
+        {
+          type: 'walk',
+          hasBarriers: false,
+          coords: [
+            [30.5234, 50.4501],
+            [30.5218, 50.4490],
+            [30.5198, 50.4478],
+            [30.5172, 50.4462],
+          ],
+        },
+        {
+          type: 'walk',
+          hasBarriers: true,
+          coords: [
+            [30.5172, 50.4462],
+            [30.5145, 50.4445],
+            [30.5118, 50.4430],
+            [30.5098, 50.4415], // ← shared end point
+          ],
+        },
       ],
     },
   },
@@ -337,12 +554,30 @@ const TimeRow: React.FC<{ route: Route }> = ({ route }) => (
   </div>
 )
 
+function mergeConsecutiveWalkSegments(segments: RouteSegment[]): RouteSegment[] {
+  const merged: RouteSegment[] = []
+  for (const seg of segments) {
+    const last = merged[merged.length - 1]
+    if (seg.type === 'walk' && last?.type === 'walk') {
+      merged[merged.length - 1] = {
+        ...last,
+        durationMin: last.durationMin + seg.durationMin,
+        hasBarriers: last.hasBarriers || seg.hasBarriers,
+      }
+    } else {
+      merged.push(seg)
+    }
+  }
+  return merged
+}
+
 function SegmentTimeline({ route, isCarTab }: { route: Route; isCarTab: boolean }) {
-  const total = route.segments.reduce((sum, s) => sum + s.durationMin, 0)
+  const displaySegments = mergeConsecutiveWalkSegments(route.segments)
+  const total = displaySegments.reduce((sum, s) => sum + s.durationMin, 0)
 
   return (
     <div className={`h-[36px] rounded-[48px] w-full flex overflow-hidden ${isCarTab ? 'bg-primary-500' : 'bg-primary-100'}`}>
-      {route.segments.map((seg, i) => {
+      {displaySegments.map((seg, i) => {
         const widthPercent = getSegmentWidthPercent(seg.durationMin, total)
         const isWalk = seg.type === 'walk'
         const isShortTransfer = seg.durationMin <= 3 && i > 0

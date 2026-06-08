@@ -242,6 +242,10 @@ export const MapScreen: React.FC = () => {
   const [routeDetailOpen, setRouteDetailOpen] = useState(false)
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
   const [routeDetailSnapTop, setRouteDetailSnapTop] = useState<number | null>(null)
+  const [routeMarkers, setRouteMarkers] = useState<{
+    start: [number, number] | null
+    end: [number, number] | null
+  }>({ start: null, end: null })
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -301,7 +305,7 @@ export const MapScreen: React.FC = () => {
         center: place.coordinates,
         zoom: 16,
         duration: 600,
-        offset: [0, -150],
+        offset: [0, -80],
       })
     }
 
@@ -329,6 +333,14 @@ export const MapScreen: React.FC = () => {
     }
   }, [])
 
+  // ── Reset map padding on mount ───────────────────────────────────
+  useEffect(() => {
+    const map = mapRef.current?.getMap()
+    if (map) {
+      map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 })
+    }
+  }, [])
+
   // ── Route polyline overlay ────────────────────────────────────────
   useEffect(() => {
     const map = mapRef.current?.getMap()
@@ -352,9 +364,14 @@ export const MapScreen: React.FC = () => {
         })
 
         // Colours are hex strings required by Mapbox — Passage token equivalents noted inline
-        const color = seg.type === 'walk'
-          ? '#ebf1ff'  // primary-100
-          : '#361ecb'  // primary-500 (bus, tram, metro, car)
+        const isTransport  = !['walk', 'car'].includes(seg.type)
+        const hasBarriers  = seg.hasBarriers ?? false
+
+        const color = isTransport
+          ? '#361ecb'  // primary-500
+          : hasBarriers
+            ? '#f0a030' // warning-500
+            : '#8b84e5' // primary-300
 
         map.addLayer({
           id: layerId,
@@ -363,8 +380,7 @@ export const MapScreen: React.FC = () => {
           layout: { 'line-join': 'round', 'line-cap': 'round' },
           paint: {
             'line-color': color,
-            'line-width': seg.type === 'walk' ? 4 : 6,
-            'line-dasharray': seg.type === 'walk' ? [2, 2] : [1],
+            'line-width': 8, // same for all segment types
           },
         })
       })
@@ -375,16 +391,17 @@ export const MapScreen: React.FC = () => {
       map.fitBounds(
         [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
         {
-          padding: {
-            top: 100,
-            bottom: Math.round(window.innerHeight * 0.52) + 40,
-            left: 60,
-            right: 60,
-          },
+          padding: { top: 100, bottom: 280, left: 60, right: 60 },
           duration: 800,
           maxZoom: 13,
         }
       )
+
+      const allSegments = selectedRoute.coordinates.segments
+      const startCoord = allSegments[0].coords[0]
+      const lastSeg = allSegments[allSegments.length - 1]
+      const endCoord = lastSeg.coords[lastSeg.coords.length - 1]
+      setRouteMarkers({ start: startCoord, end: endCoord })
     }
 
     if (map.isStyleLoaded()) {
@@ -394,12 +411,16 @@ export const MapScreen: React.FC = () => {
     }
 
     return () => {
+      // Remove route layers
       selectedRoute.coordinates.segments.forEach((_, i) => {
         const sourceId = `route-seg-${i}`
         const layerId  = `route-layer-${i}`
         if (map.getLayer(layerId))  map.removeLayer(layerId)
         if (map.getSource(sourceId)) map.removeSource(sourceId)
       })
+      setRouteMarkers({ start: null, end: null })
+      // CRITICAL: reset padding so marker flyTo works correctly after sheet closes
+      map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 })
     }
   }, [routeDetailOpen, selectedRoute])
 
@@ -462,6 +483,34 @@ export const MapScreen: React.FC = () => {
               <PlaceMarker place={place} selected={selectedPlace?.id === place.id} />
             </Marker>
           ))}
+
+          {routeDetailOpen && routeMarkers.start && (
+            <Marker
+              longitude={routeMarkers.start[0]}
+              latitude={routeMarkers.start[1]}
+              anchor="center"
+            >
+              <img
+                src="/src/assets/icons/starting-point-icon.svg"
+                alt="Start"
+                className="w-[24px] h-[24px]"
+              />
+            </Marker>
+          )}
+
+          {routeDetailOpen && routeMarkers.end && (
+            <Marker
+              longitude={routeMarkers.end[0]}
+              latitude={routeMarkers.end[1]}
+              anchor="center"
+            >
+              <img
+                src="/src/assets/icons/end-point-icon.svg"
+                alt="End"
+                className="w-[24px] h-[24px]"
+              />
+            </Marker>
+          )}
         </Map>
       )}
 
@@ -573,7 +622,7 @@ export const MapScreen: React.FC = () => {
                     mapRef.current?.getMap().flyTo({
                       center: place.coordinates,
                       zoom: 16,
-                      offset: [0, -150],
+                      offset: [0, -80],
                     })
                     setSelectedPlaceForDetail(place)
                     setPlaceDetailOpen(true)
