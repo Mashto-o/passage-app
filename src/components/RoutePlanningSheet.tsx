@@ -566,6 +566,7 @@ type RoutePlanningSheetProps = {
   destinationName: string
   onClose: () => void
   onRouteSelect: (route: Route) => void
+  overrideTop?: number | null
 }
 
 // ── Sheet ──────────────────────────────────────────────────────────────────
@@ -575,6 +576,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   destinationName,
   onClose,
   onRouteSelect,
+  overrideTop,
 }) => {
   const [routeSortValue, setRouteSortValue] = useState('Fewest barriers')
   const [routeSortOpen,  setRouteSortOpen]  = useState(false)
@@ -623,10 +625,14 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
       {/* Sheet */}
       <div
         ref={sheetRef}
-        className={`fixed left-0 right-0 bottom-0 top-[248px] z-[70] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-y-0' : 'translate-y-full'
-        }`}
-        style={{ transform: isOpen ? `translateY(${dragDelta}px)` : 'translateY(100%)' }}
+        className="fixed left-0 right-0 bottom-0 z-[70] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col"
+        style={{
+          top: overrideTop !== null && overrideTop !== undefined
+            ? overrideTop
+            : isOpen ? 248 : window.innerHeight,
+          transform: `translateY(${dragDelta}px)`,
+          transition: 'top 0.3s ease',
+        }}
       >
         {/* Drag handle */}
         <div

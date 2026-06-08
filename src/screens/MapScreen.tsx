@@ -241,6 +241,7 @@ export const MapScreen: React.FC = () => {
   const [routeSwapped, setRouteSwapped] = useState(false)
   const [routeDetailOpen, setRouteDetailOpen] = useState(false)
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
+  const [routeDetailSnapTop, setRouteDetailSnapTop] = useState<number | null>(null)
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -373,7 +374,16 @@ export const MapScreen: React.FC = () => {
       const lats = allCoords.map(c => c[1])
       map.fitBounds(
         [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
-        { padding: { top: 120, bottom: 520, left: 60, right: 60 }, duration: 800, maxZoom: 14 }
+        {
+          padding: {
+            top: 100,
+            bottom: Math.round(window.innerHeight * 0.52) + 40,
+            left: 60,
+            right: 60,
+          },
+          duration: 800,
+          maxZoom: 13,
+        }
       )
     }
 
@@ -581,7 +591,7 @@ export const MapScreen: React.FC = () => {
       )}
 
       {/* ── Bottom sheet backdrop ───────────────────────────────────── */}
-      {sheetVisible && (
+      {sheetVisible && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
           className="fixed inset-0 z-[45] bg-transparent"
           onClick={() => closeSheet()}
@@ -589,7 +599,7 @@ export const MapScreen: React.FC = () => {
       )}
 
       {/* ── Bottom sheet ────────────────────────────────────────────── */}
-      {sheetVisible && (
+      {sheetVisible && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
           className={[
             'fixed left-0 right-0 bottom-0 z-[50]',
@@ -645,7 +655,7 @@ export const MapScreen: React.FC = () => {
       )}
 
       {/* ── Popup backdrop ──────────────────────────────────────────── */}
-      {selectedPlace && (
+      {selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
           className="fixed inset-0 z-[55] bg-transparent"
           onClick={handleClosePopup}
@@ -654,7 +664,7 @@ export const MapScreen: React.FC = () => {
 
       {/* ── Place popup card ────────────────────────────────────────── */}
       <PlacePopupCard
-        visible={!!selectedPlace}
+        visible={!!selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen}
         name={selectedPlace?.name ?? ''}
         address={selectedPlace?.address ?? ''}
         distance={selectedPlace?.distance ?? ''}
@@ -692,7 +702,7 @@ export const MapScreen: React.FC = () => {
       {/* ── Place detail sheet ──────────────────────────────────────── */}
       <PlaceDetailSheet
         place={selectedPlaceForDetail}
-        isOpen={placeDetailOpen}
+        isOpen={placeDetailOpen && !routePlanningOpen}
         onClose={() => {
           setPlaceDetailOpen(false)
           setSelectedPlaceForDetail(null)
@@ -705,7 +715,7 @@ export const MapScreen: React.FC = () => {
 
       {/* ── Route planning sheet ────────────────────────────────────── */}
       <RoutePlanningSheet
-        isOpen={routePlanningOpen}
+        isOpen={routePlanningOpen && !routeDetailOpen}
         destinationName={routeDestinationName}
         onClose={() => {
           setRoutePlanningOpen(false)
@@ -716,6 +726,7 @@ export const MapScreen: React.FC = () => {
           setSelectedRoute(route)
           setRouteDetailOpen(true)
         }}
+        overrideTop={routeDetailOpen ? routeDetailSnapTop : null}
       />
 
       {/* ── Route detail sheet ──────────────────────────────────────── */}
@@ -727,6 +738,7 @@ export const MapScreen: React.FC = () => {
           setRouteDetailOpen(false)
           setSelectedRoute(null)
         }}
+        onSnapChange={(top) => setRouteDetailSnapTop(top)}
       />
 
     </div>

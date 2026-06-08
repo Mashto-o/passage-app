@@ -18,6 +18,7 @@ type RouteDetailSheetProps = {
   route: Route | null
   destinationName: string
   onClose: () => void
+  onSnapChange?: (top: number) => void
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -95,7 +96,13 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
   route,
   destinationName,
   onClose,
+  onSnapChange,
 }) => {
+  const SNAP_SHORT = Math.round(window.innerHeight * 0.52)
+  const SNAP_FULL  = 0
+
+  const [snapTop,        setSnapTop]        = useState(SNAP_SHORT)
+  const [dragging,       setDragging]       = useState(false)
   const [dragStartY,     setDragStartY]     = useState(0)
   const [dragDelta,      setDragDelta]      = useState(0)
   const [openDropdowns,  setOpenDropdowns]  = useState<Record<string, boolean>>({})
@@ -107,24 +114,40 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0
+    if (isOpen) {
+      setSnapTop(SNAP_SHORT)
+      if (scrollRef.current) scrollRef.current.scrollTop = 0
+    }
   }, [isOpen])
+
+  useEffect(() => {
+    onSnapChange?.(snapTop)
+  }, [snapTop])
 
   const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
     const y = 'touches' in e ? e.touches[0].clientY : e.clientY
     setDragStartY(y)
     setDragDelta(0)
+    setDragging(true)
   }
 
   const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
     const y = 'touches' in e ? e.touches[0].clientY : e.clientY
-    const delta = y - dragStartY
-    if (delta > 0) setDragDelta(delta)
+    setDragDelta(y - dragStartY)
   }
 
   const handleDragEnd = () => {
-    if (dragDelta > DRAG_THRESHOLD) onClose()
+    if (dragDelta > DRAG_THRESHOLD) {
+      if (snapTop === SNAP_FULL) {
+        setSnapTop(SNAP_SHORT)
+      } else {
+        onClose()
+      }
+    } else if (dragDelta < -DRAG_THRESHOLD) {
+      setSnapTop(SNAP_FULL)
+    }
     setDragDelta(0)
+    setDragging(false)
   }
 
   // ── Timeline renderer ──────────────────────────────────────────────────────
@@ -216,11 +239,11 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
         items.push(
           <div key={nextKey()} className="flex gap-[0px]">
             {/* Left bar */}
-            <div className="w-[26px] shrink-0 bg-primary-100 rounded-[24px] flex flex-col items-center justify-center py-[32px]">
+            <div className="w-[26px] shrink-0 bg-primary-100 rounded-[24px] flex flex-col items-center justify-center py-[48px]">
               <Accessibility size={16} strokeWidth={1.5} className="text-primary-500" />
             </div>
             {/* Right content */}
-            <div className="flex-1 flex flex-col justify-center py-[32px] pl-[16px]">
+            <div className="flex-1 flex flex-col justify-center py-[48px] pl-[16px]">
               <div className="flex flex-col gap-[8px] w-full">
                 <div className="flex items-center justify-between w-full">
                   <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
@@ -257,11 +280,11 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
         items.push(
           <div key={nextKey()} className="flex gap-[0px]">
             {/* Left bar — transport icon only */}
-            <div className="w-[26px] shrink-0 bg-primary-500 rounded-[24px] flex flex-col items-center justify-center py-[32px]">
+            <div className="w-[26px] shrink-0 bg-primary-500 rounded-[24px] flex flex-col items-center justify-center py-[48px]">
               {getTransportIcon(seg.type)}
             </div>
             {/* Right content */}
-            <div className="flex-1 flex flex-col py-[32px] pl-[16px] gap-[32px]">
+            <div className="flex-1 flex flex-col py-[48px] pl-[16px] gap-[48px]">
               <div className="flex flex-col gap-[8px] w-full">
                 <div className="flex items-center justify-between w-full">
                   <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
@@ -323,7 +346,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
       <div key={nextKey()} className="flex items-center justify-between py-[8px]">
         <div className="flex items-center gap-[16px]">
           <div className="w-[26px] flex items-center justify-center shrink-0">
-            <img src="/src/assets/icons/end-point-icon.png" alt="" className="w-[24px]" />
+            <img src="/src/assets/icons/end-point-icon.svg" alt="" className="w-[24px]" />
           </div>
           <span className="font-normal text-[16px] leading-[1.5] text-neutral-900">{destinationName}</span>
         </div>
@@ -345,10 +368,12 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
 
       {/* Sheet */}
       <div
-        className={`fixed left-0 right-0 bottom-0 top-[248px] z-[80] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-y-0' : 'translate-y-full'
-        }`}
-        style={{ transform: isOpen ? `translateY(${dragDelta}px)` : 'translateY(100%)' }}
+        className="fixed left-0 right-0 bottom-0 z-[80] bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] flex flex-col"
+        style={{
+          top: isOpen ? snapTop : window.innerHeight,
+          transform: `translateY(${dragDelta}px)`,
+          transition: dragging ? 'none' : 'top 0.3s ease, transform 0.3s ease',
+        }}
       >
         {/* Drag handle */}
         <div
