@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Accessibility, Bookmark, MessageCircle, Users,
   Volume2, Bell, LogOut, ChevronRight,
@@ -126,6 +127,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onMyFriends,
   onSignOut,
 }) => {
+  const navigate = useNavigate()
   const [voiceGuidance, setVoiceGuidance] = useState(false)
   const [notifications,  setNotifications]  = useState(false)
 
@@ -235,7 +237,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <MenuRow
                 icon={<Accessibility size={24} strokeWidth={1.5} />}
                 label="My accessibility preferences"
-                onPress={onAccessibilityPreferences}
+                onPress={() => { navigate('/profile/preferences'); onAccessibilityPreferences?.() }}
               />
               <Divider />
               <MenuRow

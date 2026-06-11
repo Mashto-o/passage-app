@@ -11,6 +11,7 @@ import { MapScreen } from './screens/MapScreen'
 import { FilterScreen } from './screens/FilterScreen'
 import { RouteCompleteScreen } from './screens/RouteCompleteScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
+import { AccessibilityPreferencesScreen } from './screens/AccessibilityPreferencesScreen'
 
 // ── Dev showcase imports ───────────────────────────────────────────────────
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
@@ -477,6 +478,7 @@ function App() {
       <Route path="/filter"          element={<FilterScreen />} />
       <Route path="/route-complete" element={<RouteCompleteScreen />} />
       <Route path="/profile"        element={<ProfileScreen />} />
+      <Route path="/profile/preferences" element={<AccessibilityPreferencesScreen />} />
       <Route path="/dev"            element={<DevShowcase />} />
       <Route path="*"               element={<Navigate to="/" replace />} />
     </Routes>
