@@ -2,20 +2,16 @@ import React from 'react'
 
 export interface RadioButtonProps {
   selected: boolean
-  onClick?: () => void
   className?: string
 }
 
 export const RadioButton: React.FC<RadioButtonProps> = ({
   selected,
-  onClick,
   className = '',
 }) => {
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
+    <div
+      role="presentation"
       className={[
         'flex items-center justify-center shrink-0 size-[24px] rounded-full bg-transparent',
         selected

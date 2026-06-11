@@ -4,13 +4,16 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { FilterProvider } from './context/FilterContext'
+import { OnboardingProvider } from './context/OnboardingContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <FilterProvider>
-        <App />
-      </FilterProvider>
+      <OnboardingProvider>
+        <FilterProvider>
+          <App />
+        </FilterProvider>
+      </OnboardingProvider>
     </BrowserRouter>
   </StrictMode>,
 )

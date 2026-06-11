@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, SelectionCard, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
+import { useOnboarding } from '../context/OnboardingContext'
+import type { MobilityAid } from '../context/OnboardingContext'
 
 import WheelchairManual   from '../assets/illustrations/wheelchair-manual.svg?react'
 import WheelchairElectric from '../assets/illustrations/wheelchair-electric.svg?react'
@@ -10,20 +12,12 @@ import Prosthesis         from '../assets/illustrations/prosthesis.svg?react'
 import Stroller           from '../assets/illustrations/stroller.svg?react'
 import NoWheelchair       from '../assets/illustrations/no-wheelchair.svg?react'
 
-type MobilityAid =
-  | 'wheelchair-manual'
-  | 'wheelchair-electric'
-  | 'cane'
-  | 'prosthesis'
-  | 'stroller'
-  | 'no-aid'
-
 export const Onboarding2: React.FC = () => {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState<MobilityAid | null>(null)
+  const { mobilityAid: selected, setMobilityAid } = useOnboarding()
 
   const toggle = (id: MobilityAid) =>
-    setSelected(prev => (prev === id ? null : id))
+    setMobilityAid(selected === id ? null : id)
 
   const handleNext = () => {
     navigate('/onboarding/3')
