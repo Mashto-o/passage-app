@@ -65,12 +65,8 @@ export const NavigationCard: React.FC<NavigationCardProps> = ({
     hazardRest = hazardText.slice(hazardBoldPrefix.length)
   }
 
-  // State-dependent instruction row background
-  const instructionRowBg = isArrived
-    ? 'bg-primary-100 border border-primary-500'
-    : state === 'noHazard'
-      ? 'bg-success-100 border border-success-500'
-      : 'bg-neutral-0 border border-neutral-200'
+  // Instruction row always uses the same neutral background
+  const instructionRowBg = 'bg-neutral-0 border border-neutral-200'
 
   return (
     <div className={`flex flex-col items-start w-full ${showHazard ? 'gap-[12px]' : ''} ${className}`}>

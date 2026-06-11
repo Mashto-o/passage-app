@@ -12,7 +12,7 @@ type ActiveNavigationSheetProps = {
   route: Route | null
   destinationName: string
   onClose: () => void // closes and returns to RouteDetailSheet
-  onArrived: () => void // called when navState reaches 'arrived'
+  onNavStateChange: (state: NavState) => void // called every time navState changes
   onPanelHeightChange?: (height: number) => void
 }
 
@@ -23,11 +23,14 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
   route,
   destinationName,
   onClose,
-  onArrived,
+  onNavStateChange,
   onPanelHeightChange,
 }) => {
-  const [navState, setNavState] = useState<NavState>('default')
-  const [barrierCheckOpen, setBarrierCheckOpen] = useState(false)
+  const [navState,          setNavState]          = useState<NavState>('default')
+  const [displayedNavState, setDisplayedNavState] = useState<NavState>('default')
+  const [cardVisible,       setCardVisible]       = useState(true)
+  const [panelVisible,      setPanelVisible]      = useState(true)
+  const [barrierCheckOpen,  setBarrierCheckOpen]  = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Measure bottom panel height and report it to parent
@@ -43,13 +46,19 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
     return () => observer.disconnect()
   }, [onPanelHeightChange])
 
+  // Auto-advance timer + reset on close
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      setCardVisible(true)
+      setPanelVisible(true)
+      setDisplayedNavState('default')
+      return
+    }
     setNavState('default')
 
-    const timer1 = setTimeout(() => setNavState('noHazard'), 15000)
-    const timer2 = setTimeout(() => { setNavState('arrived'); onArrived() }, 27000) // 15 + 12
-    const timerBarrier = setTimeout(() => setBarrierCheckOpen(true), 8000)
+    const timer1       = setTimeout(() => { setNavState('noHazard'); onNavStateChange('noHazard') }, 7500)
+    const timer2       = setTimeout(() => { setNavState('arrived');  onNavStateChange('arrived')  }, 13500)
+    const timerBarrier = setTimeout(() => setBarrierCheckOpen(true), 4000)
 
     return () => {
       clearTimeout(timer1)
@@ -58,22 +67,40 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
     }
   }, [isOpen])
 
-  // Derive NavigationCard props from current navState
-  const cardDirection  = navState === 'default'  ? 'turn-left' as const
-                       : navState === 'noHazard' ? 'turn-right' as const
-                       : undefined
+  // Slide-out / slide-in on navState change; hide panel on arrival
+  useEffect(() => {
+    setCardVisible(false)
+    const timeout = setTimeout(() => {
+      setDisplayedNavState(navState)
+      setCardVisible(true)
+    }, 300)
+    // Slide the bottom panel down 500ms after the card transition starts
+    let panelTimeout: ReturnType<typeof setTimeout> | null = null
+    if (navState === 'arrived') {
+      panelTimeout = setTimeout(() => setPanelVisible(false), 500)
+    }
+    return () => {
+      clearTimeout(timeout)
+      if (panelTimeout) clearTimeout(panelTimeout)
+    }
+  }, [navState])
 
-  const cardInstruction = navState === 'arrived' ? 'You have arrived'
-                        : navState === 'noHazard' ? 'Turn right'
+  // Derive NavigationCard props from displayedNavState (the rendered state)
+  const cardDirection = displayedNavState === 'default'  ? 'turn-left' as const
+                      : displayedNavState === 'noHazard' ? 'turn-right' as const
+                      : undefined
+
+  const cardInstruction = displayedNavState === 'arrived' ? 'You have arrived'
+                        : displayedNavState === 'noHazard' ? 'Turn right'
                         : 'Turn left'
 
-  const cardStreetName  = navState === 'arrived' ? destinationName
-                        : navState === 'noHazard' ? 'onto vul. Baseyna'
-                        : 'onto vul. Khreschyatyk'
+  const cardStreetName = displayedNavState === 'arrived' ? destinationName
+                       : displayedNavState === 'noHazard' ? 'onto vul. Baseyna'
+                       : 'onto vul. Khreschyatyk'
 
-  const cardDistance    = navState === 'arrived' ? undefined
-                        : navState === 'noHazard' ? '120m'
-                        : '80m'
+  const cardDistance = displayedNavState === 'arrived' ? undefined
+                     : displayedNavState === 'noHazard' ? '120m'
+                     : '80m'
 
   return (
     <>
@@ -81,26 +108,41 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex flex-col">
 
-          {/* Map area — fills all space above the bottom sheet */}
+          {/* Map area — fills all space above the bottom sheet; overflow-hidden clips card during slide */}
           <div className="flex-1 relative overflow-hidden">
 
-            {/* NavigationCard — floats over the map area */}
-            <div className="absolute top-[56px] left-[24px] right-[24px] z-[101]">
+            {/* NavigationCard — slides out downward, slides in from above */}
+            <div
+              className={[
+                'absolute top-[56px] left-[24px] right-[24px] z-[101]',
+                'transition-transform transition-opacity duration-300 ease-in-out',
+                cardVisible
+                  ? 'translate-y-0 opacity-100'
+                  : 'translate-y-[calc(-100%-56px)] opacity-0',
+              ].join(' ')}
+            >
               <NavigationCard
-                state={navState}
+                state={displayedNavState}
                 direction={cardDirection}
                 instruction={cardInstruction}
                 streetName={cardStreetName}
                 distanceToTurn={cardDistance}
-                hazardBoldPrefix={navState === 'default' ? 'Moderate incline' : undefined}
-                hazardText={navState === 'default' ? 'Moderate incline ahead in 10m' : undefined}
+                hazardBoldPrefix={displayedNavState === 'default' ? 'Moderate incline' : undefined}
+                hazardText={displayedNavState === 'default' ? 'Moderate incline ahead in 10m' : undefined}
               />
             </div>
 
           </div>
 
-          {/* Bottom sheet — fixed height, never scrolls */}
-          <div ref={panelRef} className="bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] px-[24px] pb-[48px] flex flex-col gap-[16px] shrink-0">
+          {/* Bottom sheet — slides down out of view on arrival */}
+          <div
+            ref={panelRef}
+            className={[
+              'bg-neutral-0 rounded-tl-[48px] rounded-tr-[48px] px-[24px] pb-[48px] flex flex-col gap-[16px] shrink-0',
+              'transition-transform duration-500 ease-in-out',
+              panelVisible ? 'translate-y-0' : 'translate-y-full',
+            ].join(' ')}
+          >
 
             {/* Drag handle */}
             <div className="flex justify-center pt-[24px] pb-[8px]">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { BadgeCheck } from 'lucide-react'
 import {
@@ -17,9 +17,16 @@ export const RouteCompleteScreen: React.FC = () => {
   const { distanceKm, durationMin } = (location.state as { distanceKm?: number; durationMin?: number }) ?? {}
 
   // ── Local state ──────────────────────────────────────────────────────────
+  const [visible,        setVisible]        = useState(false)
   const [routeRating,    setRouteRating]    = useState<'accessible' | 'partiallyAccessible' | 'inaccessible' | null>(null)
   const [barrierAnswer,  setBarrierAnswer]  = useState<'yes' | 'no' | null>(null)
   const [comment,        setComment]        = useState('')
+
+  // Trigger slide-up after initial hidden state is painted
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 10)
+    return () => clearTimeout(t)
+  }, [])
 
   const handleRatingClick = (value: 'accessible' | 'partiallyAccessible' | 'inaccessible') => {
     const next = routeRating === value ? null : value
@@ -28,7 +35,13 @@ export const RouteCompleteScreen: React.FC = () => {
   }
 
   return (
-    <div className="bg-neutral-50 min-h-screen">
+    <div
+      className={[
+        'fixed inset-0 bg-neutral-50 overflow-y-auto',
+        'transition-transform duration-500 ease-out',
+        visible ? 'translate-y-0' : 'translate-y-full',
+      ].join(' ')}
+    >
       <div className="px-[24px] pb-[48px] flex flex-col gap-[32px]">
 
         {/* ── Header ─────────────────────────────────────────────────────── */}

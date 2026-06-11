@@ -348,7 +348,7 @@ export const MapScreen: React.FC = () => {
   // ── Route polyline overlay ────────────────────────────────────────
   useEffect(() => {
     const map = mapRef.current?.getMap()
-    if (!map || !selectedRoute || !routeDetailOpen) return
+    if (!map || !selectedRoute) return
 
     const addLayers = () => {
       selectedRoute.coordinates.segments.forEach((seg, i) => {
@@ -426,13 +426,14 @@ export const MapScreen: React.FC = () => {
       // CRITICAL: reset padding so marker flyTo works correctly after sheet closes
       map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 })
     }
-  }, [routeDetailOpen, selectedRoute])
+  }, [selectedRoute])
 
-  // ── Navigate to route review 3 s after the user ends a route ─────
+  // ── Navigate to route review 2 s after arrival ───────────────────
   useEffect(() => {
-    console.log('routeEndedAt changed:', routeEndedAt);
     if (!routeEndedAt) return
     const timeout = setTimeout(() => {
+      setActiveNavigationOpen(false)
+      setSelectedRoute(null)
       navigate('/route-complete', {
         state: {
           distanceKm: selectedRoute?.distanceKm,
@@ -504,7 +505,7 @@ export const MapScreen: React.FC = () => {
             </Marker>
           ))}
 
-          {routeDetailOpen && routeMarkers.start && (
+          {selectedRoute && routeMarkers.start && (
             <Marker
               longitude={routeMarkers.start[0]}
               latitude={routeMarkers.start[1]}
@@ -518,7 +519,7 @@ export const MapScreen: React.FC = () => {
             </Marker>
           )}
 
-          {routeDetailOpen && routeMarkers.end && (
+          {selectedRoute && routeMarkers.end && (
             <Marker
               longitude={routeMarkers.end[0]}
               latitude={routeMarkers.end[1]}
@@ -832,7 +833,15 @@ export const MapScreen: React.FC = () => {
         route={selectedRoute}
         destinationName={routeDestinationName}
         onClose={() => setActiveNavigationOpen(false)}
-        onArrived={() => setRouteEndedAt(Date.now())}
+        onNavStateChange={(state) => {
+          if (state === 'arrived') {
+            setRouteDetailOpen(false)
+            setRoutePlanningOpen(false)
+            setPlaceDetailOpen(false)
+            setSelectedPlace(null)
+            setRouteEndedAt(Date.now())
+          }
+        }}
         onPanelHeightChange={setNavPanelHeight}
       />
 
