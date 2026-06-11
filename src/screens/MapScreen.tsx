@@ -12,6 +12,7 @@ import {
   SearchBar, Chip, AccessibilityBadge, NavBar,
   PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
   PlaceDetailSheet, RoutePlanningSheet, RouteDestination, RouteDetailSheet,
+  ActiveNavigationSheet,
 } from '../components'
 import type { Route } from '../components'
 
@@ -242,6 +243,8 @@ export const MapScreen: React.FC = () => {
   const [routeDetailOpen, setRouteDetailOpen] = useState(false)
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
   const [routeDetailSnapTop, setRouteDetailSnapTop] = useState<number | null>(null)
+  const [activeNavigationOpen, setActiveNavigationOpen] = useState(false)
+  const [navPanelHeight, setNavPanelHeight] = useState(0)
   const [routeMarkers, setRouteMarkers] = useState<{
     start: [number, number] | null
     end: [number, number] | null
@@ -527,66 +530,71 @@ export const MapScreen: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* ── Search + filter bar ─────────────────────────────────── */}
-          <div className="absolute top-[56px] left-lg right-lg z-[10] flex items-center gap-xs">
-            <div className="flex-1">
-              <SearchBar
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onFocus={handleSearchFocus}
-                placeholder="Search places..."
-                leftSlot={searchActive ? (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('')
-                      setSearchActive(false)
-                    }}
-                    className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    aria-label="Back to map"
-                  >
-                    <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
-                  </button>
-                ) : undefined}
-              />
-            </div>
-
-            <button
-              type="button"
-              className={[
-                'flex items-center justify-center shrink-0',
-                'w-[48px] h-[48px] rounded-xl',
-                'bg-neutral-0 border border-neutral-200',
-                'text-neutral-500',
-                'transition-colors duration-200',
-                'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-              ].join(' ')}
-              aria-label="Filter"
-              onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
-            >
-              <Funnel size={20} strokeWidth={1.5} aria-hidden />
-            </button>
-          </div>
-
-          {/* ── Category chips ─────────────────────────────────────── */}
-          {!searchActive && !placeDetailOpen && (
-            <div className="absolute top-[124px] left-lg right-0 z-10 flex flex-row flex-nowrap gap-xs overflow-x-auto [&::-webkit-scrollbar]:hidden">
-              {CHIPS.map(({ key, label, icon }: { key: CategoryKey; label: string; icon: React.ReactNode }) => {
-                const active = activeCategory === key
-                return (
-                  <Chip
-                    key={key}
-                    size="md"
-                    label={label}
-                    variant={active ? 'active' : 'neutral'}
-                    className="shrink-0 cursor-pointer"
-                    icon={React.cloneElement(icon as React.ReactElement, {
-                      className: active ? 'text-neutral-0' : 'text-neutral-700',
-                    })}
-                    onClick={() => handleChipClick(key)}
+          {/* ── Search + filter bar + chips — hidden during active navigation */}
+          {!activeNavigationOpen && (
+            <>
+              {/* ── Search + filter bar ─────────────────────────────── */}
+              <div className="absolute top-[56px] left-lg right-lg z-[10] flex items-center gap-xs">
+                <div className="flex-1">
+                  <SearchBar
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={handleSearchFocus}
+                    placeholder="Search places..."
+                    leftSlot={searchActive ? (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('')
+                          setSearchActive(false)
+                        }}
+                        className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                        aria-label="Back to map"
+                      >
+                        <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
+                      </button>
+                    ) : undefined}
                   />
-                )
-              })}
-            </div>
+                </div>
+
+                <button
+                  type="button"
+                  className={[
+                    'flex items-center justify-center shrink-0',
+                    'w-[48px] h-[48px] rounded-xl',
+                    'bg-neutral-0 border border-neutral-200',
+                    'text-neutral-500',
+                    'transition-colors duration-200',
+                    'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
+                  ].join(' ')}
+                  aria-label="Filter"
+                  onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
+                >
+                  <Funnel size={20} strokeWidth={1.5} aria-hidden />
+                </button>
+              </div>
+
+              {/* ── Category chips ───────────────────────────────────── */}
+              {!searchActive && !placeDetailOpen && (
+                <div className="absolute top-[124px] left-lg right-0 z-10 flex flex-row flex-nowrap gap-xs overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                  {CHIPS.map(({ key, label, icon }: { key: CategoryKey; label: string; icon: React.ReactNode }) => {
+                    const active = activeCategory === key
+                    return (
+                      <Chip
+                        key={key}
+                        size="md"
+                        label={label}
+                        variant={active ? 'active' : 'neutral'}
+                        className="shrink-0 cursor-pointer"
+                        icon={React.cloneElement(icon as React.ReactElement, {
+                          className: active ? 'text-neutral-0' : 'text-neutral-700',
+                        })}
+                        onClick={() => handleChipClick(key)}
+                      />
+                    )
+                  })}
+                </div>
+              )}
+            </>
           )}
         </>
       )}
@@ -734,13 +742,15 @@ export const MapScreen: React.FC = () => {
       />
 
       {/* ── NavBar ──────────────────────────────────────────────────── */}
-      <div className="absolute bottom-lg left-lg right-lg z-40">
-        <NavBar activeTab="map" onTabChange={() => {}} />
-      </div>
+      {!activeNavigationOpen && (
+        <div className="absolute bottom-lg left-lg right-lg z-40">
+          <NavBar activeTab="map" onTabChange={() => {}} />
+        </div>
+      )}
 
       {/* ── Sort sheet ──────────────────────────────────────────────── */}
       <SortSheet
-        isOpen={sortSheetOpen}
+        isOpen={sortSheetOpen && !activeNavigationOpen}
         options={PLACE_SORT_OPTIONS}
         value={sortValue}
         onChange={(val) => setSortValue(val)}
@@ -751,7 +761,7 @@ export const MapScreen: React.FC = () => {
       {/* ── Place detail sheet ──────────────────────────────────────── */}
       <PlaceDetailSheet
         place={selectedPlaceForDetail}
-        isOpen={placeDetailOpen && !routePlanningOpen}
+        isOpen={placeDetailOpen && !routePlanningOpen && !activeNavigationOpen}
         onClose={() => {
           setPlaceDetailOpen(false)
           setSelectedPlaceForDetail(null)
@@ -764,7 +774,7 @@ export const MapScreen: React.FC = () => {
 
       {/* ── Route planning sheet ────────────────────────────────────── */}
       <RoutePlanningSheet
-        isOpen={routePlanningOpen && !routeDetailOpen}
+        isOpen={routePlanningOpen && !routeDetailOpen && !activeNavigationOpen}
         destinationName={routeDestinationName}
         onClose={() => {
           setRoutePlanningOpen(false)
@@ -776,11 +786,12 @@ export const MapScreen: React.FC = () => {
           setRouteDetailOpen(true)
         }}
         overrideTop={routeDetailOpen ? routeDetailSnapTop : null}
+        maxHeight={activeNavigationOpen ? navPanelHeight : undefined}
       />
 
       {/* ── Route detail sheet ──────────────────────────────────────── */}
       <RouteDetailSheet
-        isOpen={routeDetailOpen}
+        isOpen={routeDetailOpen && !activeNavigationOpen}
         route={selectedRoute}
         destinationName={routeDestinationName}
         onClose={() => {
@@ -788,6 +799,17 @@ export const MapScreen: React.FC = () => {
           setSelectedRoute(null)
         }}
         onSnapChange={(top) => setRouteDetailSnapTop(top)}
+        onStartRoute={() => setActiveNavigationOpen(true)}
+        maxHeight={activeNavigationOpen ? navPanelHeight : undefined}
+      />
+
+      {/* ── Active navigation sheet ──────────────────────────────────── */}
+      <ActiveNavigationSheet
+        isOpen={activeNavigationOpen}
+        route={selectedRoute}
+        destinationName={routeDestinationName}
+        onClose={() => setActiveNavigationOpen(false)}
+        onPanelHeightChange={setNavPanelHeight}
       />
 
     </div>

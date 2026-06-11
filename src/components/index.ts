@@ -91,3 +91,7 @@ export { RoutePlanningSheet } from './RoutePlanningSheet'
 export type { Route } from './RoutePlanningSheet'
 
 export { RouteDetailSheet } from './RouteDetailSheet'
+
+export { ActiveNavigationSheet } from './ActiveNavigationSheet'
+
+export { BarrierCheckModal } from './BarrierCheckModal'

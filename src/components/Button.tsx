@@ -2,7 +2,7 @@ import React from 'react'
 import { ChevronLeft } from 'lucide-react'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'link' | 'destructive' | 'back'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'link' | 'destructive' | 'back' | 'success'
   label?: string
   children?: React.ReactNode
   icon?: React.ReactNode
@@ -21,6 +21,7 @@ const variants: Record<Exclude<NonNullable<ButtonProps['variant']>, 'back'>, str
   ghost:       'bg-transparent border border-neutral-300 text-neutral-900 active:bg-neutral-100',
   link:        'bg-transparent text-primary-500 active:text-primary-600 active:underline',
   destructive: 'bg-danger-500 text-neutral-0 active:bg-danger-700',
+  success:     'bg-success-500 text-neutral-0 active:bg-success-600',
 }
 
 const disabledClasses = 'bg-neutral-200 text-neutral-400 cursor-not-allowed pointer-events-none'

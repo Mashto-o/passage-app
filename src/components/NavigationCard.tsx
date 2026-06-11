@@ -65,11 +65,18 @@ export const NavigationCard: React.FC<NavigationCardProps> = ({
     hazardRest = hazardText.slice(hazardBoldPrefix.length)
   }
 
+  // State-dependent instruction row background
+  const instructionRowBg = isArrived
+    ? 'bg-primary-100 border border-primary-500'
+    : state === 'noHazard'
+      ? 'bg-success-100 border border-success-500'
+      : 'bg-neutral-0 border border-neutral-200'
+
   return (
     <div className={`flex flex-col items-start w-full ${showHazard ? 'gap-[12px]' : ''} ${className}`}>
 
       {/* ── Instruction row ── */}
-      <div className="flex items-center justify-between w-full bg-white/70 border border-neutral-200 rounded-[48px] px-[16px] py-[20px]">
+      <div className={`flex items-center justify-between w-full ${instructionRowBg} rounded-[48px] px-[16px] py-[20px]`}>
 
         {isArrived ? (
           /* Arrived state */
@@ -80,7 +87,7 @@ export const NavigationCard: React.FC<NavigationCardProps> = ({
                 You have arrived!
               </span>
               <span className="text-body-sm text-neutral-700 whitespace-nowrap">
-                Your destination
+                {streetName}
               </span>
             </div>
           </div>

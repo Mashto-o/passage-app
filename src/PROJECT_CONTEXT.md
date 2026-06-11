@@ -39,134 +39,128 @@ src/
 
 ## Design tokens
 - Colours: primary, neutral, accent, success, warning, danger
-- Typography: Onest font, tokens include size + lineHeight +
-  fontWeight + letterSpacing in tailwind.config.js fontSize
+- Typography: Onest font, tokens in tailwind.config.js fontSize
 - Spacing: 2xs(4) xs(8) sm(12) md(16) lg(24) xl(32) 2xl(48)
 - Radius: xs(8) sm(12) md(16) lg(24) xl(32) xxl(48) full(9999)
 
 ## All components built (src/components/index.ts)
-- Button (6 variants: primary, secondary, ghost, danger, disabled,
-  back. The "back" variant: ChevronLeft icon + label, no bg/border,
-  text-primary-500, font-semibold, h-[48px], py-[13px], gap-[10px])
-- AccessibilityBadge (accessible, inaccessible, partial,
-  unknown × sm/md sizes, pulse animation,
-  accepts optional custom icon prop replacing default checkmark)
-- SelectionCard (default + selected, SVG illustrations,
-  icon left + label right layout, no description text)
+- Button (7 variants: primary, secondary, ghost, danger,
+  disabled, back, success. "back": ChevronLeft + label, no bg/border,
+  text-primary-500, font-semibold, h-[48px].
+  "success": bg-success-500 text-neutral-0, same shape as primary.)
+- AccessibilityBadge (accessible/inaccessible/partial/unknown
+  × sm/md, pulse animation, optional custom icon prop)
+- SelectionCard (default/selected, SVG illustrations,
+  icon left + label right, no description)
 - ReviewCard (display only)
-- PreferenceCard (default + selected, custom SVG icons)
+- PreferenceCard (default/selected, custom SVG icons)
 - AccessibilityCard (accessible/partiallyAccessible/inaccessible
   × default/selected)
-- PhotoCard (src, label, selected state with primary/500 overlay)
+- PhotoCard (src, label, selected with primary/500 overlay)
 - PlacePhotoCard (optional src, location chip, last updated)
 - Chip (primary/secondary, optional icon)
 - StatusBadge (positive/warning/negative, optional icon,
   rounded-[24px])
 - Divider (1px neutral/200 horizontal rule)
 - Dropdown (expandable pill, custom bg/text colours,
-  optional items prop — when provided becomes interactive with
-  expand/collapse; when omitted stays display-only)
-- TextInput (label + input, default/focused states)
+  optional items prop for interactive expand/collapse)
+- TextInput (label + input, default/focused)
 - RouteDestination (From + To TextInputs + swap button.
-  onSwap prop swaps from/to values. stopPropagation on swap
-  button to prevent closing parent sheets)
-- CommentInput (textarea, 280 char limit, default/focused/error)
-- NavBar (Discover/Map/Profile, lucide icons, active pill,
-  justify-between)
+  onSwap swaps values. stopPropagation on swap button.)
+- CommentInput (textarea, 280 char limit)
+- NavBar (Discover/Map/Profile, lucide icons, active pill)
 - OnboardingProgress (currentStep/totalSteps, animated fill)
-- RadioButton (inset box-shadow style: 3px default, 6px selected)
+- RadioButton (inset box-shadow: 3px default, 6px selected)
 - PlaceListItem (name, address, distance, accessibilityScore,
   category, verifiedAt, isLiftDependent props.
-  Badge colour from score: 80+=accessible/green,
-  40-79=partial/orange, below 40=red.
-  Category icon shown inside AccessibilityBadge via getCategoryIcon.
-  isLiftDependent=true shows "Lift-dependent" warning badge
-  (Zap icon, warning colours) next to accessibility badge.
-  verifiedAt shown as relative time bottom-right replacing
-  barriers count label. Divider rendered internally,
-  not after last item. onPress prop makes card tappable.)
-- RouteTimeline (proportional segment frames horizontal bar.
-  bg-primary-100 base, transport segments as bg-primary-500
-  pills overlaid. Walk segments show Accessibility icon.
-  Transport segments show AccessibilityBadge + transport icon
-  + line number. Width proportional to durationMin.)
-- NavigationCard (default/noHazard/arrived, direction icons,
-  hazard banner, px-[16px] instruction row)
-- MediaInputButton (voice=solid border, camera=dashed border)
-- SortControl (value + onPress, opens SortSheet overlay)
-- SortSheet (overlay component, not a route. Props: isOpen,
-  options, value, onChange, onClose, height. Height matches
-  parent sheet dynamically via ref measurement. Full-screen
-  height covering map, rounded-tl-[48px] rounded-tr-[48px].
-  Uses Button variant="back" to close. RadioButton per option.
-  Slides up/down with transition-transform duration-300)
+  Score→colour: 80+=green, 40-79=orange, below 40=red.
+  Category icon via getCategoryIcon inside AccessibilityBadge.
+  isLiftDependent=true → "Lift-dependent" warning badge (Zap).
+  verifiedAt → relative time bottom-right.
+  onPress prop makes card tappable. Internal Divider.)
+- RouteTimeline (proportional horizontal segment bar.
+  bg-primary-100 base, transport=bg-primary-500 pills.
+  Width proportional to durationMin. mergeConsecutiveWalkSegments
+  applied before render to avoid duplicate walk icons.)
+- NavigationCard (3 states: default/noHazard/arrived.
+  default: hazard warning banner (warning-100), ArrowLeft,
+    "Turn left onto vul. Khreschyatyk", "80m", "Moderate
+    incline ahead in 10m". bg rgba(255,255,255,0.7) frosted.
+  noHazard: ArrowRight, "Turn right onto vul. Baseyna",
+    "120m", no banner, bg-success-100 border-success-500.
+  arrived: "You have arrived", no direction, no distance,
+    bg-primary-100 border-primary-500.)
+- MediaInputButton (voice=solid border, camera=dashed)
+- SortControl (value + onPress, opens SortSheet)
+- SortSheet (overlay, not a route. Props: isOpen, options,
+  value, onChange, onClose, height. Height dynamic via ref.
+  Full-screen, rounded-tl/tr-[48px]. Back button. RadioButton
+  per option. transition-transform duration-300)
 - ToggleButton (Yes/No pair, success/danger selected)
 - Toggle (on/off, thumb slides with translate-x)
-- SearchBar (Search icon + input, default/focused.
-  When searchActive: ArrowLeft replaces Search icon,
-  tapping arrow clears query and closes search)
+- SearchBar (Search icon + input. searchActive: ArrowLeft
+  replaces Search icon, tapping clears and closes search)
 - TransportSwitcher (transit/car/walking tabs + header label,
-  activeTab prop + onTabChange callback)
-- PlaceDetailSheet (overlay inside MapScreen, not a route.
-  Props: isOpen, place, onClose, onBuildRoute.
-  top-[248px], z-[60/65]. Drag-to-close on handle.
-  Scroll-to-top on open via useRef. Sticky feedback footer
-  (thumbs down/up + Leave a review). Sections: Entrance,
-  Toilet, Inside — each collapsible with photo cards +
-  factor list. AccessibilityBadge with category icon.
-  Lift warning banner if place.isLiftDependent.
-  No NavBar — sheet covers bottom of screen.)
-- RoutePlanningSheet (overlay inside MapScreen, not a route.
-  Props: isOpen, destinationName, onClose, onRouteSelect.
-  top-[X]px, z-[70/75]. Drag-to-close on handle.
-  Shows RouteDestination as static display in MapScreen
-  when open (replaces search bar + chips row).
-  Power outage warning banner — always shown.
-  TransportSwitcher with 3 tabs: transit/car/walking.
-  Route sort via SortSheet with ROUTE_SORT_OPTIONS.
-  SortSheet height measured dynamically from sheet ref.
-  Route cards show proportional SegmentTimeline.
-  Car tab split into "Own car" + "Taxi" sections with
-  caption labels. Uklon card (yellow CTA "Order Uklon") and
-  Social Taxi card (dark blue CTA "Schedule a ride") use
-  hardcoded brand colours with explanatory comments.
-  onRouteSelect called when route card tapped.)
-- RouteDetailSheet (overlay inside MapScreen, not a route.
-  Props: isOpen, route, destinationName, onClose.
-  top-[248px], z-[80/75]. Drag-to-close on handle.
-  Scroll-to-top on open. Sticky "Start route" footer.
-  Timeline: vertical sequence of StationRows + SegmentFrames.
-  Walk frames: bg-primary-100 pill, Accessibility icon inside,
-  walk text + barriers dropdown in right column.
-  Transport frames: bg-primary-500 pill, transport icon inside,
-  ride text + stations dropdown + "2 people confirmed" row
-  with Users icon outside the frame in right column.
-  Frames touch with no gap — one continuous connected bar.
-  Station rows between frames show location name + time.
-  End point row uses end-point-icon.svg.
-  Dropdowns expand below trigger row full-width — do NOT
-  use the Dropdown component here; inline implementation only.
-  Stations dropdown: bg-primary-100, station names listed.
-  Barriers dropdown: bg-warning-100, barrier descriptions listed.
-  Both use whitespace-nowrap on trigger labels, shrink-0 on
-  trigger buttons. Text stays fixed when dropdown opens.
-  Mapbox polyline drawn per route segment when sheet opens —
-  walk=primary-100 dashed, transport=primary-500 solid.
-  fitBounds with padding bottom:520 maxZoom:14 to show full
-  route above the sheet. Layers cleaned up on sheet close.)
+  activeTab + onTabChange)
+- PlaceDetailSheet (overlay in MapScreen. Props: isOpen,
+  place, onClose, onBuildRoute.
+  top-[248px], z-[60/65]. Drag-to-close. Scroll-to-top.
+  Sticky feedback footer (thumbs/Leave a review).
+  Sections: Entrance/Toilet/Inside — collapsible, photo
+  cards + factor list. Lift warning if isLiftDependent.
+  No NavBar.)
+- RoutePlanningSheet (overlay in MapScreen. Props: isOpen,
+  destinationName, onClose, onRouteSelect, overrideTop.
+  z-[70/75]. Drag-to-close. Power outage banner always shown.
+  TransportSwitcher 3 tabs. SortSheet dynamic height via ref.
+  SegmentTimeline per card. Car tab: "Own car" + "Taxi"
+  sections. Uklon (yellow) + Social Taxi (dark blue) cards
+  with brand colours + CTAs. overrideTop syncs height with
+  RouteDetailSheet when open.)
+- RouteDetailSheet (overlay in MapScreen. Props: isOpen,
+  route, destinationName, onClose, onStartRoute.
+  Two snap points: SNAP_SHORT=52vh, SNAP_FULL=0.
+  Drag handle advances between snaps, drag down from short
+  closes. onSnapChange prop notifies MapScreen of current top.
+  z-[80]. Sticky "Start route" footer.
+  Vertical timeline: StationRows + SegmentFrames connected.
+  Walk=bg-primary-100, Transport=bg-primary-500. No gaps.
+  Inline dropdowns (NOT Dropdown component): stations expand
+  below trigger full-width bg-primary-100; barriers expand
+  bg-warning-100. whitespace-nowrap + shrink-0 on triggers.
+  Mapbox polyline per segment:
+    transport=primary-500 (#361ecb) solid width 8
+    walk no barriers=primary-300 (#8b84e5) solid width 8
+    walk with barriers=warning-500 (#f0a030) solid width 8
+  fitBounds padding top:100 bottom:280 left:60 right:60
+  maxZoom:13. Padding reset in cleanup via setPadding zeros.
+  Start/end point Markers using starting-point-icon.svg and
+  end-point-icon.svg. All routes share same end coordinate
+  [30.5098, 50.4415].)
+- ActiveNavigationSheet (overlay in MapScreen. Props: isOpen,
+  route, destinationName, onClose.
+  z-[100] — highest in stack, true full-screen takeover.
+  bg-neutral-50 covers everything including map.
+  NavigationCard floats top-[56px] left/right-[24px] z-[101].
+  Bottom sheet: bg-neutral-0 rounded-tl/tr-[48px], compact
+  non-scrolling. Shows destination, arrivalTime, distanceKm.
+  "Report Difficulty" (secondary Button, console.log) +
+  "End route" (danger Button, calls onClose).
+  Arrival text: "You have arrived" when navState==='arrived'.
+  Auto-advancing timer: default 15s → noHazard 12s → arrived
+  stays until End route tapped. Timers cleared on close.
+  navState resets to 'default' on open.)
 
 ## SVG conventions
-- All SVGs imported with ?react suffix
-- stroke-width: 1.5 on all custom icons
-- Use currentColor for fill/stroke
+- All SVGs imported with ?react suffix, stroke-width: 1.5,
+  currentColor for fill/stroke
 - Illustrations: src/assets/illustrations/
   wheelchair-manual, wheelchair-electric, no-wheelchair,
   cane, stroller, prosthesis, IllustrationOnboarding, arch
 - Icons: src/assets/icons/
-  door-width-90, door-width-100, door-width-120,
-  slope-none, slope-moderate, slope-steep,
-  stairs-avoided, stairs-single, stairs-multiple,
-  surface-smooth, surface-uneven, surface-cobblestone,
+  door-width-90/100/120, slope-none/moderate/steep,
+  stairs-avoided/single/multiple,
+  surface-smooth/uneven/cobblestone,
   shelter, wc, starting-point-icon, end-point-icon,
   Uklon_Logo_2018.png, SocialTaxi_Logo.png
 
@@ -175,14 +169,8 @@ cobblestone, drain-channel, kerb, narrow-doorway,
 single-step, steep-slope
 
 ## Transport mode icons (lucide-react)
-- transit → TrainFront
-- bus → Bus, tram → TramFront, metro → Train
-- taxi → CarTaxiFront, car → Car
-- walking → Accessibility
-
-## Navigation directions
-turn-left, turn-right, slight-left, slight-right,
-sharp-left, sharp-right, go-straight, u-turn, arrive
+transit→TrainFront, bus→Bus, tram→TramFront, metro→Train,
+taxi→CarTaxiFront, car→Car, walking→Accessibility
 
 ## Sort options
 - Places: Most accessible first (default), Nearest first,
@@ -190,255 +178,147 @@ sharp-left, sharp-right, go-straight, u-turn, arrive
 - Routes: Fewest barriers (default), Shortest distance,
   Fastest, Flattest route
 
-## Sort logic (in MapScreen)
-- sortPlaces(places, sortValue) — sorts a copy, never mutates
-- Most accessible first → sort by accessibilityScore descending
-- Nearest first → parseDistanceToMetres(distance) converts
-  "700 m" and "5.1 km" to metres before comparing
-- Recently verified → sort by verifiedAt (Date) descending
+## Sort logic (MapScreen)
+- parseDistanceToMetres: converts "700 m"/"5.1 km" to metres
 - displayPlaces = sortPlaces(filterPlaces(filteredPlaces,
-  filterState), sortValue) computed once before render,
-  used for both empty-state check and list map
+  filterState), sortValue) — computed once, used everywhere
 
-## Accessibility badge colour logic (unified, score-based)
-- 80+ → accessible (green)
-- 40–79 → partial (orange)
-- below 40 → inaccessible (red)
-Applied consistently everywhere: map markers, popups,
-list items, filter cards, route detail badges.
+## Accessibility badge colour (unified, score-based)
+80+→accessible(green), 40-79→partial(orange), <40→red
+Everywhere: markers, popups, lists, filter cards, badges.
 
 ## getCategoryIcon helper
-- Location: src/utils/categoryIcon.tsx (shared utility)
-- Signature: getCategoryIcon(category: string, size: number): JSX.Element
-- Returns correct lucide-react icon per category
-- Used by: map markers, place popup badge, PlaceListItem badge,
-  FilterScreen cards, PlaceDetailSheet, and all future screens
-- Comment above function: "Shared helper — used by map markers,
-  place popup, PlaceListItem, and all future place-detail screens.
-  Import from here whenever a category icon is needed."
+Location: src/utils/categoryIcon.tsx
+Signature: getCategoryIcon(category, size): JSX.Element
+Used everywhere a category icon is needed.
 
-## Place data shape
+## Place data shape (exported from MapScreen.tsx)
 type Place = {
-  id: string
-  name: string
-  address: string
-  category: string   // 'shelter'|'hospital'|'restaurant'|
-                     // 'landmark'|'supermarket'|'park'|
-                     // 'bank'|'toilet'|'pharmacy'
-  coordinates: [number, number]  // [lng, lat]
-  accessibilityScore: number
-  barrierCount: number
-  distance: string   // e.g. "300 m" or "1.2 km"
-  verifiedAt: Date
-  isLiftDependent: boolean
+  id, name, address, category, coordinates: [lng,lat],
+  accessibilityScore, barrierCount, distance,
+  verifiedAt: Date, isLiftDependent: boolean
 }
-40+ real Kyiv places across 9 categories. All exported from
-MapScreen.tsx as: export const PLACES: Place[]
-export type { Place } also from MapScreen.tsx.
 
-## Route data shape (defined in RoutePlanningSheet.tsx)
+## Route data shape (exported from RoutePlanningSheet.tsx)
 type RouteSegment = {
-  type: 'walk' | 'bus' | 'tram' | 'metro' | 'car'
-  durationMin: number
-  line?: string
-  accessible?: boolean
-}
-type RouteCoordinates = {
-  segments: { type: string; coords: [number, number][] }[]
+  type: 'walk'|'bus'|'tram'|'metro'|'car'
+  durationMin, line?, accessible?, hasBarriers?
 }
 type Route = {
-  id: string
-  distanceKm: number
-  barrierCount: number
-  departureTime: string
-  durationMin: number
-  arrivalTime: string
-  cardType: 'standard' | 'uklon' | 'social-taxi'
+  id, distanceKm, barrierCount, departureTime,
+  durationMin, arrivalTime,
+  cardType: 'standard'|'uklon'|'social-taxi'
   segments: RouteSegment[]
-  coordinates: RouteCoordinates
-  stationNames?: {
-    boardAt?: string
-    direction?: string
-    alightAt?: string
-  }[]
+  coordinates: { segments: {type, hasBarriers?, coords}[] }
+  stationNames?: { boardAt?, direction?, alightAt? }[]
 }
-Exported as: export type { Route }
+TRANSIT_ROUTES(4), CAR_ROUTES(4), WALKING_ROUTES(2)
+All routes end at [30.5098, 50.4415].
 
-Route arrays: TRANSIT_ROUTES (4), CAR_ROUTES (4: 2 standard +
-uklon + social-taxi), WALKING_ROUTES (2) — all in
-RoutePlanningSheet.tsx.
-
-## Third-party brand colours (hardcoded, with comments)
-// Uklon brand colours — not Passage tokens
-UKLON_YELLOW = '#F5DB00'
-UKLON_BLACK = '#222426'
-// Social Taxi brand colours — not Passage tokens
-SOCIAL_TAXI_YELLOW = '#FED428'
-SOCIAL_TAXI_DARK_BLUE = '#253362'
-Used only in RoutePlanningSheet.tsx car tab cards.
+## Third-party brand colours (hardcoded with comments)
+UKLON_YELLOW='#F5DB00', UKLON_BLACK='#222426'
+SOCIAL_TAXI_YELLOW='#FED428', SOCIAL_TAXI_DARK_BLUE='#253362'
+Used only in RoutePlanningSheet.tsx.
 
 ## Filter state (src/context/FilterContext.tsx)
-FilterState lives in React Context, shared between MapScreen
-and FilterScreen. Never local to either screen.
-
+Shared via React Context between MapScreen + FilterScreen.
 type FilterState = {
-  accessibility: Set<string>  // 'accessible'|'inaccessible'|
-                               // 'partial'|'unknown'
-  avoidLifts: boolean
-  hasCompanion: boolean
+  accessibility: Set<string>, avoidLifts, hasCompanion
 }
+DEFAULT: accessibility=new Set(['accessible','inaccessible',
+'partial']), avoidLifts=false, hasCompanion=false.
+CRITICAL: always create new Set on update, never mutate.
+handleReset must create new Set, never reuse DEFAULT ref.
 
-DEFAULT_FILTER_STATE = {
-  accessibility: new Set(['accessible', 'inaccessible', 'partial']),
-  avoidLifts: false,
-  hasCompanion: false,
-}
-
-CRITICAL: Always create a new Set when updating accessibility —
-never mutate the existing one:
-  const next = new Set(prev.accessibility)
-  next.delete(variant) / next.add(variant)
-  return { ...prev, accessibility: next }
-handleReset must also create a new Set — never reuse the
-DEFAULT_FILTER_STATE reference directly.
-
-FilterProvider wraps the app in main.tsx.
-useFilterContext() hook used by both MapScreen and FilterScreen.
-
-## filterPlaces function (in MapScreen)
-Applies to both map markers AND bottom sheet list.
-function filterPlaces(places: Place[], filter: FilterState): Place[] {
-  return places.filter((place) => {
-    const variant = getAccessibilityVariant(place.accessibilityScore)
-    return filter.accessibility.has(variant)
-  })
-}
-avoidLifts and hasCompanion are wired to state but filtering
-logic pending place-level data.
-
-Selected marker guard: if selected place is filtered out,
-close popup automatically via useEffect watching filterState.
+## filterPlaces (MapScreen)
+Applies to map markers AND list. Checks getAccessibilityVariant
+against filter.accessibility Set.
 
 ## MapScreen state overview
-Key state variables (all in MapScreen.tsx):
-- searchQuery, searchActive — search bar state
-- sortValue, sortSheetOpen — place sort
-- selectedPlaceId — active map marker
-- bottomSheetOpen, bottomSheetHeight — places list sheet
-- selectedPlaceForDetail, placeDetailOpen — PlaceDetailSheet
-- routePlanningOpen, routeDestinationName, routeSwapped — route planning
-- selectedRoute, routeDetailOpen — RouteDetailSheet
+searchQuery, searchActive, sortValue, sortSheetOpen,
+selectedPlaceId, bottomSheetOpen, bottomSheetHeight,
+selectedPlaceForDetail, placeDetailOpen,
+routePlanningOpen, routeDestinationName, routeSwapped,
+selectedRoute, routeDetailOpen, routeDetailSnapTop,
+activeNavigationOpen
 
 ## MapScreen overlay z-index stack (bottom to top)
-- Map: z-0
-- Chips row backdrop / search backdrop: z-[45]
-- Bottom sheet (places list): z-[50]
-- Place popup backdrop: z-[55]
-- Place popup: z-[60]
-- PlaceDetailSheet backdrop: z-[55], sheet: z-[60]
-- RoutePlanningSheet backdrop: z-[65], sheet: z-[70]
-- RouteDetailSheet backdrop: z-[75], sheet: z-[80]
-- SortSheet (inside RoutePlanningSheet): above parent sheet
-- NavBar: fixed bottom-[24px]
+Map:z-0, chips backdrop:z-[45], bottom sheet:z-[50],
+popup backdrop:z-[55], popup:z-[60],
+PlaceDetailSheet backdrop:z-[55] sheet:z-[60],
+RoutePlanningSheet backdrop:z-[65] sheet:z-[70],
+RouteDetailSheet backdrop:z-[75] sheet:z-[80],
+ActiveNavigationSheet:z-[100] card:z-[101]
 
 ## MapScreen UI visibility rules
-- Chips row hidden when: searchActive OR placeDetailOpen
-- Search bar replaced by RouteDestination when:
+- Chips hidden: searchActive OR placeDetailOpen OR
+  routePlanningOpen OR activeNavigationOpen
+- Search bar hidden: activeNavigationOpen
+- Search replaced by RouteDestination:
   routePlanningOpen AND NOT routeDetailOpen
-- RouteDestination hidden when: routeDetailOpen
-- NavBar always visible except inside PlaceDetailSheet
-  (PlaceDetailSheet has no NavBar)
+  AND NOT activeNavigationOpen
+- NavBar hidden: activeNavigationOpen
+- PlaceDetailSheet isOpen: placeDetailOpen
+  AND NOT routePlanningOpen AND NOT activeNavigationOpen
+- RoutePlanningSheet isOpen: routePlanningOpen
+  AND NOT routeDetailOpen AND NOT activeNavigationOpen
+- RouteDetailSheet isOpen: routeDetailOpen
+  AND NOT activeNavigationOpen
+- RoutePlanningSheet overrideTop: routeDetailSnapTop
+  when routeDetailOpen, else null
+
+## Mapbox flyTo convention
+All marker/search flyTo calls use offset:[0,-80], zoom:16.
+No padding on flyTo — only fitBounds uses padding.
+map.setPadding zeros on mount and in RouteDetailSheet cleanup.
 
 ## Search behaviour
-- Tapping search bar: searchActive=true, ArrowLeft replaces
-  Search icon in bar
-- Tapping ArrowLeft: clears query, searchActive=false
-- Tapping result: sets searchQuery=place.name,
-  searchActive=false, map flies to place, PlaceDetailSheet opens
-- Filter button stays visible in search active state
-- Filter navigates with state: { from: 'search' } when
-  searchActive, { from: 'map' } otherwise
-- FilterScreen Back button returns to /map with
-  { returnToSearch: true } when from==='search'
-- MapScreen on mount: if location.state.returnToSearch →
-  setSearchActive(true)
+Tap bar→searchActive=true. ArrowLeft→clears+closes.
+Result tap→searchQuery=name, searchActive=false,
+map flyTo, PlaceDetailSheet opens.
+Filter from search: navigate with {from:'search'}.
+FilterScreen back→/map with {returnToSearch:true}.
 
 ## Code conventions
-- Named exports only (export const ComponentName)
-- No hardcoded hex values — Passage tokens only
-  Exception: third-party brand colours (Uklon, Social Taxi)
-  and Mapbox line-color values (must be hex; comment with
-  token equivalent)
-- No inline styles except dynamic numeric values (e.g. height)
+- Named exports only
+- No hardcoded hex — Passage tokens only
+  (exceptions: brand colours, Mapbox line-color with comment)
+- No inline styles except dynamic numeric values
 - No data-node-id attributes
-- <button> for all interactive components
-- aria-pressed for toggle/selection components
+- <button> for interactive, aria-pressed for toggles
 - focus-visible:ring-2 focus-visible:ring-primary-500
   focus-visible:ring-offset-2 focus-visible:outline-none
 - transition-colors duration-200
-- Font smoothing: -webkit-font-smoothing: antialiased in index.css
-- Import components from src/components/index.ts —
-  never rebuild existing components
-- whitespace-nowrap on all dropdown trigger labels
-- shrink-0 on all dropdown trigger buttons
+- whitespace-nowrap on dropdown labels, shrink-0 on triggers
+- Import from src/components/index.ts — never rebuild
 
-## Screens already built (src/screens/)
-- Onboarding1 — Route: /
-- Onboarding2 — Route: /onboarding/2
-- Onboarding3 — Route: /onboarding/3
-- Onboarding4 — Route: /onboarding/4
-- Onboarding5 — Route: /onboarding/5
-- MapScreen — Route: /map (see MapScreen state overview above)
-- FilterScreen — Route: /filter
+## Screens (src/screens/)
+Onboarding1(/), Onboarding2-5(/onboarding/2-5),
+MapScreen(/map), FilterScreen(/filter)
 
-## Routing (react-router-dom, BrowserRouter in main.tsx)
-/ → Onboarding1
-/onboarding/2 → Onboarding2
-/onboarding/3 → Onboarding3
-/onboarding/4 → Onboarding4
-/onboarding/5 → Onboarding5
-/map → MapScreen
-/filter → FilterScreen
-/dev → component showcase (all components)
+## Routing
+/ /onboarding/2-5 /map /filter /dev(component showcase)
 
-## Context providers (main.tsx wrapping order)
-<BrowserRouter>
-  <FilterProvider>
-    <App />
-  </FilterProvider>
-</BrowserRouter>
+## Context providers (main.tsx)
+<BrowserRouter><FilterProvider><App /></FilterProvider></BrowserRouter>
 
-## Mapbox setup
-- Token: VITE_MAPBOX_TOKEN in .env (never hardcoded)
-- Style: mapbox://styles/mapbox/streets-v12
-- Default centre: Kyiv (lng:30.5234, lat:50.4501), zoom:14
-- Always import: mapbox-gl/dist/mapbox-gl.css in map screens
-- Route polylines: addSource/addLayer with GeoJSON LineString
-  per segment. Cleaned up on RouteDetailSheet close.
-  fitBounds padding: top:120 bottom:520 left:60 right:60
-  maxZoom:14
+## Mapbox
+Token: VITE_MAPBOX_TOKEN. Style: streets-v12.
+Centre: Kyiv [30.5234,50.4501] zoom:14.
+Always import mapbox-gl/dist/mapbox-gl.css in map screens.
 
-## PWA
-- Planned at end of project — no setup yet
-
-## Git workflow
-- Commit after each completed screen
-- Push via Cursor terminal (not Claude Code)
-- Terminal 1: npm run dev (keep running)
-- Terminal 2: git commands
-- Run on phone: npm run dev -- --host then open Network URL
+## Git / dev
+Terminal 1: npm run dev. Terminal 2: git.
+Phone: npm run dev -- --host → open Network URL.
+Commit after each screen. Push via Cursor terminal.
 
 ## Prompt conventions for Claude Code
-- Always use Sonnet 4.6
-- Effort: Low for fixes, Medium for new screens
-- Always include: "Remove all data-node-id attributes"
-- Always include: "Use only Passage tokens, no hardcoded values"
-- Dev server: "If not running, start with npm run dev"
-- Figma specs are extracted in Claude Chat and embedded
-  in prompts — Claude Code reads specs from the prompt,
-  not directly from Figma URLs
-- Screens go in src/screens/
-- Components go in src/components/ and must be exported
-  from src/components/index.ts
-- Shared utilities go in src/utils/
-- Context providers go in src/context/81
+- Model: claude-sonnet-4-6
+- Always: "Remove all data-node-id attributes"
+- Always: "Use only Passage tokens, no hardcoded values"
+- Always: "If not running, start with npm run dev"
+- Figma specs embedded in prompts — not read from URLs
+- components→src/components/ + export from index.ts
+- screens→src/screens/
+- utils→src/utils/
+- context→src/context/

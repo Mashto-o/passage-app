@@ -802,6 +802,7 @@ type RoutePlanningSheetProps = {
   onClose: () => void
   onRouteSelect: (route: Route) => void
   overrideTop?: number | null
+  maxHeight?: number
 }
 
 // ── Sheet ──────────────────────────────────────────────────────────────────
@@ -812,6 +813,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   onClose,
   onRouteSelect,
   overrideTop,
+  maxHeight,
 }) => {
   const [routeSortValue, setRouteSortValue] = useState('Fewest barriers')
   const [routeSortOpen,  setRouteSortOpen]  = useState(false)
@@ -867,6 +869,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
             : isOpen ? 248 : window.innerHeight,
           transform: `translateY(${dragDelta}px)`,
           transition: 'top 0.3s ease',
+          ...(maxHeight !== undefined ? { maxHeight, overflow: 'hidden' } : {}),
         }}
       >
         {/* Drag handle */}

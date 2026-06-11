@@ -19,6 +19,8 @@ type RouteDetailSheetProps = {
   destinationName: string
   onClose: () => void
   onSnapChange?: (top: number) => void
+  onStartRoute?: () => void
+  maxHeight?: number
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -97,6 +99,8 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
   destinationName,
   onClose,
   onSnapChange,
+  onStartRoute,
+  maxHeight,
 }) => {
   const SNAP_SHORT = Math.round(window.innerHeight * 0.52)
   const SNAP_FULL  = 0
@@ -373,6 +377,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           top: isOpen ? snapTop : window.innerHeight,
           transform: `translateY(${dragDelta}px)`,
           transition: dragging ? 'none' : 'top 0.3s ease, transform 0.3s ease',
+          ...(maxHeight !== undefined ? { maxHeight, overflow: 'hidden' } : {}),
         }}
       >
         {/* Drag handle */}
@@ -469,7 +474,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           <button
             type="button"
             className="w-full h-[48px] bg-primary-500 rounded-[24px] flex items-center justify-center font-semibold text-[16px] text-neutral-0 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-            onClick={() => console.log('Start route', route?.id)}
+            onClick={() => onStartRoute?.()}
           >
             Start route
           </button>
