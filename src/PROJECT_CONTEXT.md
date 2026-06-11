@@ -1,3 +1,10 @@
+The file can't be written directly from here since it's on your machine, not in the container. Here's what to do — copy the entire block below and paste it into Cursor as a Claude Code prompt:
+
+---
+
+Replace the entire contents of `PROJECT_CONTEXT.md` with the following:
+
+```markdown
 # Passage App — Project Context for Claude
 
 ## What this project is
@@ -83,13 +90,28 @@ src/
   Width proportional to durationMin. mergeConsecutiveWalkSegments
   applied before render to avoid duplicate walk icons.)
 - NavigationCard (3 states: default/noHazard/arrived.
+  ALL states use bg-neutral-0 border border-neutral-200 — no
+  colour change between states.
   default: hazard warning banner (warning-100), ArrowLeft,
     "Turn left onto vul. Khreschyatyk", "80m", "Moderate
-    incline ahead in 10m". bg rgba(255,255,255,0.7) frosted.
+    incline ahead in 10m".
   noHazard: ArrowRight, "Turn right onto vul. Baseyna",
-    "120m", no banner, bg-success-100 border-success-500.
-  arrived: "You have arrived", no direction, no distance,
-    bg-primary-100 border-primary-500.)
+    "120m", no banner.
+  arrived: MapPin icon, "You have arrived!", destinationName
+    as sublabel (NOT hardcoded "Your destination").
+  Slide animation on state change: slides out downward, updates
+  content, slides in from above. transition-transform duration-300.)
+- BarrierCheckModal (modal overlay during active navigation.
+  Props: isOpen, barrierLabel, barrierImageSrc, onYes, onNo, onSkip.
+  z-[110] — above ActiveNavigationSheet.
+  Full-screen dark overlay rgba(26,26,26,0.6).
+  White card rounded-[48px] px-[24px] py-[32px], centred.
+  Title: "Is this barrier still there?" heading/sm.
+  Photo: w-[165px] h-[200px] rounded-[24px] overflow-hidden.
+  Buttons: "Yes, still there" (primary), "No, it's gone" (success),
+  "Skip — I'm not sure" (ghost, neutral/500).
+  Footer: "Your answer helps other users on this route" body/sm.
+  All three buttons dismiss modal + console.log action.)
 - MediaInputButton (voice=solid border, camera=dashed)
 - SortControl (value + onPress, opens SortSheet)
 - SortSheet (overlay, not a route. Props: isOpen, options,
@@ -136,20 +158,90 @@ src/
   maxZoom:13. Padding reset in cleanup via setPadding zeros.
   Start/end point Markers using starting-point-icon.svg and
   end-point-icon.svg. All routes share same end coordinate
-  [30.5098, 50.4415].)
+  [30.5098, 50.4415].
+  Place markers hidden when routeDetailOpen or activeNavigationOpen.
+  Only end point marker remains visible during route.)
 - ActiveNavigationSheet (overlay in MapScreen. Props: isOpen,
-  route, destinationName, onClose.
+  route, destinationName, onClose, onNavStateChange, onPanelHeightChange,
+  maxHeight.
   z-[100] — highest in stack, true full-screen takeover.
   bg-neutral-50 covers everything including map.
   NavigationCard floats top-[56px] left/right-[24px] z-[101].
-  Bottom sheet: bg-neutral-0 rounded-tl/tr-[48px], compact
+  Slide animation on navState change: card slides out down,
+  content updates, slides back in from above (300ms).
+  Bottom panel: bg-neutral-0 rounded-tl/tr-[48px], compact
   non-scrolling. Shows destination, arrivalTime, distanceKm.
   "Report Difficulty" (secondary Button, console.log) +
   "End route" (danger Button, calls onClose).
-  Arrival text: "You have arrived" when navState==='arrived'.
-  Auto-advancing timer: default 15s → noHazard 12s → arrived
-  stays until End route tapped. Timers cleared on close.
-  navState resets to 'default' on open.)
+  On arrival: bottom panel slides down and disappears (translate-y-full,
+  duration-500). NavigationCard remains visible showing arrived state.
+  Auto-advancing timers (halved): default 7.5s → noHazard 13.5s → arrived.
+  BarrierCheckModal appears at 4s (hardcoded kerb photo).
+  onNavStateChange called on every navState change.
+  onPanelHeightChange: measures bottom panel height via ResizeObserver.
+  maxHeight: when set, clamps sheet height so it cannot exceed
+  ActiveNavigationSheet panel when navigation is active.
+  Timers cleared on close. navState resets to 'default' on open.)
+
+## Map popup behaviour
+- Tapping a marker opens PlacePopupCard
+- Tapping anywhere on the popup body (photo, label, badge, bg)
+  → opens PlaceDetailSheet for that place
+- Save / Share buttons: stopPropagation + console.log only
+- "Build a route" button: stopPropagation + opens RoutePlanningSheet
+- Close (X) button: stopPropagation + closes popup
+- Popup hidden when selectedPlace is null
+
+## Route completion flow
+When navState reaches 'arrived' in ActiveNavigationSheet:
+1. onNavStateChange fires with 'arrived'
+2. MapScreen immediately: closes routeDetailOpen, routePlanningOpen,
+   placeDetailOpen, calls closeSheet() (category list), clears
+   selectedPlace, sets routeEndedAt = Date.now()
+3. ActiveNavigationSheet bottom panel slides down (hidden)
+4. NavigationCard stays visible showing arrived state + destinationName
+5. Route polyline remains drawn on map
+6. After 3 seconds: setActiveNavigationOpen(false), setSelectedRoute(null),
+   navigate('/route-complete', { state: { distanceKm, durationMin } })
+"End route" button: closes ActiveNavigationSheet only, returns to
+RouteDetailSheet. Does NOT trigger route-complete flow.
+
+## Route progress animation (during active navigation)
+- routeProgress state (0→1) increments over route durationMin
+- Grey overlay layer (neutral/400 #9a9aa3) drawn on TOP covering
+  the AHEAD portion (progressIndex → end of flattened coords)
+- Completed portion shows original segment colours underneath
+- Animated pulse dot (bg-primary-500, animate-ping ring) at
+  current progress coordinate
+- All cleared when activeNavigationOpen = false
+
+## Screens (src/screens/)
+Onboarding1(/), Onboarding2-5(/onboarding/2-5),
+MapScreen(/map), FilterScreen(/filter),
+RouteCompleteScreen(/route-complete)
+
+## RouteCompleteScreen (/route-complete)
+Full-page scrollable screen, bg-neutral-50. Slide-up entrance
+animation (translate-y-full → translate-y-0, duration-500).
+Receives route stats via React Router location state:
+{ distanceKm, durationMin }.
+Sections:
+- Header: BadgeCheck icon (bg-primary-100 rounded-[48px] p-[16px]),
+  "Route complete!" display/md, "{distanceKm} km · {durationMin} min"
+- HOW WAS THE ROUTE: 3 AccessibilityCard (single select, console.log)
+- BARRIERS: barrier label + ToggleButton Yes/No (console.log)
+- ADD A COMMENT: 2 Chips, CommentInput, OR label, MediaInputButton
+- Submit (primary) → navigate('/profile')
+- Skip (ghost) → navigate('/map')
+Section labels: caption/md (14px medium tracking-[0.56px] uppercase
+neutral/700). All gaps: 32px between sections.
+
+## Routing
+/ /onboarding/2-5 /map /filter /route-complete /profile(placeholder)
+/dev(component showcase)
+
+## Context providers (main.tsx)
+<BrowserRouter><FilterProvider><App /></FilterProvider></BrowserRouter>
 
 ## SVG conventions
 - All SVGs imported with ?react suffix, stroke-width: 1.5,
@@ -240,7 +332,8 @@ selectedPlaceId, bottomSheetOpen, bottomSheetHeight,
 selectedPlaceForDetail, placeDetailOpen,
 routePlanningOpen, routeDestinationName, routeSwapped,
 selectedRoute, routeDetailOpen, routeDetailSnapTop,
-activeNavigationOpen
+activeNavigationOpen, navPanelHeight, routeEndedAt,
+routeProgress
 
 ## MapScreen overlay z-index stack (bottom to top)
 Map:z-0, chips backdrop:z-[45], bottom sheet:z-[50],
@@ -248,7 +341,8 @@ popup backdrop:z-[55], popup:z-[60],
 PlaceDetailSheet backdrop:z-[55] sheet:z-[60],
 RoutePlanningSheet backdrop:z-[65] sheet:z-[70],
 RouteDetailSheet backdrop:z-[75] sheet:z-[80],
-ActiveNavigationSheet:z-[100] card:z-[101]
+ActiveNavigationSheet:z-[100] card:z-[101],
+BarrierCheckModal:z-[110]
 
 ## MapScreen UI visibility rules
 - Chips hidden: searchActive OR placeDetailOpen OR
@@ -266,11 +360,14 @@ ActiveNavigationSheet:z-[100] card:z-[101]
   AND NOT activeNavigationOpen
 - RoutePlanningSheet overrideTop: routeDetailSnapTop
   when routeDetailOpen, else null
+- Place markers visible: NOT routeDetailOpen AND NOT activeNavigationOpen
 
 ## Mapbox flyTo convention
 All marker/search flyTo calls use offset:[0,-80], zoom:16.
 No padding on flyTo — only fitBounds uses padding.
 map.setPadding zeros on mount and in RouteDetailSheet cleanup.
+Mapbox free tier: 50,000 map loads/month, 100,000 Directions
+API requests/month. GeoJSON layers do not count as extra loads.
 
 ## Search behaviour
 Tap bar→searchActive=true. ArrowLeft→clears+closes.
@@ -292,26 +389,6 @@ FilterScreen back→/map with {returnToSearch:true}.
 - whitespace-nowrap on dropdown labels, shrink-0 on triggers
 - Import from src/components/index.ts — never rebuild
 
-## Screens (src/screens/)
-Onboarding1(/), Onboarding2-5(/onboarding/2-5),
-MapScreen(/map), FilterScreen(/filter)
-
-## Routing
-/ /onboarding/2-5 /map /filter /dev(component showcase)
-
-## Context providers (main.tsx)
-<BrowserRouter><FilterProvider><App /></FilterProvider></BrowserRouter>
-
-## Mapbox
-Token: VITE_MAPBOX_TOKEN. Style: streets-v12.
-Centre: Kyiv [30.5234,50.4501] zoom:14.
-Always import mapbox-gl/dist/mapbox-gl.css in map screens.
-
-## Git / dev
-Terminal 1: npm run dev. Terminal 2: git.
-Phone: npm run dev -- --host → open Network URL.
-Commit after each screen. Push via Cursor terminal.
-
 ## Prompt conventions for Claude Code
 - Model: claude-sonnet-4-6
 - Always: "Remove all data-node-id attributes"
@@ -322,3 +399,9 @@ Commit after each screen. Push via Cursor terminal.
 - screens→src/screens/
 - utils→src/utils/
 - context→src/context/
+
+## Git / dev
+Terminal 1: npm run dev. Terminal 2: git.
+Phone: npm run dev -- --host → open Network URL.
+Commit after each screen. Push via Cursor terminal.
+```

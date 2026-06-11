@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Map, { Marker } from 'react-map-gl/mapbox'
 import type { MapRef } from 'react-map-gl/mapbox'
+import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Funnel, Hospital, Utensils, Landmark, ShoppingCart, Trees, Toilet, Pill, ChevronLeft } from 'lucide-react'
 import ShelterIcon from '../assets/icons/shelter.svg?react'
@@ -250,6 +251,9 @@ export const MapScreen: React.FC = () => {
     start: [number, number] | null
     end: [number, number] | null
   }>({ start: null, end: null })
+  const dotIndexRef    = useRef(0)
+  const dotMarkerRef   = useRef<mapboxgl.Marker | null>(null)
+  const dotIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -428,6 +432,63 @@ export const MapScreen: React.FC = () => {
     }
   }, [selectedRoute])
 
+  // ── Moving dot marker during active navigation ────────────────────
+  useEffect(() => {
+    const map = mapRef.current?.getMap()
+
+    if (!activeNavigationOpen || !selectedRoute || !map) {
+      if (dotIntervalRef.current) { clearInterval(dotIntervalRef.current); dotIntervalRef.current = null }
+      dotMarkerRef.current?.remove(); dotMarkerRef.current = null
+      dotIndexRef.current = 0
+      return
+    }
+
+    const allCoords   = selectedRoute.coordinates.segments.flatMap(s => s.coords)
+    const ARRIVAL_MS  = 13500
+    const INTERVAL_MS = 300
+    const totalTicks  = ARRIVAL_MS / INTERVAL_MS // 45 ticks
+
+    // Build DOM element — inline styles used because this element is created at runtime
+    const el   = document.createElement('div')
+    el.style.cssText = 'position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px'
+
+    const ring = document.createElement('div')
+    // primary-300 (#8b84e5) — Mapbox DOM element, Passage token unavailable at runtime
+    ring.style.cssText = 'position:absolute;width:24px;height:24px;border-radius:9999px;background-color:#8b84e5;opacity:0.75;animation:ping 1s cubic-bezier(0,0,0.2,1) infinite'
+
+    const dot  = document.createElement('div')
+    // primary-500 (#361ecb) — Mapbox DOM element, Passage token unavailable at runtime
+    dot.style.cssText  = 'width:16px;height:16px;border-radius:9999px;background-color:#361ecb;position:relative;z-index:10'
+
+    el.appendChild(ring)
+    el.appendChild(dot)
+
+    dotIndexRef.current = 0
+    const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      .setLngLat(allCoords[0])
+      .addTo(map)
+    dotMarkerRef.current = marker
+
+    let tick = 0
+    dotIntervalRef.current = setInterval(() => {
+      tick = Math.min(tick + 1, totalTicks)
+      // Map tick → coord index proportionally so the dot always takes exactly ARRIVAL_MS
+      const idx = Math.floor((tick / totalTicks) * (allCoords.length - 1))
+      dotIndexRef.current = idx
+      dotMarkerRef.current?.setLngLat(allCoords[idx])
+      if (tick >= totalTicks) {
+        clearInterval(dotIntervalRef.current!)
+        dotIntervalRef.current = null
+      }
+    }, INTERVAL_MS)
+
+    return () => {
+      if (dotIntervalRef.current) { clearInterval(dotIntervalRef.current); dotIntervalRef.current = null }
+      dotMarkerRef.current?.remove(); dotMarkerRef.current = null
+      dotIndexRef.current = 0
+    }
+  }, [activeNavigationOpen, selectedRoute])
+
   // ── Navigate to route review 2 s after arrival ───────────────────
   useEffect(() => {
     if (!routeEndedAt) return
@@ -493,7 +554,7 @@ export const MapScreen: React.FC = () => {
           mapStyle="mapbox://styles/mapbox/streets-v12"
           onClick={() => { if (sheetVisible) closeSheet() }}
         >
-          {filterPlaces(PLACES, filterState).map(place => (
+          {!routeDetailOpen && !activeNavigationOpen && filterPlaces(PLACES, filterState).map(place => (
             <Marker
               key={place.id}
               longitude={place.coordinates[0]}
@@ -532,6 +593,7 @@ export const MapScreen: React.FC = () => {
               />
             </Marker>
           )}
+
         </Map>
       )}
 
@@ -839,6 +901,7 @@ export const MapScreen: React.FC = () => {
             setRoutePlanningOpen(false)
             setPlaceDetailOpen(false)
             setSelectedPlace(null)
+            closeSheet()
             setRouteEndedAt(Date.now())
           }
         }}
