@@ -20,6 +20,7 @@ export interface PlacePopupCardProps {
   onRoute?: () => void
   onBookmark?: () => void
   onShare?: () => void
+  onCardClick?: () => void
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -38,6 +39,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
   onRoute,
   onBookmark,
   onShare,
+  onCardClick,
 }) => {
   return (
     <div
@@ -47,13 +49,17 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
         visible ? 'translate-y-0' : 'translate-y-[calc(100%+125px)]',
       ].join(' ')}
     >
-      <div className="bg-neutral-0 rounded-[32px] pt-sm px-md pb-md flex flex-col gap-sm shadow-lg">
+      {/* Entire card body is tappable — buttons stop propagation so they don't trigger this */}
+      <div
+        className="bg-neutral-0 rounded-[32px] pt-sm px-md pb-md flex flex-col gap-sm shadow-lg cursor-pointer"
+        onClick={onCardClick}
+      >
 
         {/* Close button row */}
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={onClose}
+            onClick={(e) => { e.stopPropagation(); onClose() }}
             className={[
               'flex items-center justify-center',
               'w-[32px] h-[32px] rounded-full',
@@ -104,12 +110,12 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
               variant="primary"
               label="Build a route"
               fullWidth
-              onClick={onRoute}
+              onClick={(e) => { e.stopPropagation(); onRoute?.() }}
             />
           </div>
           <button
             type="button"
-            onClick={onBookmark}
+            onClick={(e) => { e.stopPropagation(); onBookmark?.() }}
             className={[
               'flex items-center justify-center shrink-0',
               'w-[48px] h-[48px] rounded-full',
@@ -123,7 +129,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
           </button>
           <button
             type="button"
-            onClick={onShare}
+            onClick={(e) => { e.stopPropagation(); onShare?.() }}
             className={[
               'flex items-center justify-center shrink-0',
               'w-[48px] h-[48px] rounded-full',

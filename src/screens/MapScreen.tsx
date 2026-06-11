@@ -731,14 +731,20 @@ export const MapScreen: React.FC = () => {
         scoreVariant={scoreVariant(selectedPlace?.accessibilityScore ?? 0)}
         categoryIcon={selectedPlace ? getCategoryIcon(selectedPlace.category, 12) : undefined}
         onClose={handleClosePopup}
+        onCardClick={() => {
+          if (selectedPlace) {
+            setSelectedPlaceForDetail(selectedPlace)
+            setPlaceDetailOpen(true)
+          }
+        }}
         onRoute={() => {
           if (selectedPlace) {
             setSelectedPlaceForDetail(selectedPlace)
             setPlaceDetailOpen(true)
           }
         }}
-        onBookmark={() => console.log('Bookmark', selectedPlace)}
-        onShare={() => console.log('Share', selectedPlace)}
+        onBookmark={() => console.log('save')}
+        onShare={() => console.log('share')}
       />
 
       {/* ── NavBar ──────────────────────────────────────────────────── */}
