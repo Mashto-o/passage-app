@@ -245,6 +245,7 @@ export const MapScreen: React.FC = () => {
   const [routeDetailSnapTop, setRouteDetailSnapTop] = useState<number | null>(null)
   const [activeNavigationOpen, setActiveNavigationOpen] = useState(false)
   const [navPanelHeight, setNavPanelHeight] = useState(0)
+  const [routeEndedAt, setRouteEndedAt] = useState<number | null>(null)
   const [routeMarkers, setRouteMarkers] = useState<{
     start: [number, number] | null
     end: [number, number] | null
@@ -426,6 +427,22 @@ export const MapScreen: React.FC = () => {
       map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 })
     }
   }, [routeDetailOpen, selectedRoute])
+
+  // ── Navigate to route review 3 s after the user ends a route ─────
+  useEffect(() => {
+    console.log('routeEndedAt changed:', routeEndedAt);
+    if (!routeEndedAt) return
+    const timeout = setTimeout(() => {
+      navigate('/route-complete', {
+        state: {
+          distanceKm: selectedRoute?.distanceKm,
+          durationMin: selectedRoute?.durationMin,
+        },
+      })
+      setRouteEndedAt(null)
+    }, 3000)
+    return () => clearTimeout(timeout)
+  }, [routeEndedAt])
 
   // ── Touch handlers ────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
@@ -739,8 +756,8 @@ export const MapScreen: React.FC = () => {
         }}
         onRoute={() => {
           if (selectedPlace) {
-            setSelectedPlaceForDetail(selectedPlace)
-            setPlaceDetailOpen(true)
+            setRouteDestinationName(selectedPlace.name)
+            setRoutePlanningOpen(true)
           }
         }}
         onBookmark={() => console.log('save')}
@@ -815,6 +832,7 @@ export const MapScreen: React.FC = () => {
         route={selectedRoute}
         destinationName={routeDestinationName}
         onClose={() => setActiveNavigationOpen(false)}
+        onArrived={() => setRouteEndedAt(Date.now())}
         onPanelHeightChange={setNavPanelHeight}
       />
 

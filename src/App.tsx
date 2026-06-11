@@ -9,6 +9,7 @@ import { Onboarding4 } from './screens/Onboarding4'
 import { Onboarding5 } from './screens/Onboarding5'
 import { MapScreen } from './screens/MapScreen'
 import { FilterScreen } from './screens/FilterScreen'
+import { RouteCompleteScreen } from './screens/RouteCompleteScreen'
 
 // ── Dev showcase imports ───────────────────────────────────────────────────
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
@@ -472,9 +473,11 @@ function App() {
       <Route path="/onboarding/4"  element={<Onboarding4 />} />
       <Route path="/onboarding/5"  element={<Onboarding5 />} />
       <Route path="/map"            element={<MapScreen />} />
-      <Route path="/filter"         element={<FilterScreen />} />
-      <Route path="/dev"           element={<DevShowcase />} />
-      <Route path="*"              element={<Navigate to="/" replace />} />
+      <Route path="/filter"          element={<FilterScreen />} />
+      <Route path="/route-complete" element={<RouteCompleteScreen />} />
+      <Route path="/profile"        element={<div className="flex items-center justify-center h-screen text-neutral-500">Profile coming soon</div>} />
+      <Route path="/dev"            element={<DevShowcase />} />
+      <Route path="*"               element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

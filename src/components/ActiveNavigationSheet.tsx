@@ -12,6 +12,7 @@ type ActiveNavigationSheetProps = {
   route: Route | null
   destinationName: string
   onClose: () => void // closes and returns to RouteDetailSheet
+  onArrived: () => void // called when navState reaches 'arrived'
   onPanelHeightChange?: (height: number) => void
 }
 
@@ -22,6 +23,7 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
   route,
   destinationName,
   onClose,
+  onArrived,
   onPanelHeightChange,
 }) => {
   const [navState, setNavState] = useState<NavState>('default')
@@ -46,7 +48,7 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
     setNavState('default')
 
     const timer1 = setTimeout(() => setNavState('noHazard'), 15000)
-    const timer2 = setTimeout(() => setNavState('arrived'), 27000) // 15 + 12
+    const timer2 = setTimeout(() => { setNavState('arrived'); onArrived() }, 27000) // 15 + 12
     const timerBarrier = setTimeout(() => setBarrierCheckOpen(true), 8000)
 
     return () => {
