@@ -234,6 +234,9 @@
     "weeksAgo_one": "{{count}}w ago",
     "weeksAgo_other": "{{count}}w ago"
   },
+  "navigationCard": {
+    "arrived": "You have arrived!"
+  },
   "navigation": {
     "turnLeft": "Turn left",
     "turnRight": "Turn right",

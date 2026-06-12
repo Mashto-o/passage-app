@@ -248,6 +248,9 @@
     "weeksAgo_many": "{{count}} тижнів тому",
     "weeksAgo_other": "{{count}} тижнів тому"
   },
+  "navigationCard": {
+    "arrived": "Ви прибули!"
+  },
   "navigation": {
     "turnLeft": "Повернути ліворуч",
     "turnRight": "Повернути праворуч",

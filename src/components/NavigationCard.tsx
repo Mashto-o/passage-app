@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, ArrowRight, ArrowUpLeft, ArrowUpRight,
   ArrowDownLeft, ArrowDownRight, ArrowUp, Undo2,
@@ -56,6 +57,7 @@ export const NavigationCard: React.FC<NavigationCardProps> = ({
   hazardBoldPrefix,
   className = '',
 }) => {
+  const { t } = useTranslation()
   const showHazard = state === 'default'
   const isArrived  = state === 'arrived'
 
@@ -80,7 +82,7 @@ export const NavigationCard: React.FC<NavigationCardProps> = ({
             <MapPinCheckInside size={24} strokeWidth={1.5} className="text-primary-500 shrink-0" />
             <div className="flex flex-col">
               <span className="text-display-md text-[22px] leading-[1.3] text-neutral-900 whitespace-nowrap">
-                You have arrived!
+                {t('navigationCard.arrived')}
               </span>
               <span className="text-body-sm text-neutral-700 whitespace-nowrap">
                 {streetName}
