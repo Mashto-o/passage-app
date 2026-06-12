@@ -1,5 +1,6 @@
 import React from 'react'
 import { ImageIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export interface PlacePhotoCardProps {
   src?: string
@@ -16,6 +17,8 @@ export const PlacePhotoCard: React.FC<PlacePhotoCardProps> = ({
   updatedAt,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div className={`w-[165px] flex flex-col items-start gap-[12px] ${className}`}>
 
@@ -39,7 +42,7 @@ export const PlacePhotoCard: React.FC<PlacePhotoCardProps> = ({
 
       {/* Text area */}
       <div className="flex flex-col items-start w-full">
-        <span className="text-body-sb text-neutral-900">Last updated:</span>
+        <span className="text-body-sb text-neutral-900">{t('placePhotoCard.lastUpdated')}</span>
         <span className="text-body-sm text-neutral-700 w-[165px]">{updatedAt}</span>
       </div>
 

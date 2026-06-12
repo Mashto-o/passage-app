@@ -1,5 +1,6 @@
 import React from 'react'
 import { ArrowUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { StatusBadge } from './StatusBadge'
 import WheelchairManual from '../assets/illustrations/wheelchair-manual.svg?react'
 
@@ -20,6 +21,8 @@ export const UpdateCard: React.FC<UpdateCardProps> = ({
   verifiedCount,
   timeAgo,
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div className="w-[290px] shrink-0 bg-neutral-0 border border-neutral-200 rounded-[24px] p-md flex flex-col gap-md">
 
@@ -38,7 +41,7 @@ export const UpdateCard: React.FC<UpdateCardProps> = ({
       <div className="flex items-center justify-between gap-xs">
         <StatusBadge
           variant="positive"
-          label="Now Accessible"
+          label={t('updateCard.nowAccessible')}
           icon={<ArrowUp size={12} strokeWidth={2} />}
         />
         <span className="text-body-sm text-neutral-700 whitespace-nowrap">{timeAgo}</span>
@@ -60,14 +63,15 @@ export const UpdateCard: React.FC<UpdateCardProps> = ({
           <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 z-10 relative" />
           <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 -ml-[8px]" />
         </div>
-        <span className="text-body-sm text-neutral-700">Verified by {verifiedCount}</span>
         <WheelchairManual
           width={16}
           height={16}
           aria-hidden
           className="text-primary-500 shrink-0"
         />
-        <span className="text-body-sm text-neutral-700">users</span>
+        <span className="text-body-sm text-neutral-700">
+          {t('updateCard.verifiedBy', { count: verifiedCount })}
+        </span>
       </div>
 
     </div>

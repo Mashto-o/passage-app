@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface ReviewCardProps {
   authorName: string
@@ -17,10 +18,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   reviewText,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div
       role="article"
-      aria-label={`Review by ${authorName}`}
+      aria-label={t('reviewCard.reviewBy', { author: authorName })}
       className={`flex gap-md p-md bg-neutral-0 border border-neutral-200 rounded-xl ${className}`}
     >
       {/* Avatar */}

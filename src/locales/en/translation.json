@@ -3,6 +3,7 @@
     "next": "Next",
     "back": "Back",
     "skip": "Skip",
+    "save": "Save",
     "onboardingLabel": "Onboarding",
     "close": "Close",
     "bookmark": "Bookmark",
@@ -236,6 +237,67 @@
   },
   "navigationCard": {
     "arrived": "You have arrived!"
+  },
+  "discover": {
+    "title": "Discover",
+    "filterAll": "All",
+    "filterUpdates": "Updates",
+    "filterFriends": "Friends",
+    "filterEvents": "Events",
+    "updatesLabel": "Updates",
+    "updatesSubtitle": "Places that recently improved",
+    "friendsLabel": "Friends' activity",
+    "friendsSubtitle": "Your friends posted some reviews recently",
+    "eventsLabel": "Accessible events",
+    "eventsSubtitle": "Events we recommend you based on your interests"
+  },
+  "updateCard": {
+    "nowAccessible": "Now Accessible",
+    "verifiedBy_one": "Verified by {{count}} user",
+    "verifiedBy_other": "Verified by {{count}} users"
+  },
+  "eventCard": {
+    "going_one": "{{count}} going",
+    "going_other": "{{count}} going"
+  },
+  "reviewCard": {
+    "reviewBy": "Review by {{author}}"
+  },
+  "placePhotoCard": {
+    "lastUpdated": "Last updated:"
+  },
+  "mediaInput": {
+    "tapToSpeak": "Tap to speak",
+    "tapToAddPhoto": "Tap to add a photo"
+  },
+  "profile": {
+    "title": "Profile",
+    "impactTitle": "Your Impact This Week",
+    "reviewsPosted": "reviews posted",
+    "moreToNext_one": "{{count}} more to next level!",
+    "moreToNext_other": "{{count}} more to next level!",
+    "reviews_one": "{{count}} review",
+    "reviews_other": "{{count}} reviews",
+    "friends_one": "{{count}} friend",
+    "friends_other": "{{count}} friends",
+    "myProfile": "My Profile",
+    "accessibilityPreferences": "My accessibility preferences",
+    "savedPlaces": "Saved places",
+    "myReviews": "My reviews",
+    "myFriends": "My friends",
+    "appSettings": "App Settings",
+    "voiceGuidance": "Voice guidance",
+    "notifications": "Notifications",
+    "account": "Account",
+    "signOut": "Sign out",
+    "levelName1": "Newcomer",
+    "levelName2": "Explorer",
+    "levelName3": "Local guide",
+    "levelName4": "City mapper",
+    "levelName5": "Barrier breaker"
+  },
+  "accessibilityPreferences": {
+    "title": "Accessibility preferences"
   },
   "navigation": {
     "turnLeft": "Turn left",

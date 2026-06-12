@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Accessibility, Bookmark, MessageCircle, Users,
   Volume2, Bell, LogOut, ChevronRight,
@@ -30,14 +31,21 @@ const mobilityIllustrations: Record<MobilityAid, React.ReactElement> = {
 // ── Level system ───────────────────────────────────────────────────
 
 const REVIEWS_PER_LEVEL = 10
-const LEVEL_NAMES = ['Newcomer', 'Explorer', 'Local guide', 'City mapper', 'Barrier breaker']
 
-function getLevel(reviewCount: number): { level: number; name: string; moreToNext: number } {
-  const level     = Math.min(Math.floor(reviewCount / REVIEWS_PER_LEVEL) + 1, 5)
+const LEVEL_NAME_KEYS = [
+  'profile.levelName1',
+  'profile.levelName2',
+  'profile.levelName3',
+  'profile.levelName4',
+  'profile.levelName5',
+]
+
+function getLevel(reviewCount: number): { level: number; nameKey: string; moreToNext: number } {
+  const level      = Math.min(Math.floor(reviewCount / REVIEWS_PER_LEVEL) + 1, 5)
   const moreToNext = level < 5
     ? REVIEWS_PER_LEVEL - (reviewCount % REVIEWS_PER_LEVEL)
     : 0
-  return { level, name: LEVEL_NAMES[level - 1], moreToNext }
+  return { level, nameKey: LEVEL_NAME_KEYS[level - 1], moreToNext }
 }
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -130,6 +138,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onSignOut,
 }) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [voiceGuidance, setVoiceGuidance] = useState(false)
   const [notifications,  setNotifications]  = useState(false)
 
@@ -138,14 +147,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     ? mobilityIllustrations[mobilityAid]
     : <WheelchairManual width={24} height={24} aria-hidden className="text-primary-500" />
 
-  const { level, name: levelName, moreToNext } = getLevel(reviewCount)
+  const { level, nameKey: levelNameKey, moreToNext } = getLevel(reviewCount)
 
   return (
     <main className="relative w-full min-h-screen overflow-y-auto bg-neutral-50">
       <div className="flex flex-col gap-xl px-lg pt-[56px] pb-[144px]">
 
         {/* ── Page title ─────────────────────────────────────────── */}
-        <h1 className="text-display-md text-neutral-900">Profile</h1>
+        <h1 className="text-display-md text-neutral-900">{t('profile.title')}</h1>
 
         {/* ── User info row ───────────────────────────────────────── */}
         <div className="flex items-start justify-between w-full">
@@ -179,7 +188,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   onClick={() => onMyReviews?.()}
                   className="text-body-sm text-neutral-700 underline underline-offset-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 >
-                  {reviewCount} reviews
+                  {t('profile.reviews', { count: reviewCount })}
                 </button>
                 <div className="w-px h-[10px] bg-neutral-200 shrink-0" aria-hidden />
                 <button
@@ -187,7 +196,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   onClick={() => onMyFriends?.()}
                   className="text-body-sm text-neutral-700 underline underline-offset-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 >
-                  {friendCount} friends
+                  {t('profile.friends', { count: friendCount })}
                 </button>
               </div>
             </div>
@@ -198,14 +207,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <div className="flex items-center justify-center border-2 border-primary-500 rounded-[24px] px-[7px] py-[2px]">
               <span className="text-caption-sm font-semibold text-primary-500 leading-[1.4]">{level}</span>
             </div>
-            <span className="text-caption-sm text-primary-500 whitespace-nowrap">{levelName}</span>
+            <span className="text-caption-sm text-primary-500 whitespace-nowrap">{t(levelNameKey)}</span>
           </div>
         </div>
 
         {/* ── Impact widget ───────────────────────────────────────── */}
         <div className="bg-primary-100 rounded-[24px] p-sm flex flex-col gap-sm w-full">
           <p className="text-caption-md tracking-[0.56px] uppercase text-primary-500">
-            Your Impact This Week
+            {t('profile.impactTitle')}
           </p>
           <div className="flex items-start gap-sm w-full">
             {/* Left: count + badge + label */}
@@ -215,12 +224,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 {level < 5 && moreToNext > 0 && (
                   <div className="bg-primary-500 rounded-[24px] px-xs py-[4px] shrink-0">
                     <span className="text-caption-sm text-neutral-0 whitespace-nowrap">
-                      {moreToNext} more to get the next level!
+                      {t('profile.moreToNext', { count: moreToNext })}
                     </span>
                   </div>
                 )}
               </div>
-              <span className="text-body-md text-neutral-700">reviews posted</span>
+              <span className="text-body-md text-neutral-700">{t('profile.reviewsPosted')}</span>
             </div>
             {/* Right: illustration */}
             <div className="shrink-0 w-[90px] h-[54px] flex items-center justify-end">
@@ -234,29 +243,29 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           {/* MY PROFILE */}
           <div className="flex flex-col gap-lg w-full">
-            <SectionLabel>My Profile</SectionLabel>
+            <SectionLabel>{t('profile.myProfile')}</SectionLabel>
             <div className="flex flex-col gap-md w-full">
               <MenuRow
                 icon={<Accessibility size={24} strokeWidth={1.5} />}
-                label="My accessibility preferences"
+                label={t('profile.accessibilityPreferences')}
                 onPress={() => { navigate('/profile/preferences'); onAccessibilityPreferences?.() }}
               />
               <Divider />
               <MenuRow
                 icon={<Bookmark size={24} strokeWidth={1.5} />}
-                label="Saved places"
+                label={t('profile.savedPlaces')}
                 onPress={onSavedPlaces}
               />
               <Divider />
               <MenuRow
                 icon={<MessageCircle size={24} strokeWidth={1.5} />}
-                label="My reviews"
+                label={t('profile.myReviews')}
                 onPress={onMyReviews}
               />
               <Divider />
               <MenuRow
                 icon={<Users size={24} strokeWidth={1.5} />}
-                label="My friends"
+                label={t('profile.myFriends')}
                 onPress={onMyFriends}
               />
             </div>
@@ -264,32 +273,32 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           {/* APP SETTINGS */}
           <div className="flex flex-col gap-lg w-full">
-            <SectionLabel>App Settings</SectionLabel>
+            <SectionLabel>{t('profile.appSettings')}</SectionLabel>
             <div className="flex flex-col gap-md w-full">
               <ToggleRow
                 icon={<Volume2 size={24} strokeWidth={1.5} />}
-                label="Voice guidance"
+                label={t('profile.voiceGuidance')}
                 value={voiceGuidance}
                 onChange={setVoiceGuidance}
-                toggleLabel="Voice guidance"
+                toggleLabel={t('profile.voiceGuidance')}
               />
               <Divider />
               <ToggleRow
                 icon={<Bell size={24} strokeWidth={1.5} />}
-                label="Notifications"
+                label={t('profile.notifications')}
                 value={notifications}
                 onChange={setNotifications}
-                toggleLabel="Notifications"
+                toggleLabel={t('profile.notifications')}
               />
             </div>
           </div>
 
           {/* ACCOUNT */}
           <div className="flex flex-col gap-lg w-full">
-            <SectionLabel>Account</SectionLabel>
+            <SectionLabel>{t('profile.account')}</SectionLabel>
             <MenuRow
               icon={<LogOut size={24} strokeWidth={1.5} />}
-              label="Sign out"
+              label={t('profile.signOut')}
               onPress={onSignOut}
             />
           </div>

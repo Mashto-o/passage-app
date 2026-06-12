@@ -1,5 +1,6 @@
 import React from 'react'
 import { Mic, Camera } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export interface MediaInputButtonProps {
   variant: 'voice' | 'camera'
@@ -8,16 +9,8 @@ export interface MediaInputButtonProps {
 }
 
 const config = {
-  voice: {
-    border: 'border-solid',
-    Icon: Mic,
-    label: 'Tap to speak',
-  },
-  camera: {
-    border: 'border-dashed',
-    Icon: Camera,
-    label: 'Tap to add a photo',
-  },
+  voice:  { border: 'border-solid',  Icon: Mic,    labelKey: 'mediaInput.tapToSpeak'    },
+  camera: { border: 'border-dashed', Icon: Camera, labelKey: 'mediaInput.tapToAddPhoto' },
 }
 
 export const MediaInputButton: React.FC<MediaInputButtonProps> = ({
@@ -25,7 +18,8 @@ export const MediaInputButton: React.FC<MediaInputButtonProps> = ({
   onPress,
   className = '',
 }) => {
-  const { border, Icon, label } = config[variant]
+  const { t } = useTranslation()
+  const { border, Icon, labelKey } = config[variant]
 
   return (
     <button
@@ -46,7 +40,7 @@ export const MediaInputButton: React.FC<MediaInputButtonProps> = ({
     >
       <Icon size={24} strokeWidth={1.5} className="text-neutral-500" />
       <span className="text-caption-sm tracking-[0.12px] text-neutral-500">
-        {label}
+        {t(labelKey)}
       </span>
     </button>
   )

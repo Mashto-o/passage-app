@@ -3,6 +3,7 @@
     "next": "Далі",
     "back": "Назад",
     "skip": "Пропустити",
+    "save": "Зберегти",
     "onboardingLabel": "Онбординг",
     "close": "Закрити",
     "bookmark": "Закладка",
@@ -250,6 +251,77 @@
   },
   "navigationCard": {
     "arrived": "Ви прибули!"
+  },
+  "discover": {
+    "title": "Відкрити",
+    "filterAll": "Усі",
+    "filterUpdates": "Оновлення",
+    "filterFriends": "Друзі",
+    "filterEvents": "Події",
+    "updatesLabel": "Оновлення",
+    "updatesSubtitle": "Місця, що нещодавно покращились",
+    "friendsLabel": "Активність друзів",
+    "friendsSubtitle": "Ваші друзі нещодавно залишили відгуки",
+    "eventsLabel": "Доступні події",
+    "eventsSubtitle": "Події, які ми рекомендуємо на основі ваших інтересів"
+  },
+  "updateCard": {
+    "nowAccessible": "Тепер доступно",
+    "verifiedBy_one": "Підтверджено {{count}} користувачем",
+    "verifiedBy_few": "Підтверджено {{count}} користувачами",
+    "verifiedBy_many": "Підтверджено {{count}} користувачами",
+    "verifiedBy_other": "Підтверджено {{count}} користувачами"
+  },
+  "eventCard": {
+    "going_one": "{{count}} піде",
+    "going_few": "{{count}} підуть",
+    "going_many": "{{count}} підуть",
+    "going_other": "{{count}} підуть"
+  },
+  "reviewCard": {
+    "reviewBy": "Відгук від {{author}}"
+  },
+  "placePhotoCard": {
+    "lastUpdated": "Оновлено:"
+  },
+  "mediaInput": {
+    "tapToSpeak": "Натисніть, щоб говорити",
+    "tapToAddPhoto": "Натисніть, щоб додати фото"
+  },
+  "profile": {
+    "title": "Профіль",
+    "impactTitle": "Ваш вплив цього тижня",
+    "reviewsPosted": "відгуків опубліковано",
+    "moreToNext_one": "ще {{count}} до наступного рівня!",
+    "moreToNext_few": "ще {{count}} до наступного рівня!",
+    "moreToNext_many": "ще {{count}} до наступного рівня!",
+    "moreToNext_other": "ще {{count}} до наступного рівня!",
+    "reviews_one": "{{count}} відгук",
+    "reviews_few": "{{count}} відгуки",
+    "reviews_many": "{{count}} відгуків",
+    "reviews_other": "{{count}} відгуків",
+    "friends_one": "{{count}} друг",
+    "friends_few": "{{count}} друзі",
+    "friends_many": "{{count}} друзів",
+    "friends_other": "{{count}} друзів",
+    "myProfile": "Мій профіль",
+    "accessibilityPreferences": "Мої уподобання доступності",
+    "savedPlaces": "Збережені місця",
+    "myReviews": "Мої відгуки",
+    "myFriends": "Мої друзі",
+    "appSettings": "Налаштування",
+    "voiceGuidance": "Голосові підказки",
+    "notifications": "Сповіщення",
+    "account": "Акаунт",
+    "signOut": "Вийти",
+    "levelName1": "Новачок",
+    "levelName2": "Дослідник",
+    "levelName3": "Місцевий гід",
+    "levelName4": "Картограф міста",
+    "levelName5": "Руйнівник бар'єрів"
+  },
+  "accessibilityPreferences": {
+    "title": "Уподобання доступності"
   },
   "navigation": {
     "turnLeft": "Повернути ліворуч",
