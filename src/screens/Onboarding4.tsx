@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, PreferenceCard, OnboardingProgress } from '../components'
+import { useOnboarding } from '../context/OnboardingContext'
 import Logo from '../assets/icons/Logo.svg?react'
 
 import DoorWidth90        from '../assets/icons/door-width-90.svg?react'
@@ -18,10 +19,12 @@ import SurfaceSmooth      from '../assets/icons/surface-smooth.svg?react'
 
 export const Onboarding4: React.FC = () => {
   const navigate = useNavigate()
-  const [door,    setDoor]    = useState<string>('100')
-  const [stairs,  setStairs]  = useState<string>('avoided')
-  const [slope,   setSlope]   = useState<string>('moderate')
-  const [surface, setSurface] = useState<string>('uneven')
+  const {
+    doorWidth: door,    setDoorWidth: setDoor,
+    stairs,             setStairs,
+    slope,              setSlope,
+    surface,            setSurface,
+  } = useOnboarding()
 
   const handleNext = () => {
     navigate('/onboarding/5')

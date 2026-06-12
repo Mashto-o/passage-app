@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Bookmark, Share2, Zap, Construction,
   DoorOpen, Sofa, ChevronUp, ChevronDown, ThumbsUp, ThumbsDown,
@@ -121,6 +122,7 @@ type PlaceDetailSheetProps = {
 // ── Component ──────────────────────────────────────────────────────────────
 
 export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpen, onClose, onBuildRoute }) => {
+  const navigate = useNavigate()
   const [entranceOpen, setEntranceOpen] = useState(true)
   const [toiletOpen,   setToiletOpen]   = useState(true)
   const [insideOpen,   setInsideOpen]   = useState(true)
@@ -421,7 +423,9 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               variant="primary"
               label="Leave a review"
               fullWidth
-              onClick={() => place && console.log('Leave a review', place.id)}
+              onClick={() => place && navigate('/review', {
+              state: { placeId: place.id, placeName: place.name, address: place.address },
+            })}
             />
           </div>
         </div>

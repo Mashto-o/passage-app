@@ -1,10 +1,13 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Phone, Mail } from 'lucide-react'
 import { Button, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 import IllustrationOnboarding from '../assets/illustrations/IllustrationOnboarding.svg?react'
 
 export const Onboarding5: React.FC = () => {
+  const navigate = useNavigate()
+
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col overflow-hidden relative">
 
@@ -56,7 +59,7 @@ export const Onboarding5: React.FC = () => {
           fullWidth
           icon={<Phone size={20} />}
           iconPosition="right"
-          onClick={() => console.log('Sign up with phone')}
+          onClick={() => navigate('/map')}
         />
         <Button
           variant="secondary"
@@ -64,11 +67,11 @@ export const Onboarding5: React.FC = () => {
           fullWidth
           icon={<Mail size={20} />}
           iconPosition="right"
-          onClick={() => console.log('Sign up with e-mail')}
+          onClick={() => navigate('/map')}
         />
         <button
           type="button"
-          onClick={() => console.log('Continue as guest')}
+          onClick={() => navigate('/map')}
           className="text-heading-sm text-neutral-700 text-center w-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           Continue as guest

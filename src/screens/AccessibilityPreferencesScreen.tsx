@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, PreferenceCard } from '../components'
+import { useOnboarding } from '../context/OnboardingContext'
 
 import DoorWidth90        from '../assets/icons/door-width-90.svg?react'
 import DoorWidth100       from '../assets/icons/door-width-100.svg?react'
@@ -17,11 +18,12 @@ import SurfaceSmooth      from '../assets/icons/surface-smooth.svg?react'
 
 export const AccessibilityPreferencesScreen: React.FC = () => {
   const navigate = useNavigate()
-
-  const [door,    setDoor]    = useState<string>('100')
-  const [stairs,  setStairs]  = useState<string>('avoided')
-  const [slope,   setSlope]   = useState<string>('moderate')
-  const [surface, setSurface] = useState<string>('uneven')
+  const {
+    doorWidth: door,    setDoorWidth: setDoor,
+    stairs,             setStairs,
+    slope,              setSlope,
+    surface,            setSurface,
+  } = useOnboarding()
 
   return (
     <div className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">

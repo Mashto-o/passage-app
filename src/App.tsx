@@ -13,6 +13,7 @@ import { RouteCompleteScreen } from './screens/RouteCompleteScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { AccessibilityPreferencesScreen } from './screens/AccessibilityPreferencesScreen'
 import { DiscoverScreen } from './screens/DiscoverScreen'
+import { ReviewScreen } from './screens/ReviewScreen'
 
 // ── Dev showcase imports ───────────────────────────────────────────────────
 import { ArrowRight, Star, AlertTriangle, CheckCircle, XCircle, TrafficCone } from 'lucide-react'
@@ -481,6 +482,7 @@ function App() {
       <Route path="/profile"        element={<ProfileScreen />} />
       <Route path="/profile/preferences" element={<AccessibilityPreferencesScreen />} />
       <Route path="/discover"       element={<DiscoverScreen />} />
+      <Route path="/review"         element={<ReviewScreen />} />
       <Route path="/dev"            element={<DevShowcase />} />
       <Route path="*"               element={<Navigate to="/" replace />} />
     </Routes>

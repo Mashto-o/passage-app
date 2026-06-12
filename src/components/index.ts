@@ -107,3 +107,6 @@ export type { EventCardProps } from './EventCard'
 
 export { FilterChip } from './FilterChip'
 export type { FilterChipProps } from './FilterChip'
+
+export { ReviewSection } from './ReviewSection'
+export type { ReviewSectionProps, ReviewSectionQuestion } from './ReviewSection'

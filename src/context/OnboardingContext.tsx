@@ -10,44 +10,133 @@ export type MobilityAid =
   | 'stroller'
   | 'no-aid'
 
+export type DoorWidth = '90' | '100' | '120'
+export type Stairs    = 'multiple' | 'single' | 'avoided'
+export type Slope     = 'steep' | 'moderate' | 'none'
+export type Surface   = 'cobblestone' | 'uneven' | 'smooth'
+
+// ── Context shape ──────────────────────────────────────────────────
+
 interface OnboardingContextValue {
-  mobilityAid: MobilityAid | null
+  mobilityAid:    MobilityAid | null
   setMobilityAid: (aid: MobilityAid | null) => void
+
+  doorWidth:    DoorWidth | null
+  setDoorWidth: (v: DoorWidth | null) => void
+
+  stairs:    Stairs | null
+  setStairs: (v: Stairs | null) => void
+
+  slope:    Slope | null
+  setSlope: (v: Slope | null) => void
+
+  surface:    Surface | null
+  setSurface: (v: Surface | null) => void
+}
+
+// ── Storage keys ───────────────────────────────────────────────────
+
+const KEYS = {
+  mobilityAid: 'passage_mobility_aid',
+  doorWidth:   'passage_pref_door_width',
+  stairs:      'passage_pref_stairs',
+  slope:       'passage_pref_slope',
+  surface:     'passage_pref_surface',
+} as const
+
+// ── Helpers ────────────────────────────────────────────────────────
+
+function loadItem<T extends string>(key: string, fallback: T): T {
+  try {
+    const stored = localStorage.getItem(key)
+    return stored ? (stored as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function loadItemNullable<T extends string>(key: string): T | null {
+  try {
+    const stored = localStorage.getItem(key)
+    return stored ? (stored as T) : null
+  } catch {
+    return null
+  }
+}
+
+function persist(key: string, value: string | null) {
+  try {
+    if (value === null) {
+      localStorage.removeItem(key)
+    } else {
+      localStorage.setItem(key, value)
+    }
+  } catch {
+    // localStorage unavailable — state-only fallback
+  }
 }
 
 // ── Context ────────────────────────────────────────────────────────
-
-const STORAGE_KEY = 'passage_mobility_aid'
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
 
 // ── Provider ───────────────────────────────────────────────────────
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mobilityAid, setMobilityAidState] = useState<MobilityAid | null>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      return stored ? (stored as MobilityAid) : null
-    } catch {
-      return null
-    }
-  })
 
+  // mobilityAid — no default (user must choose)
+  const [mobilityAid, setMobilityAidState] = useState<MobilityAid | null>(
+    () => loadItemNullable<MobilityAid>(KEYS.mobilityAid),
+  )
   const setMobilityAid = (aid: MobilityAid | null) => {
     setMobilityAidState(aid)
-    try {
-      if (aid === null) {
-        localStorage.removeItem(STORAGE_KEY)
-      } else {
-        localStorage.setItem(STORAGE_KEY, aid)
-      }
-    } catch {
-      // localStorage unavailable — state-only fallback
-    }
+    persist(KEYS.mobilityAid, aid)
+  }
+
+  // doorWidth — defaults to '100'
+  const [doorWidth, setDoorWidthState] = useState<DoorWidth | null>(
+    () => loadItem<DoorWidth>(KEYS.doorWidth, '100'),
+  )
+  const setDoorWidth = (v: DoorWidth | null) => {
+    setDoorWidthState(v)
+    persist(KEYS.doorWidth, v)
+  }
+
+  // stairs — defaults to 'avoided'
+  const [stairs, setStairsState] = useState<Stairs | null>(
+    () => loadItem<Stairs>(KEYS.stairs, 'avoided'),
+  )
+  const setStairs = (v: Stairs | null) => {
+    setStairsState(v)
+    persist(KEYS.stairs, v)
+  }
+
+  // slope — defaults to 'moderate'
+  const [slope, setSlopeState] = useState<Slope | null>(
+    () => loadItem<Slope>(KEYS.slope, 'moderate'),
+  )
+  const setSlope = (v: Slope | null) => {
+    setSlopeState(v)
+    persist(KEYS.slope, v)
+  }
+
+  // surface — defaults to 'uneven'
+  const [surface, setSurfaceState] = useState<Surface | null>(
+    () => loadItem<Surface>(KEYS.surface, 'uneven'),
+  )
+  const setSurface = (v: Surface | null) => {
+    setSurfaceState(v)
+    persist(KEYS.surface, v)
   }
 
   return (
-    <OnboardingContext.Provider value={{ mobilityAid, setMobilityAid }}>
+    <OnboardingContext.Provider value={{
+      mobilityAid, setMobilityAid,
+      doorWidth,   setDoorWidth,
+      stairs,      setStairs,
+      slope,       setSlope,
+      surface,     setSurface,
+    }}>
       {children}
     </OnboardingContext.Provider>
   )
