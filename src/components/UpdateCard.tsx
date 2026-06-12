@@ -1,0 +1,75 @@
+import React from 'react'
+import { ArrowUp } from 'lucide-react'
+import { StatusBadge } from './StatusBadge'
+import WheelchairManual from '../assets/illustrations/wheelchair-manual.svg?react'
+
+export interface UpdateCardProps {
+  imageSrc?: string
+  placeName: string
+  address: string
+  description: string
+  verifiedCount: number
+  timeAgo: string
+}
+
+export const UpdateCard: React.FC<UpdateCardProps> = ({
+  imageSrc,
+  placeName,
+  address,
+  description,
+  verifiedCount,
+  timeAgo,
+}) => {
+  return (
+    <div className="w-[290px] shrink-0 bg-neutral-0 border border-neutral-200 rounded-[24px] p-md flex flex-col gap-md">
+
+      {/* Image */}
+      {imageSrc ? (
+        <img
+          src={imageSrc}
+          alt={placeName}
+          className="h-[120px] w-full rounded-[24px] object-cover"
+        />
+      ) : (
+        <div className="h-[120px] w-full rounded-[24px] bg-neutral-200" />
+      )}
+
+      {/* Status + time */}
+      <div className="flex items-center justify-between gap-xs">
+        <StatusBadge
+          variant="positive"
+          label="Now Accessible"
+          icon={<ArrowUp size={12} strokeWidth={2} />}
+        />
+        <span className="text-body-sm text-neutral-700 whitespace-nowrap">{timeAgo}</span>
+      </div>
+
+      {/* Place name + address */}
+      <div className="flex flex-col gap-[2px]">
+        <span className="text-heading-sm text-neutral-900">{placeName}</span>
+        <span className="text-body-sm text-neutral-700">{address}</span>
+      </div>
+
+      {/* Description */}
+      <p className="text-body-md text-neutral-900">{description}</p>
+
+      {/* Footer: avatar stack + verified by */}
+      <div className="flex items-center gap-xs">
+        {/* Two overlapping avatar circles */}
+        <div className="flex items-center">
+          <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 z-10 relative" />
+          <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 -ml-[8px]" />
+        </div>
+        <span className="text-body-sm text-neutral-700">Verified by {verifiedCount}</span>
+        <WheelchairManual
+          width={16}
+          height={16}
+          aria-hidden
+          className="text-primary-500 shrink-0"
+        />
+        <span className="text-body-sm text-neutral-700">users</span>
+      </div>
+
+    </div>
+  )
+}

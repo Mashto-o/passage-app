@@ -830,7 +830,7 @@ export const MapScreen: React.FC = () => {
       {/* ── NavBar ──────────────────────────────────────────────────── */}
       {!activeNavigationOpen && (
         <div className="absolute bottom-lg left-lg right-lg z-40">
-          <NavBar activeTab="map" onTabChange={() => {}} />
+          <NavBar activeTab="map" onTabChange={(tab) => navigate('/' + tab)} />
         </div>
       )}
 

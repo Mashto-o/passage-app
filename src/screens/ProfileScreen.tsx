@@ -297,7 +297,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       <div className="fixed bottom-[24px] left-[24px] right-[24px] z-40">
         <NavBar
           activeTab="profile"
-          onTabChange={onTabChange ?? (() => {})}
+          onTabChange={onTabChange ?? ((tab) => navigate('/' + tab))}
         />
       </div>
     </div>

@@ -207,18 +207,24 @@ When navState reaches 'arrived' in ActiveNavigationSheet:
 RouteDetailSheet. Does NOT trigger route-complete flow.
 
 ## Route progress animation (during active navigation)
-- routeProgress state (0→1) increments over route durationMin
-- Grey overlay layer (neutral/400 #9a9aa3) drawn on TOP covering
-  the AHEAD portion (progressIndex → end of flattened coords)
-- Completed portion shows original segment colours underneath
-- Animated pulse dot (bg-primary-500, animate-ping ring) at
-  current progress coordinate
-- All cleared when activeNavigationOpen = false
+- Animated pulse dot (bg-primary-500, animate-ping ring bg-primary-300
+  opacity-75) moves along flattened route coords as a Mapbox Marker
+- Moves via setInterval every 300ms, stepPerTick = ceil(allCoords.length / 45)
+- Timed to reach the end coordinate at exactly 13,500ms — the same
+  moment navState becomes 'arrived' (matches timer2 in
+  ActiveNavigationSheet)
+- Dot stays at final coordinate once arrived, interval clears itself
+- Coloured segment polylines remain fully coloured throughout — no
+  grey overlay/fill layer (this approach was tried and removed)
+- Marker added when activeNavigationOpen becomes true, removed on
+  false or unmount
 
 ## Screens (src/screens/)
 Onboarding1(/), Onboarding2-5(/onboarding/2-5),
 MapScreen(/map), FilterScreen(/filter),
-RouteCompleteScreen(/route-complete)
+RouteCompleteScreen(/route-complete),
+ProfileScreen(/profile),
+AccessibilityPreferencesScreen(/profile/preferences)
 
 ## RouteCompleteScreen (/route-complete)
 Full-page scrollable screen, bg-neutral-50. Slide-up entrance
@@ -236,12 +242,43 @@ Sections:
 Section labels: caption/md (14px medium tracking-[0.56px] uppercase
 neutral/700). All gaps: 32px between sections.
 
+## OnboardingContext (src/context/OnboardingContext.tsx)
+Stores mobilityAid, persisted to localStorage (key: passage_mobility_aid).
+type MobilityAid = same union used in Onboarding2 (wheelchair-manual,
+wheelchair-electric, no-wheelchair, cane, stroller, prosthesis).
+setMobilityAid(null) removes the localStorage key.
+Used by: Onboarding2 (selection), ProfileScreen (display).
+Exported MobilityAid type is single source of truth.
+
+## ProfileScreen (/profile)
+Reads mobilityAid from useOnboarding(), renders matching illustration
+from src/assets/illustrations/ (fallback: wheelchair-manual),
+className="text-primary-500" (illustrations use currentColor).
+Level system: REVIEWS_PER_LEVEL = 10. reviewCount 24 → Level 3
+"Local guide", badge shows "X more to get the next level!".
+ProfileIllustration SVG in impact widget.
+Layout: px-lg, pt-[56px], pb-[120px] (scrollable, overflow-y-auto,
+min-h-screen — clears fixed NavBar), gap-xl/gap-lg/gap-md spacing.
+NavBar fixed bottom-[24px] left-[24px] right-[24px].
+"My accessibility preferences" list item → navigate('/profile/preferences')
+
+## AccessibilityPreferencesScreen (/profile/preferences)
+Subpage of ProfileScreen — same four preference groups as Onboarding4
+(Door width, Stairs, Slope, Surface) using PreferenceCard, but without
+Logo, OnboardingProgress, or onboarding heading/intro.
+Back button (variant="back") → navigate('/profile')
+Heading: "Accessibility preferences" (text-display-lg)
+Save button (primary, fullWidth) → navigate('/profile')
+Local state for door/stairs/slope/surface (not yet wired to
+OnboardingContext — separate from mobilityAid).
+
 ## Routing
-/ /onboarding/2-5 /map /filter /route-complete /profile(placeholder)
-/dev(component showcase)
+/ /onboarding/2-5 /map /filter /route-complete
+/profile /profile/preferences /dev(component showcase)
 
 ## Context providers (main.tsx)
-<BrowserRouter><FilterProvider><App /></FilterProvider></BrowserRouter>
+<BrowserRouter><OnboardingProvider><FilterProvider><App />
+</FilterProvider></OnboardingProvider></BrowserRouter>
 
 ## SVG conventions
 - All SVGs imported with ?react suffix, stroke-width: 1.5,
