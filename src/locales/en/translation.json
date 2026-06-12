@@ -1,0 +1,65 @@
+{
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip",
+    "onboardingLabel": "Onboarding"
+  },
+  "onboarding1": {
+    "title": "Passage",
+    "subtitle": "Routes that adapt to you",
+    "getStarted": "Get started",
+    "setupTime": "Setup takes less than 2 minutes"
+  },
+  "onboarding2": {
+    "title": "How do you usually move?",
+    "subtitle": "Tell us about your mobility aid you use",
+    "wheelchairSection": "Wheelchair",
+    "otherSection": "Other",
+    "manual": "Manual",
+    "electric": "Electric",
+    "cane": "Cane",
+    "limbAid": "Limb aid",
+    "stroller": "Stroller",
+    "noAid": "No aid"
+  },
+  "onboarding3": {
+    "title": "Select the barriers you can manage",
+    "subtitle": "This helps us filter routes that work for you",
+    "barriers": {
+      "kerb": "Kerb without dropped kerb",
+      "cobblestone": "Cobblestone / uneven pavement",
+      "narrow-doorway": "Narrow doorway, < 90 cm",
+      "steep-slope": "Steep slope / gradient",
+      "single-step": "Single step at entrance",
+      "drain-channel": "Drain grate"
+    }
+  },
+  "onboarding4": {
+    "title": "Based on your data, we've set these preferences for you",
+    "subtitle": "You can change them now or also any time in your profile",
+    "doorWidth": "Door width",
+    "doorNarrow": "< 90 cm",
+    "doorMedium": "± 90 cm",
+    "doorWide": "100+ cm",
+    "stairs": "Stairs",
+    "stairsStandard": "Standard",
+    "stairsLow": "Low step",
+    "stairsRamp": "Ramp only",
+    "slope": "Slope",
+    "slopeSteep": "Steep",
+    "slopeModerate": "Moderate",
+    "slopeFlat": "Flat only",
+    "surface": "Surface",
+    "surfaceCobblestone": "Cobblestone",
+    "surfaceUneven": "Uneven pavement",
+    "surfaceSmooth": "Flat only"
+  },
+  "onboarding5": {
+    "title": "Save your preferences?",
+    "subtitle": "Sign up to keep your routes and reviews across devices.",
+    "signUpPhone": "Sign up with phone",
+    "signUpEmail": "Sign up with e-mail",
+    "continueGuest": "Continue as guest"
+  }
+}

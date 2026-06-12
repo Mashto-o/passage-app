@@ -113,3 +113,5 @@ export type { ReviewSectionProps, ReviewSectionQuestion } from './ReviewSection'
 
 export { BestMatchCard } from './BestMatchCard'
 export type { BestMatchCardProps } from './BestMatchCard'
+
+export { DevLanguageToggle } from './DevLanguageToggle'

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 import Arch from '../assets/illustrations/arch.svg?react'
 
 export const Onboarding1: React.FC = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export const Onboarding1: React.FC = () => {
             ready ? 'opacity-100 translate-y-0 delay-500' : 'opacity-0 translate-y-4 delay-0',
           ].join(' ')}
         >
-          Passage
+          {t('onboarding1.title')}
         </h1>
 
         {/* Subtitle · delay 650 ms */}
@@ -52,7 +54,7 @@ export const Onboarding1: React.FC = () => {
             ready ? 'opacity-100 translate-y-0 delay-[650ms]' : 'opacity-0 translate-y-4 delay-0',
           ].join(' ')}
         >
-          Routes that adapt to you
+          {t('onboarding1.subtitle')}
         </p>
       </div>
 
@@ -78,12 +80,12 @@ export const Onboarding1: React.FC = () => {
       >
         <Button
           variant="primary"
-          label="Get started"
+          label={t('onboarding1.getStarted')}
           fullWidth
           onClick={() => navigate('/onboarding/2')}
         />
         <p className="text-caption-md text-neutral-700">
-          Setup takes less than 2 minutes
+          {t('onboarding1.setupTime')}
         </p>
       </div>
 

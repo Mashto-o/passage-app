@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Phone, Mail } from 'lucide-react'
 import { Button, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
@@ -7,6 +8,7 @@ import IllustrationOnboarding from '../assets/illustrations/IllustrationOnboardi
 
 export const Onboarding5: React.FC = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <main className="min-h-screen bg-neutral-50 flex flex-col overflow-hidden relative">
@@ -25,7 +27,7 @@ export const Onboarding5: React.FC = () => {
           {/* Progress row */}
           <div className="flex items-center justify-between">
             <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-              Onboarding
+              {t('common.onboardingLabel')}
             </span>
             <OnboardingProgress currentStep={4} totalSteps={4} />
           </div>
@@ -33,10 +35,10 @@ export const Onboarding5: React.FC = () => {
           {/* Heading block */}
           <div className="flex flex-col gap-xs">
             <h1 className="text-display-lg text-neutral-900">
-              Save your preferences?
+              {t('onboarding5.title')}
             </h1>
             <p className="text-body-md text-neutral-700">
-              Sign up to keep your routes and reviews across devices.
+              {t('onboarding5.subtitle')}
             </p>
           </div>
 
@@ -55,7 +57,7 @@ export const Onboarding5: React.FC = () => {
       <div className="px-lg pb-xl flex flex-col gap-md shrink-0">
         <Button
           variant="primary"
-          label="Sign up with phone"
+          label={t('onboarding5.signUpPhone')}
           fullWidth
           icon={<Phone size={20} />}
           iconPosition="right"
@@ -63,7 +65,7 @@ export const Onboarding5: React.FC = () => {
         />
         <Button
           variant="secondary"
-          label="Sign up with e-mail"
+          label={t('onboarding5.signUpEmail')}
           fullWidth
           icon={<Mail size={20} />}
           iconPosition="right"
@@ -74,7 +76,7 @@ export const Onboarding5: React.FC = () => {
           onClick={() => navigate('/map')}
           className="text-heading-sm text-neutral-700 text-center w-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          Continue as guest
+          {t('onboarding5.continueGuest')}
         </button>
       </div>
 

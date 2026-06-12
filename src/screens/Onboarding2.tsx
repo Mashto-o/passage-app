@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button, SelectionCard, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 import { useOnboarding } from '../context/OnboardingContext'
@@ -14,6 +15,7 @@ import NoWheelchair       from '../assets/illustrations/no-wheelchair.svg?react'
 
 export const Onboarding2: React.FC = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { mobilityAid: selected, setMobilityAid } = useOnboarding()
 
   const toggle = (id: MobilityAid) =>
@@ -37,32 +39,32 @@ export const Onboarding2: React.FC = () => {
         {/* Progress row */}
         <div className="flex items-center justify-between">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Onboarding
+            {t('common.onboardingLabel')}
           </span>
           <OnboardingProgress currentStep={1} totalSteps={4} />
         </div>
 
         {/* Heading block */}
         <div className="flex flex-col gap-xs">
-        <h1 className="text-display-lg text-neutral-900">
-          How do you usually move?
-        </h1>
-        <p className="text-body-md text-neutral-700">
-          Tell us about your mobility aid you use
-        </p>
+          <h1 className="text-display-lg text-neutral-900">
+            {t('onboarding2.title')}
+          </h1>
+          <p className="text-body-md text-neutral-700">
+            {t('onboarding2.subtitle')}
+          </p>
         </div>
       </div>{/* end Progress + Heading */}
 
       {/* ── Wheelchair section ────────────────────────────────────── */}
       <div className="flex flex-col gap-sm">
         <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-          Wheelchair
+          {t('onboarding2.wheelchairSection')}
         </span>
         <div className="flex flex-row items-stretch gap-md">
           <div className="w-[calc(50%-8px)]">
             <SelectionCard
               icon={<WheelchairManual width={32} height={32} />}
-              label="Manual"
+              label={t('onboarding2.manual')}
               subtitle=""
               selected={selected === 'wheelchair-manual'}
               onClick={() => toggle('wheelchair-manual')}
@@ -71,7 +73,7 @@ export const Onboarding2: React.FC = () => {
           <div className="w-[calc(50%-8px)]">
             <SelectionCard
               icon={<WheelchairElectric width={32} height={32} />}
-              label="Electric"
+              label={t('onboarding2.electric')}
               subtitle=""
               selected={selected === 'wheelchair-electric'}
               onClick={() => toggle('wheelchair-electric')}
@@ -83,14 +85,14 @@ export const Onboarding2: React.FC = () => {
       {/* ── Other section ─────────────────────────────────────────── */}
       <div className="flex flex-col gap-sm">
         <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-          Other
+          {t('onboarding2.otherSection')}
         </span>
         <div className="flex flex-col gap-xs">
           <div className="flex items-stretch gap-xs">
             <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<Cane width={32} height={32} />}
-                label="Cane"
+                label={t('onboarding2.cane')}
                 subtitle=""
                 selected={selected === 'cane'}
                 onClick={() => toggle('cane')}
@@ -99,7 +101,7 @@ export const Onboarding2: React.FC = () => {
             <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<Prosthesis width={32} height={32} />}
-                label="Limb aid"
+                label={t('onboarding2.limbAid')}
                 subtitle=""
                 selected={selected === 'prosthesis'}
                 onClick={() => toggle('prosthesis')}
@@ -110,7 +112,7 @@ export const Onboarding2: React.FC = () => {
             <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<Stroller width={32} height={32} />}
-                label="Stroller"
+                label={t('onboarding2.stroller')}
                 subtitle=""
                 selected={selected === 'stroller'}
                 onClick={() => toggle('stroller')}
@@ -119,7 +121,7 @@ export const Onboarding2: React.FC = () => {
             <div className="w-[calc(50%-4px)]">
               <SelectionCard
                 icon={<NoWheelchair width={32} height={32} />}
-                label="No aid"
+                label={t('onboarding2.noAid')}
                 subtitle=""
                 selected={selected === 'no-aid'}
                 onClick={() => toggle('no-aid')}
@@ -135,7 +137,7 @@ export const Onboarding2: React.FC = () => {
       {/* ── Next button ───────────────────────────────────────────── */}
       <Button
         variant="primary"
-        label="Next"
+        label={t('common.next')}
         fullWidth
         disabled={selected === null}
         onClick={handleNext}

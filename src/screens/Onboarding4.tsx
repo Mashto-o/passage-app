@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button, PreferenceCard, OnboardingProgress } from '../components'
 import { useOnboarding } from '../context/OnboardingContext'
 import Logo from '../assets/icons/Logo.svg?react'
@@ -19,6 +20,7 @@ import SurfaceSmooth      from '../assets/icons/surface-smooth.svg?react'
 
 export const Onboarding4: React.FC = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const {
     doorWidth: door,    setDoorWidth: setDoor,
     stairs,             setStairs,
@@ -44,7 +46,7 @@ export const Onboarding4: React.FC = () => {
         {/* Progress row */}
         <div className="flex items-center justify-between">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Onboarding
+            {t('common.onboardingLabel')}
           </span>
           <OnboardingProgress currentStep={3} totalSteps={4} />
         </div>
@@ -52,10 +54,10 @@ export const Onboarding4: React.FC = () => {
         {/* Heading block */}
         <div className="flex flex-col gap-xs">
           <h1 className="text-display-lg text-neutral-900">
-            Based on your data, we've set these preferences for you
+            {t('onboarding4.title')}
           </h1>
           <p className="text-body-md text-neutral-700">
-            You can change them now or also any time in your profile
+            {t('onboarding4.subtitle')}
           </p>
         </div>
       </div>{/* end Progress + Heading */}
@@ -66,48 +68,48 @@ export const Onboarding4: React.FC = () => {
         {/* Door width */}
         <div className="flex flex-col gap-sm">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Door width
+            {t('onboarding4.doorWidth')}
           </span>
           <div className="flex flex-row items-stretch gap-xs">
-            <PreferenceCard icon={<DoorWidth90  width={36} height={36} />} label="< 90 cm"   selected={door === '90'}   onClick={() => setDoor('90')}   />
-            <PreferenceCard icon={<DoorWidth100 width={36} height={36} />} label="± 90 cm"   selected={door === '100'}  onClick={() => setDoor('100')}  />
-            <PreferenceCard icon={<DoorWidth120 width={36} height={36} />} label="100+ cm"   selected={door === '120'}  onClick={() => setDoor('120')}  />
+            <PreferenceCard icon={<DoorWidth90  width={36} height={36} />} label={t('onboarding4.doorNarrow')} selected={door === '90'}   onClick={() => setDoor('90')}   />
+            <PreferenceCard icon={<DoorWidth100 width={36} height={36} />} label={t('onboarding4.doorMedium')} selected={door === '100'}  onClick={() => setDoor('100')}  />
+            <PreferenceCard icon={<DoorWidth120 width={36} height={36} />} label={t('onboarding4.doorWide')}   selected={door === '120'}  onClick={() => setDoor('120')}  />
           </div>
         </div>
 
         {/* Stairs */}
         <div className="flex flex-col gap-sm">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Stairs
+            {t('onboarding4.stairs')}
           </span>
           <div className="flex flex-row items-stretch gap-xs">
-            <PreferenceCard icon={<StairsMultiple width={36} height={36} />} label="Standard"  selected={stairs === 'multiple'} onClick={() => setStairs('multiple')} />
-            <PreferenceCard icon={<StairsSingle   width={36} height={36} />} label="Low step"  selected={stairs === 'single'}   onClick={() => setStairs('single')}   />
-            <PreferenceCard icon={<StairsAvoided  width={36} height={36} />} label="Ramp only" selected={stairs === 'avoided'}  onClick={() => setStairs('avoided')}  />
+            <PreferenceCard icon={<StairsMultiple width={36} height={36} />} label={t('onboarding4.stairsStandard')} selected={stairs === 'multiple'} onClick={() => setStairs('multiple')} />
+            <PreferenceCard icon={<StairsSingle   width={36} height={36} />} label={t('onboarding4.stairsLow')}      selected={stairs === 'single'}   onClick={() => setStairs('single')}   />
+            <PreferenceCard icon={<StairsAvoided  width={36} height={36} />} label={t('onboarding4.stairsRamp')}     selected={stairs === 'avoided'}  onClick={() => setStairs('avoided')}  />
           </div>
         </div>
 
         {/* Slope */}
         <div className="flex flex-col gap-sm">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Slope
+            {t('onboarding4.slope')}
           </span>
           <div className="flex flex-row items-stretch gap-xs">
-            <PreferenceCard icon={<SlopeSteep    width={36} height={36} />} label="Steep"     selected={slope === 'steep'}    onClick={() => setSlope('steep')}    />
-            <PreferenceCard icon={<SlopeModerate width={36} height={36} />} label="Moderate"  selected={slope === 'moderate'} onClick={() => setSlope('moderate')} />
-            <PreferenceCard icon={<SlopeNone     width={36} height={36} />} label="Flat only" selected={slope === 'none'}     onClick={() => setSlope('none')}     />
+            <PreferenceCard icon={<SlopeSteep    width={36} height={36} />} label={t('onboarding4.slopeSteep')}    selected={slope === 'steep'}    onClick={() => setSlope('steep')}    />
+            <PreferenceCard icon={<SlopeModerate width={36} height={36} />} label={t('onboarding4.slopeModerate')} selected={slope === 'moderate'} onClick={() => setSlope('moderate')} />
+            <PreferenceCard icon={<SlopeNone     width={36} height={36} />} label={t('onboarding4.slopeFlat')}     selected={slope === 'none'}     onClick={() => setSlope('none')}     />
           </div>
         </div>
 
         {/* Surface */}
         <div className="flex flex-col gap-sm">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Surface
+            {t('onboarding4.surface')}
           </span>
           <div className="flex flex-row items-stretch gap-xs">
-            <PreferenceCard icon={<SurfaceCobblestone width={36} height={36} />} label="Cobblestone"     selected={surface === 'cobblestone'} onClick={() => setSurface('cobblestone')} />
-            <PreferenceCard icon={<SurfaceUneven      width={36} height={36} />} label="Uneven pavement" selected={surface === 'uneven'}      onClick={() => setSurface('uneven')}      />
-            <PreferenceCard icon={<SurfaceSmooth      width={36} height={36} />} label="Flat only"       selected={surface === 'smooth'}      onClick={() => setSurface('smooth')}      />
+            <PreferenceCard icon={<SurfaceCobblestone width={36} height={36} />} label={t('onboarding4.surfaceCobblestone')} selected={surface === 'cobblestone'} onClick={() => setSurface('cobblestone')} />
+            <PreferenceCard icon={<SurfaceUneven      width={36} height={36} />} label={t('onboarding4.surfaceUneven')}      selected={surface === 'uneven'}      onClick={() => setSurface('uneven')}      />
+            <PreferenceCard icon={<SurfaceSmooth      width={36} height={36} />} label={t('onboarding4.surfaceSmooth')}      selected={surface === 'smooth'}      onClick={() => setSurface('smooth')}      />
           </div>
         </div>
 
@@ -119,7 +121,7 @@ export const Onboarding4: React.FC = () => {
       {/* ── Next button ───────────────────────────────────────────── */}
       <Button
         variant="primary"
-        label="Next"
+        label={t('common.next')}
         fullWidth
         onClick={handleNext}
       />

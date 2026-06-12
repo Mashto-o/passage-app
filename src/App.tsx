@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { DevLanguageToggle } from './components'
 
 // ── Screens ────────────────────────────────────────────────────────────────
 import { Onboarding1 } from './screens/Onboarding1'
@@ -470,22 +471,25 @@ function DevShowcase() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/"              element={<Onboarding1 />} />
-      <Route path="/onboarding/2"  element={<Onboarding2 />} />
-      <Route path="/onboarding/3"  element={<Onboarding3 />} />
-      <Route path="/onboarding/4"  element={<Onboarding4 />} />
-      <Route path="/onboarding/5"  element={<Onboarding5 />} />
-      <Route path="/map"            element={<MapScreen />} />
-      <Route path="/filter"          element={<FilterScreen />} />
-      <Route path="/route-complete" element={<RouteCompleteScreen />} />
-      <Route path="/profile"        element={<ProfileScreen />} />
-      <Route path="/profile/preferences" element={<AccessibilityPreferencesScreen />} />
-      <Route path="/discover"       element={<DiscoverScreen />} />
-      <Route path="/review"         element={<ReviewScreen />} />
-      <Route path="/dev"            element={<DevShowcase />} />
-      <Route path="*"               element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/"              element={<Onboarding1 />} />
+        <Route path="/onboarding/2"  element={<Onboarding2 />} />
+        <Route path="/onboarding/3"  element={<Onboarding3 />} />
+        <Route path="/onboarding/4"  element={<Onboarding4 />} />
+        <Route path="/onboarding/5"  element={<Onboarding5 />} />
+        <Route path="/map"            element={<MapScreen />} />
+        <Route path="/filter"          element={<FilterScreen />} />
+        <Route path="/route-complete" element={<RouteCompleteScreen />} />
+        <Route path="/profile"        element={<ProfileScreen />} />
+        <Route path="/profile/preferences" element={<AccessibilityPreferencesScreen />} />
+        <Route path="/discover"       element={<DiscoverScreen />} />
+        <Route path="/review"         element={<ReviewScreen />} />
+        <Route path="/dev"            element={<DevShowcase />} />
+        <Route path="*"               element={<Navigate to="/" replace />} />
+      </Routes>
+      {import.meta.env.DEV && <DevLanguageToggle />}
+    </>
   )
 }
 

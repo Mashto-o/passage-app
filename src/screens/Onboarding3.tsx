@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button, PhotoCard, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 
@@ -10,17 +11,27 @@ import imgSteepSlope    from '../assets/images/steep-slope.png'
 import imgSingleStep    from '../assets/images/single-step.png'
 import imgDrainChannel  from '../assets/images/drain-channel.png'
 
-const barriers: { id: string; src: string; label: string }[] = [
-  { id: 'kerb',           src: imgKerb,          label: 'Kerb without dropped kerb'     },
-  { id: 'cobblestone',    src: imgCobblestone,    label: 'Cobblestone / uneven pavement' },
-  { id: 'narrow-doorway', src: imgNarrowDoorway,  label: 'Narrow doorway, < 90 cm'       },
-  { id: 'steep-slope',    src: imgSteepSlope,     label: 'Steep slope / gradient'        },
-  { id: 'single-step',    src: imgSingleStep,     label: 'Single step at entrance'       },
-  { id: 'drain-channel',  src: imgDrainChannel,   label: 'Drain grate'                   },
-]
+const barrierImages: Record<string, string> = {
+  kerb:             imgKerb,
+  cobblestone:      imgCobblestone,
+  'narrow-doorway': imgNarrowDoorway,
+  'steep-slope':    imgSteepSlope,
+  'single-step':    imgSingleStep,
+  'drain-channel':  imgDrainChannel,
+}
+
+const BARRIER_IDS = [
+  'kerb',
+  'cobblestone',
+  'narrow-doorway',
+  'steep-slope',
+  'single-step',
+  'drain-channel',
+] as const
 
 export const Onboarding3: React.FC = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [selected, setSelected] = useState<string[]>([])
 
   const toggle = (id: string) =>
@@ -44,7 +55,7 @@ export const Onboarding3: React.FC = () => {
       <div className="flex flex-col gap-xl">
         <div className="flex items-center justify-between">
           <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            Onboarding
+            {t('common.onboardingLabel')}
           </span>
           <OnboardingProgress currentStep={2} totalSteps={4} />
         </div>
@@ -52,28 +63,27 @@ export const Onboarding3: React.FC = () => {
         {/* ── Heading block ───────────────────────────────────────── */}
         <div className="flex flex-col gap-xs">
           <h1 className="text-display-lg text-neutral-900">
-            Select the barriers you can manage
+            {t('onboarding3.title')}
           </h1>
           <p className="text-body-md text-neutral-700">
-            This helps us filter routes that work for you
+            {t('onboarding3.subtitle')}
           </p>
         </div>
       </div>
 
       {/* ── Photo grid ────────────────────────────────────────────── */}
       <div className="flex flex-wrap justify-between gap-md mt-xl">
-        {barriers.map(({ id, src, label }) => (
+        {BARRIER_IDS.map(id => (
           <div key={id} className="w-[calc(50%-8px)]">
             <PhotoCard
-              src={src}
+              src={barrierImages[id]}
               alt=""
-              label={label}
+              label={t(`onboarding3.barriers.${id}`)}
               selected={selected.includes(id)}
               onClick={() => toggle(id)}
             />
           </div>
         ))}
-
       </div>
 
       {/* ── Spacer pushes button to bottom ────────────────────────── */}
@@ -83,7 +93,7 @@ export const Onboarding3: React.FC = () => {
       <div className="mt-xl">
         <Button
           variant="primary"
-          label="Next"
+          label={t('common.next')}
           fullWidth
           disabled={selected.length === 0}
           onClick={handleNext}
