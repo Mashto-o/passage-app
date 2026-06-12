@@ -139,11 +139,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const { level, name: levelName, moreToNext } = getLevel(reviewCount)
 
   return (
-    <div className="relative w-full min-h-screen overflow-y-auto bg-neutral-50">
+    <main className="relative w-full min-h-screen overflow-y-auto bg-neutral-50">
       <div className="flex flex-col gap-xl px-lg pt-[56px] pb-[144px]">
 
         {/* ── Page title ─────────────────────────────────────────── */}
-        <p className="text-display-md text-neutral-900">Profile</p>
+        <h1 className="text-display-md text-neutral-900">Profile</h1>
 
         {/* ── User info row ───────────────────────────────────────── */}
         <div className="flex items-start justify-between w-full">
@@ -300,6 +300,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           onTabChange={onTabChange ?? ((tab) => navigate('/' + tab))}
         />
       </div>
-    </div>
+    </main>
   )
 }

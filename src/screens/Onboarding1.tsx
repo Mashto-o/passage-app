@@ -16,7 +16,7 @@ export const Onboarding1: React.FC = () => {
   }, [])
 
   return (
-    <div className="relative flex flex-col w-full min-h-screen overflow-hidden bg-primary-500">
+    <main className="relative flex flex-col w-full min-h-screen overflow-hidden bg-primary-500">
 
       {/* ── Logo (top-left) · slides down · delay 200 ms ────────────── */}
       <div
@@ -87,6 +87,6 @@ export const Onboarding1: React.FC = () => {
         </p>
       </div>
 
-    </div>
+    </main>
   )
 }

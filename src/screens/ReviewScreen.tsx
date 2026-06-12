@@ -163,15 +163,15 @@ export const ReviewScreen: React.FC = () => {
   // ── Render ────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen overflow-y-auto bg-neutral-50 px-lg pt-[56px] pb-[120px]">
+    <main className="min-h-screen overflow-y-auto bg-neutral-50 px-lg pt-[56px] pb-[120px]">
       <div className="flex flex-col gap-2xl">
 
         {/* ── Header ──────────────────────────────────────────── */}
         <div className="flex flex-col gap-xs">
           <Button variant="back" label="Back" onClick={() => navigate(-1)} />
-          <p className="text-display-md text-neutral-900">
+          <h1 className="text-display-md text-neutral-900">
             {state.placeName ?? 'Leave a review'}
-          </p>
+          </h1>
           {state.address && (
             <p className="text-body-sm text-neutral-700">{state.address}</p>
           )}
@@ -250,6 +250,6 @@ export const ReviewScreen: React.FC = () => {
           onClick={handleSubmit}
         />
       </div>
-    </div>
+    </main>
   )
 }

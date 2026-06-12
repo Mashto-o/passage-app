@@ -26,7 +26,7 @@ export const AccessibilityPreferencesScreen: React.FC = () => {
   } = useOnboarding()
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">
+    <main className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">
 
       {/* ── Back button ───────────────────────────────────────────── */}
       <Button variant="back" label="Back" onClick={() => navigate('/profile')} />
@@ -91,6 +91,6 @@ export const AccessibilityPreferencesScreen: React.FC = () => {
       <div className="flex-1" />
       <Button variant="primary" label="Save" fullWidth onClick={() => navigate('/profile')} />
 
-    </div>
+    </main>
   )
 }

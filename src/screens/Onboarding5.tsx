@@ -9,7 +9,7 @@ export const Onboarding5: React.FC = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col overflow-hidden relative">
+    <main className="min-h-screen bg-neutral-50 flex flex-col overflow-hidden relative">
 
       {/* ── Top zone ──────────────────────────────────────────────── */}
       <div className="px-lg pt-xl flex flex-col gap-lg shrink-0">
@@ -78,6 +78,6 @@ export const Onboarding5: React.FC = () => {
         </button>
       </div>
 
-    </div>
+    </main>
   )
 }

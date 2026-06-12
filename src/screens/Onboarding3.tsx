@@ -33,7 +33,7 @@ export const Onboarding3: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col overflow-y-auto">
+    <main className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col overflow-y-auto">
 
       {/* ── Logo ──────────────────────────────────────────────────── */}
       <div className="mb-2xl">
@@ -90,6 +90,6 @@ export const Onboarding3: React.FC = () => {
         />
       </div>
 
-    </div>
+    </main>
   )
 }

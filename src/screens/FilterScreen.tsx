@@ -32,7 +32,7 @@ export const FilterScreen: React.FC = () => {
   ]
 
   return (
-    <div className="bg-neutral-50 min-h-screen">
+    <main className="bg-neutral-50 min-h-screen">
       <div className="px-[24px] pt-[56px] flex flex-col gap-[24px]">
 
         {/* ── Header ──────────────────────────────────────────────── */}
@@ -51,9 +51,9 @@ export const FilterScreen: React.FC = () => {
           </Button>
 
           <div className="flex items-center justify-between">
-            <span className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
+            <h1 className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
               Filter
-            </span>
+            </h1>
             <button
               type="button"
               onClick={handleReset}
@@ -156,6 +156,6 @@ export const FilterScreen: React.FC = () => {
 
         </div>
       </div>
-    </div>
+    </main>
   )
 }

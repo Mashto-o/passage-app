@@ -31,7 +31,7 @@ export const Onboarding4: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">
+    <main className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">
 
       {/* ── Logo ──────────────────────────────────────────────────── */}
       <div className="mb-2xl">
@@ -124,6 +124,6 @@ export const Onboarding4: React.FC = () => {
         onClick={handleNext}
       />
 
-    </div>
+    </main>
   )
 }

@@ -35,7 +35,7 @@ export const RouteCompleteScreen: React.FC = () => {
   }
 
   return (
-    <div
+    <main
       className={[
         'fixed inset-0 bg-neutral-50 overflow-y-auto',
         'transition-transform duration-500 ease-out',
@@ -53,9 +53,9 @@ export const RouteCompleteScreen: React.FC = () => {
           </div>
 
           {/* Title */}
-          <span className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
+          <h1 className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
             Route complete!
-          </span>
+          </h1>
 
           {/* Subtitle row — distance · duration */}
           <div className="flex items-center gap-[8px]">
@@ -169,6 +169,6 @@ export const RouteCompleteScreen: React.FC = () => {
         </div>
 
       </div>
-    </div>
+    </main>
   )
 }

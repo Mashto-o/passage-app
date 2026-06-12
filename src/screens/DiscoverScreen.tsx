@@ -95,11 +95,11 @@ export const DiscoverScreen: React.FC = () => {
   ]
 
   return (
-    <div className="min-h-screen overflow-y-auto bg-neutral-50 px-lg pt-[56px] pb-[144px]">
+    <main className="min-h-screen overflow-y-auto bg-neutral-50 px-lg pt-[56px] pb-[144px]">
 
       {/* ── Header ──────────────────────────────────────────────── */}
       <div className="flex flex-col gap-md mb-2xl">
-        <p className="text-display-md text-neutral-900">Discover</p>
+        <h1 className="text-display-md text-neutral-900">Discover</h1>
 
         {/* Filter chips */}
         <div className="flex items-center gap-xs flex-wrap">
@@ -204,6 +204,6 @@ export const DiscoverScreen: React.FC = () => {
           onTabChange={(tab) => navigate('/' + tab)}
         />
       </div>
-    </div>
+    </main>
   )
 }
