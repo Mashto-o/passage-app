@@ -3,6 +3,7 @@ import {
   Users, Bookmark, Share2, Construction, Accessibility,
   Bus, TramFront, Train, Car, ChevronDown,
 } from 'lucide-react'
+import { clickableCardProps } from '../utils/a11y'
 import { Button, Divider } from './index'
 import type { Route } from './RoutePlanningSheet'
 
@@ -367,7 +368,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
     <>
       {/* Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-[75]" onClick={onClose} />
+        <div className="fixed inset-0 z-[75]" {...clickableCardProps(onClose)} />
       )}
 
       {/* Sheet */}
@@ -383,6 +384,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
         {/* Drag handle */}
         <div
           className="flex justify-center pt-[24px] pb-[8px] shrink-0 cursor-grab active:cursor-grabbing"
+          {...clickableCardProps(onClose)}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}

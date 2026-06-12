@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button } from './Button'
+import { clickableCardProps } from '../utils/a11y'
 import { RadioButton } from './RadioButton'
 import { Divider } from './Divider'
 
@@ -39,7 +40,7 @@ export const SortSheet: React.FC<SortSheetProps> = ({
           'fixed inset-0 z-[45] bg-transparent',
           isOpen ? '' : 'pointer-events-none',
         ].filter(Boolean).join(' ')}
-        onClick={onClose}
+        {...clickableCardProps(onClose)}
       />
 
       {/* SortSheet: width matches bottom sheet in MapScreen. Update both together if width changes. */}

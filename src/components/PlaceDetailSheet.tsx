@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { clickableCardProps } from '../utils/a11y'
 import {
   Bookmark, Share2, Zap, Construction,
   DoorOpen, Sofa, ChevronUp, ChevronDown, ThumbsUp, ThumbsDown,
@@ -167,7 +168,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
       {isOpen && (
         <div
           className="fixed inset-0 z-[55]"
-          onClick={onClose}
+          {...clickableCardProps(onClose)}
         />
       )}
 
@@ -181,6 +182,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
         {/* Drag handle — shrink-0, never scrolls */}
         <div
           className="flex justify-center pt-[24px] pb-[8px] shrink-0 cursor-grab active:cursor-grabbing"
+          {...clickableCardProps(onClose)}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}

@@ -1,5 +1,6 @@
 import React from 'react'
 import { X, Bookmark, Share2 } from 'lucide-react'
+import { clickableCardProps } from '../utils/a11y'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
 import { Button } from './Button'
@@ -52,7 +53,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
       {/* Entire card body is tappable — buttons stop propagation so they don't trigger this */}
       <div
         className="bg-neutral-0 rounded-[32px] pt-sm px-md pb-md flex flex-col gap-sm shadow-lg cursor-pointer"
-        onClick={onCardClick}
+        {...clickableCardProps(() => onCardClick?.())}
       >
 
         {/* Close button row */}

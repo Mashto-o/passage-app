@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { clickableCardProps } from '../utils/a11y'
 import Map, { Marker } from 'react-map-gl/mapbox'
 import type { MapRef } from 'react-map-gl/mapbox'
 import mapboxgl from 'mapbox-gl'
@@ -539,7 +540,7 @@ export const MapScreen: React.FC = () => {
           <div className="fixed inset-0 z-[8] bg-neutral-50" />
           <div
             className="fixed inset-0 z-[9]"
-            onClick={dismissSearch}
+            {...clickableCardProps(dismissSearch)}
           />
         </>
       )}
@@ -684,6 +685,7 @@ export const MapScreen: React.FC = () => {
         <div
           className="absolute top-[136px] left-lg right-lg z-[10] overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 224px)' }}
+          {...clickableCardProps(() => {})}
           onClick={e => e.stopPropagation()}
         >
           {searchResults.length === 0 && searchQuery.trim() ? (
@@ -731,7 +733,7 @@ export const MapScreen: React.FC = () => {
       {sheetVisible && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
           className="fixed inset-0 z-[45] bg-transparent"
-          onClick={() => closeSheet()}
+          {...clickableCardProps(() => closeSheet())}
         />
       )}
 
@@ -795,7 +797,7 @@ export const MapScreen: React.FC = () => {
       {selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
           className="fixed inset-0 z-[55] bg-transparent"
-          onClick={handleClosePopup}
+          {...clickableCardProps(handleClosePopup)}
         />
       )}
 

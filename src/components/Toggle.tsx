@@ -15,7 +15,7 @@ export const Toggle: React.FC<ToggleProps> = ({
     <button
       type="button"
       role="switch"
-      aria-pressed={value}
+      aria-checked={value}
       onClick={() => onChange(!value)}
       className={[
         'flex items-center w-[48px] h-[32px] rounded-[24px] p-[4px] shrink-0',

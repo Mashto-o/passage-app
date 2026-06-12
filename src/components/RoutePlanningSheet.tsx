@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Zap, Construction, Bus, TramFront, Train, Car, CarTaxiFront, Accessibility } from 'lucide-react'
+import { clickableCardProps } from '../utils/a11y'
 import {
   Button, SortControl, SortSheet, TransportSwitcher, AccessibilityBadge,
 } from './index'
@@ -856,7 +857,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
     <>
       {/* Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-[65]" onClick={onClose} />
+        <div className="fixed inset-0 z-[65]" {...clickableCardProps(onClose)} />
       )}
 
       {/* Sheet */}
@@ -875,6 +876,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
         {/* Drag handle */}
         <div
           className="flex justify-center pt-[24px] pb-[8px] shrink-0 cursor-grab active:cursor-grabbing"
+          {...clickableCardProps(onClose)}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
