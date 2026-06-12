@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { clickableCardProps } from '../utils/a11y'
 import Map, { Marker } from 'react-map-gl/mapbox'
 import type { MapRef } from 'react-map-gl/mapbox'
 import mapboxgl from 'mapbox-gl'
@@ -507,6 +506,18 @@ export const MapScreen: React.FC = () => {
     return () => clearTimeout(timeout)
   }, [routeEndedAt])
 
+  // Dismiss active overlay on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (searchActive) { dismissSearch(); return }
+      if (selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen) { handleClosePopup(); return }
+      if (sheetVisible && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen) { closeSheet() }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [searchActive, selectedPlace, sheetVisible, placeDetailOpen, routePlanningOpen, routeDetailOpen])
+
   // ── Touch handlers ────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartY.current    = e.touches[0].clientY
@@ -539,8 +550,9 @@ export const MapScreen: React.FC = () => {
         <>
           <div className="fixed inset-0 z-[8] bg-neutral-50" />
           <div
+            aria-hidden="true"
             className="fixed inset-0 z-[9]"
-            {...clickableCardProps(dismissSearch)}
+            onClick={dismissSearch}
           />
         </>
       )}
@@ -682,6 +694,7 @@ export const MapScreen: React.FC = () => {
 
       {/* ── Search results ──────────────────────────────────────────── */}
       {searchActive && (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- propagation stopper only, not an interactive control
         <div
           className="absolute top-[136px] left-lg right-lg z-[10] overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 224px)' }}
@@ -731,8 +744,9 @@ export const MapScreen: React.FC = () => {
       {/* ── Bottom sheet backdrop ───────────────────────────────────── */}
       {sheetVisible && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
+          aria-hidden="true"
           className="fixed inset-0 z-[45] bg-transparent"
-          {...clickableCardProps(() => closeSheet())}
+          onClick={() => closeSheet()}
         />
       )}
 
@@ -795,8 +809,9 @@ export const MapScreen: React.FC = () => {
       {/* ── Popup backdrop ──────────────────────────────────────────── */}
       {selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
         <div
+          aria-hidden="true"
           className="fixed inset-0 z-[55] bg-transparent"
-          {...clickableCardProps(handleClosePopup)}
+          onClick={handleClosePopup}
         />
       )}
 
