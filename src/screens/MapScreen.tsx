@@ -685,7 +685,6 @@ export const MapScreen: React.FC = () => {
         <div
           className="absolute top-[136px] left-lg right-lg z-[10] overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 224px)' }}
-          {...clickableCardProps(() => {})}
           onClick={e => e.stopPropagation()}
         >
           {searchResults.length === 0 && searchQuery.trim() ? (

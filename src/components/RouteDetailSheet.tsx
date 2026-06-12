@@ -3,7 +3,6 @@ import {
   Users, Bookmark, Share2, Construction, Accessibility,
   Bus, TramFront, Train, Car, ChevronDown,
 } from 'lucide-react'
-import { clickableCardProps } from '../utils/a11y'
 import { Button, Divider } from './index'
 import type { Route } from './RoutePlanningSheet'
 
@@ -124,6 +123,13 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
       if (scrollRef.current) scrollRef.current.scrollTop = 0
     }
   }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
 
   useEffect(() => {
     onSnapChange?.(snapTop)
@@ -368,7 +374,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
     <>
       {/* Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-[75]" {...clickableCardProps(onClose)} />
+        <div aria-hidden="true" className="fixed inset-0 z-[75]" onClick={onClose} />
       )}
 
       {/* Sheet */}
@@ -383,8 +389,8 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
       >
         {/* Drag handle */}
         <div
+          aria-hidden="true"
           className="flex justify-center pt-[24px] pb-[8px] shrink-0 cursor-grab active:cursor-grabbing"
-          {...clickableCardProps(onClose)}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}

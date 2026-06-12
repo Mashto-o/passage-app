@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Zap, Construction, Bus, TramFront, Train, Car, CarTaxiFront, Accessibility } from 'lucide-react'
-import { clickableCardProps } from '../utils/a11y'
 import {
   Button, SortControl, SortSheet, TransportSwitcher, AccessibilityBadge,
 } from './index'
@@ -836,6 +835,13 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
     }
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
   const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
     const y = 'touches' in e ? e.touches[0].clientY : e.clientY
     setDragStartY(y)
@@ -857,7 +863,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
     <>
       {/* Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-[65]" {...clickableCardProps(onClose)} />
+        <div aria-hidden="true" className="fixed inset-0 z-[65]" onClick={onClose} />
       )}
 
       {/* Sheet */}
@@ -875,8 +881,8 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
       >
         {/* Drag handle */}
         <div
+          aria-hidden="true"
           className="flex justify-center pt-[24px] pb-[8px] shrink-0 cursor-grab active:cursor-grabbing"
-          {...clickableCardProps(onClose)}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
