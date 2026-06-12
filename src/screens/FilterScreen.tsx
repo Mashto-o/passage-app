@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Zap, UserPlus } from 'lucide-react'
 import { Button, AccessibilityBadge, Toggle } from '../components'
@@ -15,6 +16,7 @@ const sectionLabel = 'font-medium text-[14px] leading-[1.4] tracking-[0.56px] up
 // ── Screen ─────────────────────────────────────────────────────────────────
 
 export const FilterScreen: React.FC = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from ?? 'map'
@@ -25,18 +27,18 @@ export const FilterScreen: React.FC = () => {
     variant: 'accessible' | 'inaccessible' | 'partial' | 'unknown'
     label: string
   }[] = [
-    { value: 'accessible',   variant: 'accessible',   label: 'Accessible'           },
-    { value: 'inaccessible', variant: 'inaccessible', label: 'Inaccessible'         },
-    { value: 'partial',      variant: 'partial',      label: 'Partially accessible' },
-    { value: 'unknown',      variant: 'unknown',      label: 'Unknown'              },
+    { value: 'accessible',   variant: 'accessible',   label: t('accessibility.accessible')   },
+    { value: 'inaccessible', variant: 'inaccessible', label: t('accessibility.inaccessible') },
+    { value: 'partial',      variant: 'partial',      label: t('accessibility.partial')      },
+    { value: 'unknown',      variant: 'unknown',      label: t('accessibility.unknown')      },
   ]
 
   return (
     <main className="bg-neutral-50 min-h-screen">
-      <div className="px-[24px] pt-[56px] flex flex-col gap-[24px]">
+      <div className="px-lg pt-[56px] flex flex-col gap-lg">
 
         {/* ── Header ──────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-[12px]">
+        <div className="flex flex-col gap-sm">
           <Button
             variant="back"
             onClick={() => {
@@ -47,12 +49,12 @@ export const FilterScreen: React.FC = () => {
               }
             }}
           >
-            Back
+            {t('common.back')}
           </Button>
 
           <div className="flex items-center justify-between">
-            <h1 className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
-              Filter
+            <h1 className="text-display-md text-neutral-900">
+              {t('filter.title')}
             </h1>
             <button
               type="button"
@@ -63,7 +65,7 @@ export const FilterScreen: React.FC = () => {
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
               ].join(' ')}
             >
-              Reset
+              {t('filter.reset')}
             </button>
           </div>
         </div>
@@ -72,14 +74,14 @@ export const FilterScreen: React.FC = () => {
         <div className="flex flex-col gap-[36px]">
 
           {/* Section 1 — Places */}
-          <div className="flex flex-col gap-[16px]">
-            <span className={sectionLabel}>Places</span>
+          <div className="flex flex-col gap-md">
+            <span className={sectionLabel}>{t('filter.placesSection')}</span>
             <span className="font-normal text-[16px] leading-[1.5] text-neutral-900">
-              Which places do you want to see?
+              {t('filter.placesSubtitle')}
             </span>
 
             {/* Accessibility cards */}
-            <div className="grid grid-cols-2 gap-[24px] w-full">
+            <div className="grid grid-cols-2 gap-lg w-full">
               {ACCESSIBILITY_OPTIONS.map(({ value, variant, label }) => {
                 const selected = filterState.accessibility.has(value)
                 return (
@@ -90,8 +92,8 @@ export const FilterScreen: React.FC = () => {
                     onClick={() => toggleAccessibility(value)}
                     className={[
                       'w-full h-[72px]',
-                      'flex items-center gap-[16px] px-[16px]',
-                      'rounded-[24px] border',
+                      'flex items-center gap-md px-md',
+                      'rounded-xl border',
                       selected ? 'bg-primary-100 border-primary-500' : 'bg-neutral-0 border-neutral-200',
                       'transition-colors duration-200',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
@@ -111,47 +113,47 @@ export const FilterScreen: React.FC = () => {
             </div>
 
             {/* Avoid lifts toggle */}
-            <div className="flex items-center justify-between w-full pt-[16px]">
-              <div className="flex gap-[12px] items-start flex-1">
+            <div className="flex items-center justify-between w-full pt-md">
+              <div className="flex gap-sm items-start flex-1">
                 <Zap size={24} strokeWidth={1.5} className="text-neutral-900 shrink-0" aria-hidden />
-                <div className="flex flex-col gap-[4px]">
+                <div className="flex flex-col gap-2xs">
                   <span className="font-semibold text-[16px] leading-[1.4] text-neutral-900">
-                    Avoid lift-dependent places
+                    {t('filter.avoidLifts')}
                   </span>
                   <span className="font-normal text-[14px] leading-[1.5] text-neutral-900 max-w-[230px]">
-                    Excludes places that rely on powered infrastructure
+                    {t('filter.avoidLiftsDesc')}
                   </span>
                 </div>
               </div>
               <Toggle
                 value={filterState.avoidLifts}
                 onChange={setAvoidLifts}
-                label="Avoid lift-dependent places"
+                label={t('filter.avoidLifts')}
               />
             </div>
           </div>
 
           {/* Section 2 — Company */}
-          <div className="flex flex-col gap-[16px]">
-            <span className={sectionLabel}>Company</span>
+          <div className="flex flex-col gap-md">
+            <span className={sectionLabel}>{t('filter.companySection')}</span>
 
             {/* Companion toggle */}
             <div className="flex items-center justify-between w-full">
-              <div className="flex gap-[12px] items-start flex-1">
+              <div className="flex gap-sm items-start flex-1">
                 <UserPlus size={24} strokeWidth={1.5} className="text-neutral-900 shrink-0" aria-hidden />
-                <div className="flex flex-col gap-[4px]">
+                <div className="flex flex-col gap-2xs">
                   <span className="font-semibold text-[16px] leading-[1.4] text-neutral-900">
-                    I'm travelling with a companion
+                    {t('filter.companion')}
                   </span>
                   <span className="font-normal text-[14px] leading-[1.5] text-neutral-900 max-w-[230px]">
-                    More places become accessible with help
+                    {t('filter.companionDesc')}
                   </span>
                 </div>
               </div>
               <Toggle
                 value={filterState.hasCompanion}
                 onChange={setHasCompanion}
-                label="I'm travelling with a companion"
+                label={t('filter.companion')}
               />
             </div>
           </div>

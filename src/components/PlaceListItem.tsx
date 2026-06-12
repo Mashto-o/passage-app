@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Zap } from 'lucide-react'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
@@ -51,24 +52,6 @@ const toAccessibilityVariant = (variant: string): 'accessible' | 'partial' | 'in
   return 'unknown'
 }
 
-function formatVerifiedAt(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / (1000 * 60))
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  const diffWeeks = Math.floor(diffDays / 7)
-  const diffMonths = Math.floor(diffDays / 30)
-
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  if (diffWeeks < 5) return `${diffWeeks}w ago`
-  if (diffMonths < 12) {
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
-  }
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })
-}
 
 export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   name,
@@ -82,8 +65,27 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
   onClick,
   className = '',
 }) => {
-  const variant      = getVariantFromScore(accessibilityScore)
-  const { icon: iconClass } = getColourClasses(variant)
+  const { t, i18n } = useTranslation()
+
+  const getVerifiedAtLabel = (date: Date): string => {
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins   = Math.floor(diffMs / (1000 * 60))
+    const diffHours  = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffDays   = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffWeeks  = Math.floor(diffDays / 7)
+    const diffMonths = Math.floor(diffDays / 30)
+
+    const locale = i18n.language === 'uk' ? 'uk-UA' : 'en-GB'
+    if (diffMins  <  60) return t('placeListItem.minutesAgo', { count: diffMins  })
+    if (diffHours <  24) return t('placeListItem.hoursAgo',   { count: diffHours })
+    if (diffDays  <   7) return t('placeListItem.daysAgo',    { count: diffDays  })
+    if (diffWeeks <   5) return t('placeListItem.weeksAgo',   { count: diffWeeks })
+    if (diffMonths < 12) return date.toLocaleDateString(locale, { day: '2-digit', month: 'short' })
+    return date.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: '2-digit' })
+  }
+
+  const variant       = getVariantFromScore(accessibilityScore)
   const statusVariant = toStatusVariant(variant)
   const a11yVariant   = toAccessibilityVariant(variant)
 
@@ -93,21 +95,21 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
     ? {
         type: 'button' as const,
         onClick: handler,
-        'aria-label': `View details for ${name}`,
+        'aria-label': t('placeListItem.viewDetails', { name }),
         className: [
-          'flex flex-col gap-[24px] w-full text-left',
+          'flex flex-col gap-lg w-full text-left',
           'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
           className,
         ]
           .filter(Boolean)
           .join(' '),
       }
-    : { className: `flex flex-col gap-[24px] w-full ${className}` }
+    : { className: `flex flex-col gap-lg w-full ${className}` }
 
   return (
     <Tag {...interactiveProps}>
       {/* Badge row + info row grouped with tight gap */}
-      <div className="flex flex-col gap-[8px] w-full">
+      <div className="flex flex-col gap-xs w-full">
 
         {/* Badge row — full width */}
         <div className="flex items-center gap-[10px]">
@@ -115,14 +117,14 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
 
           <StatusBadge
             variant={statusVariant}
-            label={`${accessibilityScore}% Accessible`}
+            label={t('map.accessiblePercent', { score: accessibilityScore })}
           />
 
           {isLiftDependent && (
-            <div className="flex items-center gap-[8px] px-[8px] py-[4px] bg-warning-100 rounded-[24px]">
+            <div className="flex items-center gap-xs px-xs py-2xs bg-warning-100 rounded-xl">
               <Zap size={16} strokeWidth={1.5} className="text-warning-500 shrink-0" />
               <span className="text-[14px] font-regular leading-[1.4] tracking-[0.12px] text-warning-500 whitespace-nowrap">
-                Lift-dependent
+                {t('placeListItem.liftDependent')}
               </span>
             </div>
           )}
@@ -132,7 +134,7 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
         <div className="flex items-end justify-between w-full">
 
           {/* Left: name + address */}
-          <div className="flex flex-col gap-[4px] flex-1 min-w-0">
+          <div className="flex flex-col gap-2xs flex-1 min-w-0">
             <span className="text-heading-sm text-neutral-900 truncate">
               {name}
             </span>
@@ -141,13 +143,13 @@ export const PlaceListItem: React.FC<PlaceListItemProps> = ({
             </span>
           </div>
 
-          {/* Right: distance + barrier count */}
-          <div className="flex flex-col gap-[4px] items-end w-[56px] shrink-0">
+          {/* Right: distance + verified time */}
+          <div className="flex flex-col gap-2xs items-end w-[56px] shrink-0">
             <span className="text-body-sb text-neutral-900 text-right whitespace-nowrap">
               {distance}
             </span>
             <span className="text-body-sm text-neutral-400 text-right whitespace-nowrap">
-              {formatVerifiedAt(verifiedAt)}
+              {getVerifiedAtLabel(verifiedAt)}
             </span>
           </div>
         </div>{/* end info row */}

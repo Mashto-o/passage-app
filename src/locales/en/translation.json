@@ -205,5 +205,33 @@
     "fewestBarriers": "Fewest barriers ({{count}})",
     "accessibleThroughout": "Accessible throughout",
     "fastestOption": "Fastest option"
+  },
+  "filter": {
+    "title": "Filter",
+    "reset": "Reset",
+    "placesSection": "Places",
+    "placesSubtitle": "Which places do you want to see?",
+    "avoidLifts": "Avoid lift-dependent places",
+    "avoidLiftsDesc": "Excludes places that rely on powered infrastructure",
+    "companySection": "Company",
+    "companion": "I'm travelling with a companion",
+    "companionDesc": "More places become accessible with help"
+  },
+  "navBar": {
+    "discover": "Discover",
+    "map": "Map",
+    "profile": "Profile"
+  },
+  "placeListItem": {
+    "liftDependent": "Lift-dependent",
+    "viewDetails": "View details for {{name}}",
+    "minutesAgo_one": "{{count}}m ago",
+    "minutesAgo_other": "{{count}}m ago",
+    "hoursAgo_one": "{{count}}h ago",
+    "hoursAgo_other": "{{count}}h ago",
+    "daysAgo_one": "{{count}}d ago",
+    "daysAgo_other": "{{count}}d ago",
+    "weeksAgo_one": "{{count}}w ago",
+    "weeksAgo_other": "{{count}}w ago"
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Compass, Map, User, type LucideIcon } from 'lucide-react'
 
 type Tab = 'discover' | 'map' | 'profile'
@@ -9,10 +10,10 @@ export interface NavBarProps {
   className?: string
 }
 
-const tabs: { id: Tab; label: string; Icon: LucideIcon }[] = [
-  { id: 'discover', label: 'Discover', Icon: Compass },
-  { id: 'map',      label: 'Map',      Icon: Map     },
-  { id: 'profile',  label: 'Profile',  Icon: User    },
+const TAB_DEFS: { id: Tab; Icon: LucideIcon }[] = [
+  { id: 'discover', Icon: Compass },
+  { id: 'map',      Icon: Map     },
+  { id: 'profile',  Icon: User    },
 ]
 
 export const NavBar: React.FC<NavBarProps> = ({
@@ -20,11 +21,15 @@ export const NavBar: React.FC<NavBarProps> = ({
   onTabChange,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
+  const tabs = TAB_DEFS.map(def => ({ ...def, label: t(`navBar.${def.id}`) }))
+
   return (
     <div
       className={[
         'flex items-center justify-between w-full',
-        'bg-neutral-0 border border-neutral-200 rounded-[48px] py-[20px] px-[32px]',
+        'bg-neutral-0 border border-neutral-200 rounded-full py-[20px] px-xl',
         className,
       ]
         .filter(Boolean)
@@ -38,8 +43,9 @@ export const NavBar: React.FC<NavBarProps> = ({
             type="button"
             onClick={() => onTabChange(id)}
             aria-pressed={active}
+            aria-label={label}
             className={[
-              'flex flex-col items-center gap-[4px] w-[45px]',
+              'flex flex-1 flex-col items-center gap-2xs',
               'transition-colors duration-200',
               'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
             ].join(' ')}
@@ -48,9 +54,10 @@ export const NavBar: React.FC<NavBarProps> = ({
               size={24}
               strokeWidth={1.5}
               className={active ? 'text-primary-500' : 'text-neutral-500'}
+              aria-hidden
             />
             {active ? (
-              <div className="bg-primary-100 px-[4px] rounded-[8px]">
+              <div className="bg-primary-100 px-2xs rounded-xs">
                 <span className="text-caption-sm tracking-[0.12px] text-primary-500">
                   {label}
                 </span>

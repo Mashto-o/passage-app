@@ -211,5 +211,41 @@
     "fewestBarriers": "Найменше перешкод ({{count}})",
     "accessibleThroughout": "Доступний по всьому маршруту",
     "fastestOption": "Найшвидший варіант"
+  },
+  "filter": {
+    "title": "Фільтр",
+    "reset": "Скинути",
+    "placesSection": "Місця",
+    "placesSubtitle": "Які місця ви хочете бачити?",
+    "avoidLifts": "Уникати місць із ліфтом",
+    "avoidLiftsDesc": "Виключає місця, що залежать від електроінфраструктури",
+    "companySection": "Компанія",
+    "companion": "Я подорожую з супутником",
+    "companionDesc": "Більше місць стають доступними з допомогою"
+  },
+  "navBar": {
+    "discover": "Пошук",
+    "map": "Карта",
+    "profile": "Профіль"
+  },
+  "placeListItem": {
+    "liftDependent": "Із ліфтом",
+    "viewDetails": "Деталі: {{name}}",
+    "minutesAgo_one": "{{count}} хв тому",
+    "minutesAgo_few": "{{count}} хв тому",
+    "minutesAgo_many": "{{count}} хв тому",
+    "minutesAgo_other": "{{count}} хв тому",
+    "hoursAgo_one": "{{count}} год тому",
+    "hoursAgo_few": "{{count}} год тому",
+    "hoursAgo_many": "{{count}} год тому",
+    "hoursAgo_other": "{{count}} год тому",
+    "daysAgo_one": "{{count}} день тому",
+    "daysAgo_few": "{{count}} дні тому",
+    "daysAgo_many": "{{count}} днів тому",
+    "daysAgo_other": "{{count}} днів тому",
+    "weeksAgo_one": "{{count}} тиждень тому",
+    "weeksAgo_few": "{{count}} тижні тому",
+    "weeksAgo_many": "{{count}} тижнів тому",
+    "weeksAgo_other": "{{count}} тижнів тому"
   }
 }
