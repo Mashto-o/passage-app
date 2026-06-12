@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { TrainFront, Car, Accessibility, type LucideIcon } from 'lucide-react'
 
 export type TransportMode = 'transit' | 'car' | 'walking'
@@ -7,12 +8,6 @@ export interface TransportSwitcherProps {
   value: TransportMode
   onChange: (mode: TransportMode) => void
   className?: string
-}
-
-const modeLabels: Record<TransportMode, string> = {
-  transit: 'Public transport',
-  car:     'Car',
-  walking: 'Walking',
 }
 
 const tabs: { id: TransportMode; Icon: LucideIcon }[] = [
@@ -26,8 +21,16 @@ export const TransportSwitcher: React.FC<TransportSwitcherProps> = ({
   onChange,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
+  const modeLabels: Record<TransportMode, string> = {
+    transit: t('transportSwitcher.transit'),
+    car:     t('transportSwitcher.car'),
+    walking: t('transportSwitcher.walking'),
+  }
+
   return (
-    <div className={`flex flex-col items-start gap-[12px] w-full ${className}`}>
+    <div className={`flex flex-col items-start gap-sm w-full ${className}`}>
       <span className="text-display-md text-neutral-900">
         {modeLabels[value]}
       </span>

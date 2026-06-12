@@ -75,7 +75,11 @@
     "sortBy": "Sort by",
     "most-accessible": "Most accessible first",
     "nearest": "Nearest first",
-    "recently-verified": "Recently verified"
+    "recently-verified": "Recently verified",
+    "fewest-barriers": "Fewest barriers",
+    "shortest-distance": "Shortest distance",
+    "fastest": "Fastest",
+    "flattest": "Flattest route"
   },
   "map": {
     "search": "Search places...",
@@ -149,5 +153,57 @@
     "notHelpful": "Not helpful",
     "helpful": "Helpful",
     "leaveReview": "Leave a review"
+  },
+  "transportSwitcher": {
+    "transit": "Public transport",
+    "car": "Car",
+    "walking": "Walking"
+  },
+  "routeDestination": {
+    "from": "From",
+    "to": "To",
+    "destinationPlaceholder": "Destination",
+    "swapAria": "Swap origin and destination"
+  },
+  "routePlanning": {
+    "routesTo": "Routes to {{destination}}",
+    "powerOutageWarning": "Power outage expected in ~30 min. We recommend the shortest route.",
+    "ownCar": "Own car",
+    "taxi": "Taxi",
+    "accessibleVehicle": "Accessible vehicle",
+    "inaccessibleVehicle": "Inaccessible vehicle",
+    "durationMin": "{{count}} min",
+    "orderUklon": "Order Uklon",
+    "scheduleRide": "Schedule a ride",
+    "uklonAlt": "Uklon",
+    "socialTaxiAlt": "Social Taxi"
+  },
+  "routeDetail": {
+    "title": "Route details",
+    "arriving": "Arriving {{time}}",
+    "boardHere": "Board here",
+    "transfer": "Transfer",
+    "alightHere": "Alight here",
+    "transferPoint": "Transfer point",
+    "walkFor": "walk for {{count}} min",
+    "rideFor": "ride for {{count}} min",
+    "stations_one": "{{count}} station",
+    "stations_other": "{{count}} stations",
+    "confirmedAccessible_one": "{{count}} person confirmed this {{type}} is accessible",
+    "confirmedAccessible_other": "{{count}} people confirmed this {{type}} is accessible",
+    "segmentTypes": {
+      "bus": "bus",
+      "tram": "tram",
+      "metro": "metro",
+      "car": "car"
+    },
+    "startRoute": "Start route"
+  },
+  "bestMatch": {
+    "badge": "Best match for you",
+    "noBarriers": "No barriers",
+    "fewestBarriers": "Fewest barriers ({{count}})",
+    "accessibleThroughout": "Accessible throughout",
+    "fastestOption": "Fastest option"
   }
 }

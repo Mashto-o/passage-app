@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ArrowUpDown } from 'lucide-react'
 import { TextInput } from './TextInput'
 
@@ -19,6 +20,8 @@ export const RouteDestination: React.FC<RouteDestinationProps> = ({
   onSwap,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
   const handleSwap = () => {
     onFromChange(to)
     onToChange(from)
@@ -27,24 +30,24 @@ export const RouteDestination: React.FC<RouteDestinationProps> = ({
   return (
     <div
       className={[
-        'flex items-center gap-[24px] w-full',
-        'bg-neutral-0 border border-neutral-200 rounded-[24px] p-[16px]',
+        'flex items-center gap-lg w-full',
+        'bg-neutral-0 border border-neutral-200 rounded-xl p-md',
         className,
       ]
         .filter(Boolean)
         .join(' ')}
     >
       {/* Inputs column */}
-      <div className="flex flex-col gap-[8px] flex-1">
+      <div className="flex flex-col gap-xs flex-1">
         <TextInput
-          label="From"
-          placeholder="Current location"
+          label={t('routeDestination.from')}
+          placeholder={t('map.currentLocation')}
           value={from}
           onChange={onFromChange}
         />
         <TextInput
-          label="To"
-          placeholder="Destination"
+          label={t('routeDestination.to')}
+          placeholder={t('routeDestination.destinationPlaceholder')}
           value={to}
           onChange={onToChange}
         />
@@ -57,9 +60,9 @@ export const RouteDestination: React.FC<RouteDestinationProps> = ({
           e.stopPropagation()
           onSwap ? onSwap() : handleSwap()
         }}
-        aria-label="Swap origin and destination"
+        aria-label={t('routeDestination.swapAria')}
         className={[
-          'shrink-0 border border-neutral-200 rounded-[48px] p-[8px]',
+          'shrink-0 border border-neutral-200 rounded-full p-xs',
           'text-neutral-700 hover:bg-neutral-100',
           'transition-colors duration-200',
           'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',

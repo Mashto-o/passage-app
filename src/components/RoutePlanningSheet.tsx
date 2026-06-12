@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Zap, Construction, Bus, TramFront, Train, Car, CarTaxiFront, Accessibility } from 'lucide-react'
 import {
   Button, SortControl, SortSheet, TransportSwitcher, AccessibilityBadge,
@@ -6,6 +7,10 @@ import {
 } from './index'
 import { useOnboarding } from '../context/OnboardingContext'
 import { getBestMatch } from '../utils/accessibilityMatch'
+
+// ── Sort key type ──────────────────────────────────────────────────────────
+
+export type RouteSortKey = 'fewest-barriers' | 'shortest-distance' | 'fastest' | 'flattest'
 
 // Third-party brand colours — hardcoded intentionally, not Passage tokens
 const UKLON_YELLOW          = '#F5DB00'
@@ -460,15 +465,15 @@ const WALKING_ROUTES: Route[] = [
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-const ROUTE_SORT_OPTIONS = ['Fewest barriers', 'Shortest distance', 'Fastest', 'Flattest route']
+const ROUTE_SORT_KEYS: RouteSortKey[] = ['fewest-barriers', 'shortest-distance', 'fastest', 'flattest']
 
-function sortRoutes(routes: Route[], sortValue: string): Route[] {
+function sortRoutes(routes: Route[], sortKey: RouteSortKey): Route[] {
   const sorted = [...routes]
-  switch (sortValue) {
-    case 'Fewest barriers':   return sorted.sort((a, b) => a.barrierCount - b.barrierCount)
-    case 'Shortest distance': return sorted.sort((a, b) => a.distanceKm - b.distanceKm)
-    case 'Fastest':           return sorted.sort((a, b) => a.durationMin - b.durationMin)
-    case 'Flattest route':    return sorted.sort((a, b) => a.barrierCount - b.barrierCount)
+  switch (sortKey) {
+    case 'fewest-barriers':   return sorted.sort((a, b) => a.barrierCount - b.barrierCount)
+    case 'shortest-distance': return sorted.sort((a, b) => a.distanceKm - b.distanceKm)
+    case 'fastest':           return sorted.sort((a, b) => a.durationMin - b.durationMin)
+    case 'flattest':          return sorted.sort((a, b) => a.barrierCount - b.barrierCount)
     default: return sorted
   }
 }
@@ -498,6 +503,7 @@ function getSegmentWidthPercent(segmentDuration: number, totalDuration: number):
 // ── Shared helpers for transit / walking cards ─────────────────────────────
 
 const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
+  const { t } = useTranslation()
   const vehicleSegment = route.segments.find(s => s.type !== 'walk' && s.type !== 'car')
 
   return (
@@ -521,7 +527,7 @@ const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
               'text-[12px] font-medium leading-[1.4] tracking-[0.12px] whitespace-nowrap',
               accessible ? 'text-success-700' : 'text-danger-500',
             ].join(' ')}>
-              {accessible ? 'Accessible vehicle' : 'Inaccessible vehicle'}
+              {accessible ? t('routePlanning.accessibleVehicle') : t('routePlanning.inaccessibleVehicle')}
             </span>
           </div>
         )
@@ -541,7 +547,7 @@ const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
             'text-[12px] font-medium leading-[1.4] tracking-[0.12px] whitespace-nowrap',
             vehicleSegment?.accessible !== false ? 'text-warning-700' : 'text-danger-500',
           ].join(' ')}>
-            {route.barrierCount} barriers
+            {t('map.barriers', { count: route.barrierCount })}
           </span>
         </div>
       )}
@@ -549,13 +555,18 @@ const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
   )
 }
 
-const TimeRow: React.FC<{ route: Route }> = ({ route }) => (
-  <div className="flex items-center justify-between">
-    <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.departureTime}</span>
-    <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">{route.durationMin} min</span>
-    <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.arrivalTime}</span>
-  </div>
-)
+const TimeRow: React.FC<{ route: Route }> = ({ route }) => {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center justify-between">
+      <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.departureTime}</span>
+      <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">
+        {t('routePlanning.durationMin', { count: route.durationMin })}
+      </span>
+      <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.arrivalTime}</span>
+    </div>
+  )
+}
 
 function mergeConsecutiveWalkSegments(segments: RouteSegment[]): RouteSegment[] {
   const merged: RouteSegment[] = []
@@ -670,7 +681,9 @@ const RouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
 
 // ── Car tab — own car card ─────────────────────────────────────────────────
 
-const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
+const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
+  const { t } = useTranslation()
+  return (
   <button
     type="button"
     onClick={() => onSelect(route)}
@@ -687,7 +700,7 @@ const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }
         <div className="flex items-center gap-[8px] bg-warning-100 px-[8px] py-[4px] rounded-[24px]">
           <Construction size={16} strokeWidth={1.5} className="text-warning-500" />
           <span className="text-[12px] font-medium text-warning-500 tracking-[0.12px]">
-            {route.barrierCount} barriers
+            {t('map.barriers', { count: route.barrierCount })}
           </span>
         </div>
       )}
@@ -696,18 +709,23 @@ const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
+      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+        {t('routePlanning.durationMin', { count: route.durationMin })}
+      </span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
     {/* Timeline */}
     <SegmentTimeline route={route} isCarTab={true} />
   </button>
-)
+  )
+}
 
 // ── Car tab — Uklon card ───────────────────────────────────────────────────
 
-const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
+const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
+  const { t } = useTranslation()
+  return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
     {/* Top row: distance badge left, Uklon logo right */}
     <div className="flex items-center justify-between">
@@ -718,7 +736,7 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
       </div>
       <img
         src="/src/assets/icons/Uklon_Logo_2018.png"
-        alt="Uklon"
+        alt={t('routePlanning.uklonAlt')}
         className="h-[16px] object-contain"
       />
     </div>
@@ -726,7 +744,9 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
+      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+        {t('routePlanning.durationMin', { count: route.durationMin })}
+      </span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
@@ -742,14 +762,17 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
       style={{ backgroundColor: UKLON_YELLOW, color: UKLON_BLACK }}
       onClick={() => onSelect(route)}
     >
-      Order Uklon
+      {t('routePlanning.orderUklon')}
     </button>
   </div>
-)
+  )
+}
 
 // ── Car tab — Social Taxi card ─────────────────────────────────────────────
 
-const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
+const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
+  const { t } = useTranslation()
+  return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
     {/* Top row: distance badge left, Social Taxi logo right */}
     <div className="flex items-center justify-between">
@@ -760,7 +783,7 @@ const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> =
       </div>
       <img
         src="/src/assets/icons/SocialTaxi_Logo.png"
-        alt="Соціальне таксі"
+        alt={t('routePlanning.socialTaxiAlt')}
         className="h-[24px] object-contain"
       />
     </div>
@@ -768,7 +791,9 @@ const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> =
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">{route.durationMin} min</span>
+      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+        {t('routePlanning.durationMin', { count: route.durationMin })}
+      </span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
@@ -784,10 +809,11 @@ const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> =
       style={{ backgroundColor: SOCIAL_TAXI_DARK_BLUE, color: SOCIAL_TAXI_YELLOW }}
       onClick={() => onSelect(route)}
     >
-      Schedule a ride
+      {t('routePlanning.scheduleRide')}
     </button>
   </div>
-)
+  )
+}
 
 // ── Section label ──────────────────────────────────────────────────────────
 
@@ -818,7 +844,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   overrideTop,
   maxHeight,
 }) => {
-  const [routeSortValue, setRouteSortValue] = useState('Fewest barriers')
+  const [routeSortValue, setRouteSortValue] = useState<RouteSortKey>('fewest-barriers')
   const [routeSortOpen,  setRouteSortOpen]  = useState(false)
   const [activeTab,      setActiveTab]      = useState<'transit' | 'car' | 'walking'>('transit')
   const [dragStartY,     setDragStartY]     = useState(0)
@@ -827,6 +853,10 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   const DRAG_THRESHOLD = 80
 
   const { mobilityAid } = useOnboarding()
+  const { t } = useTranslation()
+
+  const routeSortOptions = ROUTE_SORT_KEYS.map(key => ({ key, label: t(`sort.${key}`) }))
+  const routeSortLabel   = t(`sort.${routeSortValue}`)
 
   const scrollRef  = useRef<HTMLDivElement>(null)
   const sheetRef   = useRef<HTMLDivElement>(null)
@@ -905,26 +935,26 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
         >
           {/* Back button */}
           <div className="pt-[8px]">
-            <Button variant="back" onClick={onClose}>Back</Button>
+            <Button variant="back" onClick={onClose}>{t('common.back')}</Button>
           </div>
 
           {/* Destination heading */}
-          <h2 className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
-            Routes to {destinationName}
+          <h2 className="text-display-md text-neutral-900">
+            {t('routePlanning.routesTo', { destination: destinationName })}
           </h2>
 
           {/* Power outage warning */}
           <div className="flex gap-[12px] items-center p-[16px] bg-warning-100 rounded-[48px] w-full">
             <Zap size={16} strokeWidth={1.5} className="text-warning-700 shrink-0" />
             <p className="text-[14px] font-normal leading-[1.5] text-warning-700 flex-1">
-              Power outage expected in ~30 min. We recommend the shortest route.
+              {t('routePlanning.powerOutageWarning')}
             </p>
           </div>
 
           {/* Transport switcher + sort control */}
           <div className="flex flex-col gap-[16px]">
             <TransportSwitcher value={activeTab} onChange={setActiveTab} />
-            <SortControl value={routeSortValue} onPress={() => setRouteSortOpen(true)} />
+            <SortControl value={routeSortLabel} onPress={() => setRouteSortOpen(true)} />
           </div>
 
           {/* Route cards */}
@@ -951,7 +981,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 {/* Own car section */}
                 {regularStandard.length > 0 && (
                   <div className="flex flex-col gap-[16px]">
-                    <SectionLabel>Own car</SectionLabel>
+                    <SectionLabel>{t('routePlanning.ownCar')}</SectionLabel>
                     {regularStandard.map(route => (
                       <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} />
                     ))}
@@ -960,7 +990,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
 
                 {/* Taxi section */}
                 <div className="flex flex-col gap-[16px]">
-                  <SectionLabel>Taxi</SectionLabel>
+                  <SectionLabel>{t('routePlanning.taxi')}</SectionLabel>
                   {CAR_ROUTES.filter(r => r.cardType !== 'standard').map(route =>
                     route.cardType === 'uklon'
                       ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} />
@@ -1001,9 +1031,9 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
         {/* Sort sheet — outside scrollable area */}
         <SortSheet
           isOpen={routeSortOpen}
-          options={ROUTE_SORT_OPTIONS}
+          options={routeSortOptions}
           value={routeSortValue}
-          onChange={(val) => setRouteSortValue(val)}
+          onChange={(key) => setRouteSortValue(key as RouteSortKey)}
           onClose={() => setRouteSortOpen(false)}
           height={sheetHeight}
         />

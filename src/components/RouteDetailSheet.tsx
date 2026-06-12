@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Users, Bookmark, Share2, Construction, Accessibility,
   Bus, TramFront, Train, Car, ChevronDown,
@@ -112,6 +113,8 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
   const [openDropdowns,  setOpenDropdowns]  = useState<Record<string, boolean>>({})
   const DRAG_THRESHOLD = 80
 
+  const { t } = useTranslation()
+
   const toggleDropdown = (key: string) =>
     setOpenDropdowns(prev => ({ ...prev, [key]: !prev[key] }))
 
@@ -184,7 +187,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
         // First segment
         if (seg.type === 'walk') {
           items.push(
-            <StationRow key={nextKey()} label="Current location" time={time} iconType="starting-point" />
+            <StationRow key={nextKey()} label={t('map.currentLocation')} time={time} iconType="starting-point" />
           )
         } else {
           // First segment is transport — no walk prefix, show boarding station
@@ -192,7 +195,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           items.push(
             <StationRow
               key={nextKey()}
-              label={sName?.boardAt ?? 'Board here'}
+              label={sName?.boardAt ?? t('routeDetail.boardHere')}
               time={time}
               iconType="starting-point"
               lineInfo={{ line: seg.line, direction: sName?.direction }}
@@ -207,7 +210,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           items.push(
             <StationRow
               key={nextKey()}
-              label={sName?.boardAt ?? 'Board here'}
+              label={sName?.boardAt ?? t('routeDetail.boardHere')}
               time={time}
               iconType="starting-point"
               lineInfo={{ line: seg.line, direction: sName?.direction }}
@@ -219,7 +222,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           items.push(
             <StationRow
               key={nextKey()}
-              label={stationNames[transportIdx - 1]?.alightAt ?? 'Transfer'}
+              label={stationNames[transportIdx - 1]?.alightAt ?? t('routeDetail.transfer')}
               time={time}
               iconType="dot"
               lineInfo={{ line: seg.line, direction: nextSName?.direction }}
@@ -230,7 +233,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           items.push(
             <StationRow
               key={nextKey()}
-              label={stationNames[transportIdx - 1]?.alightAt ?? 'Alight here'}
+              label={stationNames[transportIdx - 1]?.alightAt ?? t('routeDetail.alightHere')}
               time={time}
               iconType="starting-point"
             />
@@ -238,7 +241,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
         } else {
           // Walk → Walk
           items.push(
-            <StationRow key={nextKey()} label="Transfer point" time={time} iconType="starting-point" />
+            <StationRow key={nextKey()} label={t('routeDetail.transferPoint')} time={time} iconType="starting-point" />
           )
         }
       }
@@ -258,7 +261,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
               <div className="flex flex-col gap-[8px] w-full">
                 <div className="flex items-center justify-between w-full">
                   <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
-                    walk for {seg.durationMin} min
+                    {t('routeDetail.walkFor', { count: seg.durationMin })}
                   </span>
                   {showBarriers && (
                     <button
@@ -299,7 +302,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
               <div className="flex flex-col gap-[8px] w-full">
                 <div className="flex items-center justify-between w-full">
                   <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
-                    ride for {seg.durationMin} minutes
+                    {t('routeDetail.rideFor', { count: seg.durationMin })}
                   </span>
                   <button
                     type="button"
@@ -307,7 +310,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
                     className="flex items-center gap-[8px] bg-primary-100 px-[8px] py-[4px] rounded-[16px] shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-none transition-colors duration-200"
                   >
                     <span className="font-normal text-[14px] text-primary-700 whitespace-nowrap">
-                      4 stations
+                      {t('routeDetail.stations', { count: STATIONS.length })}
                     </span>
                     <ChevronDown
                       size={16}
@@ -326,7 +329,10 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
               <div className="flex items-center gap-[8px]">
                 <Users size={16} strokeWidth={1.5} className="text-success-500 shrink-0" />
                 <span className="text-[12px] font-medium text-success-500 tracking-[0.12px]">
-                  2 people confirmed this {seg.type} is accessible
+                  {t('routeDetail.confirmedAccessible', {
+                    count: 2,
+                    type: t(`routeDetail.segmentTypes.${seg.type}`),
+                  })}
                 </span>
               </div>
             </div>
@@ -344,7 +350,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
       items.push(
         <StationRow
           key={nextKey()}
-          label={stationNames[transportIdx - 1]?.alightAt ?? 'Alight here'}
+          label={stationNames[transportIdx - 1]?.alightAt ?? t('routeDetail.alightHere')}
           time={finalTime}
           iconType="starting-point"
         />
@@ -410,7 +416,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
             <>
               {/* Back button */}
               <div className="pt-[8px]">
-                <Button variant="back" onClick={onClose}>Back</Button>
+                <Button variant="back" onClick={onClose}>{t('common.back')}</Button>
               </div>
 
               {/* Header block */}
@@ -418,12 +424,12 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
                 {/* Row 1: title + actions */}
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col gap-[4px]">
-                    <span className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
-                      Route details
+                    <span className="text-display-md text-neutral-900">
+                      {t('routeDetail.title')}
                     </span>
                     <div className="flex items-center gap-[16px]">
                       <span className="font-normal text-[14px] text-neutral-700">
-                        Arriving {route.arrivalTime}
+                        {t('routeDetail.arriving', { time: route.arrivalTime })}
                       </span>
                       <div className="w-px h-[10px] bg-neutral-200" />
                       <span className="font-normal text-[14px] text-neutral-700">
@@ -435,7 +441,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
                     <button
                       type="button"
                       className="border border-neutral-200 rounded-[48px] p-[14px] transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                      aria-label="Bookmark"
+                      aria-label={t('common.bookmark')}
                       onClick={() => console.log('Bookmark route', route.id)}
                     >
                       <Bookmark size={20} strokeWidth={1.5} className="text-neutral-900" />
@@ -443,7 +449,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
                     <button
                       type="button"
                       className="border border-neutral-200 rounded-[48px] p-[14px] transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                      aria-label="Share"
+                      aria-label={t('common.share')}
                       onClick={() => console.log('Share route', route.id)}
                     >
                       <Share2 size={20} strokeWidth={1.5} className="text-neutral-900" />
@@ -455,14 +461,14 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
                 <div className="flex gap-[10px] items-center h-[36px]">
                   <div className="bg-success-100 px-[8px] py-[4px] rounded-[24px]">
                     <span className="text-[12px] font-medium text-success-700 tracking-[0.12px]">
-                      80% Accessible
+                      {t('map.accessiblePercent', { score: 80 })}
                     </span>
                   </div>
                   {route.barrierCount > 0 && (
                     <div className="flex items-center gap-[6px] bg-warning-100 px-[8px] py-[4px] rounded-[24px]">
                       <Construction size={16} strokeWidth={1.5} className="text-warning-500" />
                       <span className="text-[12px] font-medium text-warning-500 tracking-[0.12px]">
-                        {route.barrierCount} barriers
+                        {t('map.barriers', { count: route.barrierCount })}
                       </span>
                     </div>
                   )}
@@ -484,7 +490,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
             className="w-full h-[48px] bg-primary-500 rounded-[24px] flex items-center justify-center font-semibold text-[16px] text-neutral-0 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
             onClick={() => onStartRoute?.()}
           >
-            Start route
+            {t('routeDetail.startRoute')}
           </button>
         </div>
       </div>

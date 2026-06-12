@@ -75,7 +75,11 @@
     "sortBy": "Сортувати за",
     "most-accessible": "Найдоступніші",
     "nearest": "Найближчі",
-    "recently-verified": "Нещодавно перевірені"
+    "recently-verified": "Нещодавно перевірені",
+    "fewest-barriers": "Найменше перешкод",
+    "shortest-distance": "Найкоротший шлях",
+    "fastest": "Найшвидший",
+    "flattest": "Найрівніший маршрут"
   },
   "map": {
     "search": "Пошук місць...",
@@ -151,5 +155,61 @@
     "notHelpful": "Не корисно",
     "helpful": "Корисно",
     "leaveReview": "Залишити відгук"
+  },
+  "transportSwitcher": {
+    "transit": "Громадський транспорт",
+    "car": "Авто",
+    "walking": "Пішки"
+  },
+  "routeDestination": {
+    "from": "Звідки",
+    "to": "Куди",
+    "destinationPlaceholder": "Пункт призначення",
+    "swapAria": "Поміняти місцями початок і кінець"
+  },
+  "routePlanning": {
+    "routesTo": "Маршрути до {{destination}}",
+    "powerOutageWarning": "Очікується відключення електроенергії через ~30 хв. Рекомендуємо найкоротший маршрут.",
+    "ownCar": "Власне авто",
+    "taxi": "Таксі",
+    "accessibleVehicle": "Доступний транспорт",
+    "inaccessibleVehicle": "Недоступний транспорт",
+    "durationMin": "{{count}} хв",
+    "orderUklon": "Замовити Uklon",
+    "scheduleRide": "Замовити поїздку",
+    "uklonAlt": "Uklon",
+    "socialTaxiAlt": "Соціальне таксі"
+  },
+  "routeDetail": {
+    "title": "Деталі маршруту",
+    "arriving": "Прибуття о {{time}}",
+    "boardHere": "Сідайте тут",
+    "transfer": "Пересадка",
+    "alightHere": "Виходьте тут",
+    "transferPoint": "Точка пересадки",
+    "walkFor": "іти {{count}} хв",
+    "rideFor": "їхати {{count}} хв",
+    "stations_one": "{{count}} зупинка",
+    "stations_few": "{{count}} зупинки",
+    "stations_many": "{{count}} зупинок",
+    "stations_other": "{{count}} зупинок",
+    "confirmedAccessible_one": "{{count}} людина підтвердила доступність",
+    "confirmedAccessible_few": "{{count}} людини підтвердили доступність",
+    "confirmedAccessible_many": "{{count}} людей підтвердили доступність",
+    "confirmedAccessible_other": "{{count}} людей підтвердили доступність",
+    "segmentTypes": {
+      "bus": "автобус",
+      "tram": "трамвай",
+      "metro": "метро",
+      "car": "авто"
+    },
+    "startRoute": "Почати маршрут"
+  },
+  "bestMatch": {
+    "badge": "Найкращий збіг",
+    "noBarriers": "Без перешкод",
+    "fewestBarriers": "Найменше перешкод ({{count}})",
+    "accessibleThroughout": "Доступний по всьому маршруту",
+    "fastestOption": "Найшвидший варіант"
   }
 }

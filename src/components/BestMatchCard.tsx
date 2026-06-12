@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Chip } from './Chip'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -12,7 +13,9 @@ export interface BestMatchCardProps {
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export const BestMatchCard: React.FC<BestMatchCardProps> = ({ tags, children }) => (
+export const BestMatchCard: React.FC<BestMatchCardProps> = ({ tags, children }) => {
+  const { t } = useTranslation()
+  return (
   <div className="bg-success-100 border border-success-500 rounded-[24px] p-md flex flex-col gap-md">
 
     {/* "Best match" badge */}
@@ -22,7 +25,7 @@ export const BestMatchCard: React.FC<BestMatchCardProps> = ({ tags, children }) 
         'px-sm py-2xs',
         'text-caption-md',
       ].join(' ')}>
-        Best match for you
+        {t('bestMatch.badge')}
       </span>
     </div>
 
@@ -39,4 +42,5 @@ export const BestMatchCard: React.FC<BestMatchCardProps> = ({ tags, children }) 
     )}
 
   </div>
-)
+  )
+}

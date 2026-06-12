@@ -1,4 +1,5 @@
 import type { MobilityAid } from '../context/OnboardingContext'
+import i18n from '../i18n'
 
 // Match score is computed from the route's own segment-level accessibility data against the
 // user's mobility profile — not from other users' reviews of this specific route, which would
@@ -59,18 +60,18 @@ export function getBestMatch<T extends MatchableRoute>(
   const tags: string[] = []
 
   if (best.barrierCount === 0) {
-    tags.push('No barriers')
+    tags.push(i18n.t('bestMatch.noBarriers'))
   } else {
-    tags.push(`Fewest barriers (${best.barrierCount})`)
+    tags.push(i18n.t('bestMatch.fewestBarriers', { count: best.barrierCount }))
   }
 
   if (best.segments.every(s => s.accessible !== false)) {
-    tags.push('Accessible throughout')
+    tags.push(i18n.t('bestMatch.accessibleThroughout'))
   }
 
   const minDuration = Math.min(...routes.map(r => r.durationMin))
   if (best.durationMin === minDuration) {
-    tags.push('Fastest option')
+    tags.push(i18n.t('bestMatch.fastestOption'))
   }
 
   return { route: best, tags }
