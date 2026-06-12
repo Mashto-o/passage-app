@@ -195,6 +195,7 @@ export const ReviewScreen: React.FC = () => {
                 key={cfg.id}
                 icon={sectionIcons[cfg.id]}
                 label={cfg.label}
+                inputLabel={`Upload photo for ${cfg.label.toLowerCase()} accessibility`}
                 photoSrc={s.photoSrc}
                 status={s.status}
                 accessibilityValue={s.accessibilityValue}

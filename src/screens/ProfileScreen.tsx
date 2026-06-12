@@ -95,11 +95,13 @@ function ToggleRow({
   label,
   value,
   onChange,
+  toggleLabel,
 }: {
   icon: React.ReactNode
   label: string
   value: boolean
   onChange: (v: boolean) => void
+  toggleLabel?: string
 }) {
   return (
     <div className="flex items-center justify-between w-full h-[24px]">
@@ -107,7 +109,7 @@ function ToggleRow({
         <span className="shrink-0 text-neutral-700">{icon}</span>
         <span className="text-body-md text-neutral-900">{label}</span>
       </div>
-      <Toggle value={value} onChange={onChange} />
+      <Toggle value={value} onChange={onChange} label={toggleLabel ?? label} />
     </div>
   )
 }
@@ -211,7 +213,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <div className="flex items-center gap-xs flex-wrap">
                 <span className="text-display-md text-neutral-900">{weeklyReviews}</span>
                 {level < 5 && moreToNext > 0 && (
-                  <div className="bg-primary-300 rounded-[24px] px-xs py-[4px] shrink-0">
+                  <div className="bg-primary-500 rounded-[24px] px-xs py-[4px] shrink-0">
                     <span className="text-caption-sm text-neutral-0 whitespace-nowrap">
                       {moreToNext} more to get the next level!
                     </span>
@@ -269,6 +271,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 label="Voice guidance"
                 value={voiceGuidance}
                 onChange={setVoiceGuidance}
+                toggleLabel="Voice guidance"
               />
               <Divider />
               <ToggleRow
@@ -276,6 +279,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 label="Notifications"
                 value={notifications}
                 onChange={setNotifications}
+                toggleLabel="Notifications"
               />
             </div>
           </div>

@@ -4,6 +4,7 @@ export interface CommentInputProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  label?: string
   maxLength?: number
   className?: string
 }
@@ -12,6 +13,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   value,
   onChange,
   placeholder,
+  label = 'Additional comments about accessibility (optional)',
   maxLength = 280,
   className = '',
 }) => {
@@ -33,6 +35,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
+          aria-label={label}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           className={[

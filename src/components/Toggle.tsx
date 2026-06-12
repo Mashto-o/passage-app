@@ -3,12 +3,14 @@ import React from 'react'
 export interface ToggleProps {
   value: boolean
   onChange: (value: boolean) => void
+  label?: string
   className?: string
 }
 
 export const Toggle: React.FC<ToggleProps> = ({
   value,
   onChange,
+  label,
   className = '',
 }) => {
   return (
@@ -16,6 +18,7 @@ export const Toggle: React.FC<ToggleProps> = ({
       type="button"
       role="switch"
       aria-checked={value}
+      aria-label={label}
       onClick={() => onChange(!value)}
       className={[
         'flex items-center w-[48px] h-[32px] rounded-[24px] p-[4px] shrink-0',

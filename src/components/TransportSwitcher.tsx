@@ -39,6 +39,7 @@ export const TransportSwitcher: React.FC<TransportSwitcherProps> = ({
             key={id}
             type="button"
             aria-pressed={active}
+            aria-label={modeLabels[id]}
             onClick={() => onChange(id)}
             className={[
               'flex-1 flex items-center justify-center py-[8px] rounded-[24px]',

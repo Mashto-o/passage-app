@@ -66,7 +66,7 @@ export const Onboarding3: React.FC = () => {
           <div key={id} className="w-[calc(50%-8px)]">
             <PhotoCard
               src={src}
-              alt={label}
+              alt=""
               label={label}
               selected={selected.includes(id)}
               onClick={() => toggle(id)}

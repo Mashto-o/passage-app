@@ -12,7 +12,7 @@ export interface ChipProps {
 const variantConfig = {
   primary:   { container: 'bg-primary-100 text-primary-500',                                       },
   active:    { container: 'bg-primary-500 text-neutral-0 border border-primary-500',               },
-  secondary: { container: 'bg-accent-100 text-accent-500',                                         },
+  secondary: { container: 'bg-accent-100 text-accent-700',                                         },
   neutral:   { container: 'bg-neutral-0 border border-neutral-200 text-neutral-700',               },
 }
 

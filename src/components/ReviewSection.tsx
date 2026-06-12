@@ -17,6 +17,7 @@ export interface ReviewSectionQuestion {
 export interface ReviewSectionProps {
   icon: React.ReactNode
   label: string
+  inputLabel?: string
   photoSrc: string | null
   status: 'empty' | 'analyzing' | 'done'
   accessibilityValue: 'accessible' | 'partiallyAccessible' | 'inaccessible' | null
@@ -34,6 +35,7 @@ export interface ReviewSectionProps {
 export const ReviewSection: React.FC<ReviewSectionProps> = ({
   icon,
   label,
+  inputLabel,
   photoSrc,
   status,
   accessibilityValue,
@@ -98,6 +100,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
             accept="image/*"
             ref={fileInputRef}
             className="sr-only"
+            aria-label={inputLabel ?? `Upload photo for ${label.toLowerCase()} accessibility`}
             onChange={handleFileChange}
           />
           <MediaInputButton

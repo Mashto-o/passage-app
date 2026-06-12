@@ -1,6 +1,5 @@
 import React from 'react'
 import { X, Bookmark, Share2 } from 'lucide-react'
-import { clickableCardProps } from '../utils/a11y'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
 import { Button } from './Button'
@@ -50,17 +49,13 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
         visible ? 'translate-y-0' : 'translate-y-[calc(100%+125px)]',
       ].join(' ')}
     >
-      {/* Entire card body is tappable — buttons stop propagation so they don't trigger this */}
-      <div
-        className="bg-neutral-0 rounded-[32px] pt-sm px-md pb-md flex flex-col gap-sm shadow-lg cursor-pointer"
-        {...clickableCardProps(() => onCardClick?.())}
-      >
+      <div className="bg-neutral-0 rounded-[32px] pt-sm px-md pb-md flex flex-col gap-sm shadow-lg">
 
         {/* Close button row */}
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onClose() }}
+            onClick={onClose}
             className={[
               'flex items-center justify-center',
               'w-[32px] h-[32px] rounded-full',
@@ -74,35 +69,42 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
           </button>
         </div>
 
-        {/* Photo */}
-        <img
-          src="https://placehold.co/354x120"
-          alt={name}
-          className="h-[120px] w-full rounded-xl object-cover bg-neutral-100"
-        />
+        {/* Photo + info — tappable to open details */}
+        <button
+          type="button"
+          onClick={onCardClick}
+          className="text-left w-full bg-transparent flex flex-col gap-sm focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded-xl"
+        >
+          {/* Photo */}
+          <img
+            src="https://placehold.co/354x120"
+            alt={name}
+            className="h-[120px] w-full rounded-xl object-cover bg-neutral-100"
+          />
 
-        {/* Info section */}
-        <div className="flex flex-col gap-xs pt-xs">
-          <div className="flex items-center gap-xs">
-            <AccessibilityBadge
-              variant={accessibilityVariant}
-              size="sm"
-              icon={categoryIcon}
-            />
-            <StatusBadge
-              variant={scoreVariant}
-              label={`${accessibilityScore}% Accessible`}
-            />
+          {/* Info section */}
+          <div className="flex flex-col gap-xs pt-xs w-full">
+            <div className="flex items-center gap-xs">
+              <AccessibilityBadge
+                variant={accessibilityVariant}
+                size="sm"
+                icon={categoryIcon}
+              />
+              <StatusBadge
+                variant={scoreVariant}
+                label={`${accessibilityScore}% Accessible`}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-heading-sm text-neutral-900 flex-1">{name}</span>
+              <span className="text-body-sb text-neutral-900">{distance}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-body-sm text-neutral-500 flex-1">{address}</span>
+              <span className="text-body-sm text-neutral-500">{barrierCount} barriers</span>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-heading-sm text-neutral-900 flex-1">{name}</span>
-            <span className="text-body-sb text-neutral-900">{distance}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-body-sm text-neutral-500 flex-1">{address}</span>
-            <span className="text-body-sm text-neutral-500">{barrierCount} barriers</span>
-          </div>
-        </div>
+        </button>
 
         {/* Action row */}
         <div className="flex items-center gap-xs">
@@ -111,12 +113,12 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
               variant="primary"
               label="Build a route"
               fullWidth
-              onClick={(e) => { e.stopPropagation(); onRoute?.() }}
+              onClick={onRoute}
             />
           </div>
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onBookmark?.() }}
+            onClick={onBookmark}
             className={[
               'flex items-center justify-center shrink-0',
               'w-[48px] h-[48px] rounded-full',
@@ -130,7 +132,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
           </button>
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onShare?.() }}
+            onClick={onShare}
             className={[
               'flex items-center justify-center shrink-0',
               'w-[48px] h-[48px] rounded-full',

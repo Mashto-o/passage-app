@@ -126,6 +126,7 @@ export const FilterScreen: React.FC = () => {
               <Toggle
                 value={filterState.avoidLifts}
                 onChange={setAvoidLifts}
+                label="Avoid lift-dependent places"
               />
             </div>
           </div>
@@ -150,6 +151,7 @@ export const FilterScreen: React.FC = () => {
               <Toggle
                 value={filterState.hasCompanion}
                 onChange={setHasCompanion}
+                label="I'm travelling with a companion"
               />
             </div>
           </div>
