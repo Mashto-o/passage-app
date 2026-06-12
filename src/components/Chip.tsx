@@ -2,7 +2,7 @@ import React from 'react'
 
 export interface ChipProps {
   label: string
-  variant?: 'primary' | 'secondary' | 'neutral' | 'active'
+  variant?: 'primary' | 'secondary' | 'neutral' | 'active' | 'success'
   size?: 'sm' | 'md'
   icon?: React.ReactNode
   className?: string
@@ -14,6 +14,7 @@ const variantConfig = {
   active:    { container: 'bg-primary-500 text-neutral-0 border border-primary-500',               },
   secondary: { container: 'bg-accent-100 text-accent-700',                                         },
   neutral:   { container: 'bg-neutral-0 border border-neutral-200 text-neutral-700',               },
+  success:   { container: 'bg-success-100 text-success-700',                                       },
 }
 
 export const Chip: React.FC<ChipProps> = ({

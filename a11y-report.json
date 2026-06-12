@@ -1,0 +1,62 @@
+[
+  {
+    "route": "/",
+    "name": "Onboarding1",
+    "violations": []
+  },
+  {
+    "route": "/onboarding/2",
+    "name": "Onboarding2",
+    "violations": []
+  },
+  {
+    "route": "/onboarding/3",
+    "name": "Onboarding3",
+    "violations": []
+  },
+  {
+    "route": "/onboarding/4",
+    "name": "Onboarding4",
+    "violations": []
+  },
+  {
+    "route": "/onboarding/5",
+    "name": "Onboarding5",
+    "violations": []
+  },
+  {
+    "route": "/discover",
+    "name": "DiscoverScreen",
+    "violations": []
+  },
+  {
+    "route": "/map",
+    "name": "MapScreen",
+    "violations": []
+  },
+  {
+    "route": "/filter",
+    "name": "FilterScreen",
+    "violations": []
+  },
+  {
+    "route": "/route-complete",
+    "name": "RouteCompleteScreen",
+    "violations": []
+  },
+  {
+    "route": "/profile",
+    "name": "ProfileScreen",
+    "violations": []
+  },
+  {
+    "route": "/profile/preferences",
+    "name": "AccessibilityPreferencesScreen",
+    "violations": []
+  },
+  {
+    "route": "/review",
+    "name": "ReviewScreen",
+    "violations": []
+  }
+]

@@ -111,5 +111,5 @@ export type { FilterChipProps } from './FilterChip'
 export { ReviewSection } from './ReviewSection'
 export type { ReviewSectionProps, ReviewSectionQuestion } from './ReviewSection'
 
-export { RecommendedRouteCard } from './RecommendedRouteCard'
-export type { RecommendedRouteCardProps } from './RecommendedRouteCard'
+export { BestMatchCard } from './BestMatchCard'
+export type { BestMatchCardProps } from './BestMatchCard'
