@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Zap, Construction, Bus, TramFront, Train, Car, CarTaxiFront, Accessibility } from 'lucide-react'
 import {
   Button, SortControl, SortSheet, TransportSwitcher, AccessibilityBadge,
+  RecommendedRouteCard,
 } from './index'
+import { useOnboarding } from '../context/OnboardingContext'
+import type { MobilityAid } from '../context/OnboardingContext'
+import { ROUTE_COMMUNITY_RATINGS } from '../utils/mockData'
 
 // Third-party brand colours — hardcoded intentionally, not Passage tokens
 const UKLON_YELLOW          = '#F5DB00'
@@ -794,6 +798,37 @@ const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   </p>
 )
 
+// ── Community recommendation helpers ──────────────────────────────────────
+
+const MOBILITY_AID_LABELS: Record<MobilityAid, string> = {
+  'wheelchair-manual':   'manual wheelchair users',
+  'wheelchair-electric': 'electric wheelchair users',
+  'cane':                'cane users',
+  'stroller':            'stroller users',
+  'prosthesis':          'prosthesis users',
+  'no-aid':              'other users',
+}
+
+const RECOMMENDATION_THRESHOLD = 85
+
+/** Returns the route with the highest community accessiblePercent >= threshold, or null. */
+function getRecommendedRoute(
+  routes: Route[],
+  mobilityAid: MobilityAid | null,
+): Route | null {
+  if (!mobilityAid) return null
+  let best: Route | null = null
+  let bestPct = 0
+  for (const route of routes) {
+    const rating = ROUTE_COMMUNITY_RATINGS[route.id]?.[mobilityAid]
+    if (rating && rating.accessiblePercent >= RECOMMENDATION_THRESHOLD && rating.accessiblePercent > bestPct) {
+      bestPct = rating.accessiblePercent
+      best = route
+    }
+  }
+  return best
+}
+
 // ── Props ──────────────────────────────────────────────────────────────────
 
 type RoutePlanningSheetProps = {
@@ -822,6 +857,8 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   const [dragDelta,      setDragDelta]      = useState(0)
   const [sheetHeight,    setSheetHeight]    = useState(600)
   const DRAG_THRESHOLD = 80
+
+  const { mobilityAid } = useOnboarding()
 
   const scrollRef  = useRef<HTMLDivElement>(null)
   const sheetRef   = useRef<HTMLDivElement>(null)
@@ -923,38 +960,87 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
           </div>
 
           {/* Route cards */}
-          {activeTab === 'car' ? (
-            <div className="flex flex-col gap-[24px]">
+          {activeTab === 'car' ? (() => {
+            // For car tab, only standard routes can be "recommended" (they open RouteDetailSheet).
+            const standardRoutes = CAR_ROUTES.filter(r => r.cardType === 'standard')
+            const recommended    = getRecommendedRoute(standardRoutes, mobilityAid)
+            const rating         = recommended && mobilityAid
+              ? ROUTE_COMMUNITY_RATINGS[recommended.id]?.[mobilityAid]
+              : null
+            const regularStandard = sortRoutes(
+              recommended ? standardRoutes.filter(r => r.id !== recommended.id) : standardRoutes,
+              routeSortValue,
+            )
 
-              {/* Own car section */}
-              <div className="flex flex-col gap-[16px]">
-                <SectionLabel>Own car</SectionLabel>
-                {sortRoutes(
-                  CAR_ROUTES.filter(r => r.cardType === 'standard'),
-                  routeSortValue
-                ).map(route => (
-                  <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} />
-                ))}
-              </div>
+            return (
+              <div className="flex flex-col gap-[24px]">
 
-              {/* Taxi section */}
-              <div className="flex flex-col gap-[16px]">
-                <SectionLabel>Taxi</SectionLabel>
-                {CAR_ROUTES.filter(r => r.cardType !== 'standard').map(route =>
-                  route.cardType === 'uklon'
-                    ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} />
-                    : <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} />
+                {/* Recommended pinned card (standard routes only) */}
+                {recommended && rating && mobilityAid && (
+                  <RecommendedRouteCard
+                    accessiblePercent={rating.accessiblePercent}
+                    reviewCount={rating.reviewCount}
+                    mobilityAidLabel={MOBILITY_AID_LABELS[mobilityAid]}
+                  >
+                    <StandardRouteCard route={recommended} onSelect={onRouteSelect} />
+                  </RecommendedRouteCard>
                 )}
-              </div>
 
-            </div>
-          ) : (
-            <div className="flex flex-col gap-[24px]">
-              {sortRoutes(getActiveRoutes(activeTab), routeSortValue).map((route) => (
-                <RouteCard key={route.id} route={route} onSelect={onRouteSelect} />
-              ))}
-            </div>
-          )}
+                {/* Own car section */}
+                {regularStandard.length > 0 && (
+                  <div className="flex flex-col gap-[16px]">
+                    <SectionLabel>Own car</SectionLabel>
+                    {regularStandard.map(route => (
+                      <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Taxi section */}
+                <div className="flex flex-col gap-[16px]">
+                  <SectionLabel>Taxi</SectionLabel>
+                  {CAR_ROUTES.filter(r => r.cardType !== 'standard').map(route =>
+                    route.cardType === 'uklon'
+                      ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} />
+                      : <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} />
+                  )}
+                </div>
+
+              </div>
+            )
+          })() : (() => {
+            const activeRoutes  = getActiveRoutes(activeTab)
+            const recommended   = getRecommendedRoute(activeRoutes, mobilityAid)
+            const rating        = recommended && mobilityAid
+              ? ROUTE_COMMUNITY_RATINGS[recommended.id]?.[mobilityAid]
+              : null
+            const regularRoutes = sortRoutes(
+              recommended ? activeRoutes.filter(r => r.id !== recommended.id) : activeRoutes,
+              routeSortValue,
+            )
+
+            return (
+              <div className="flex flex-col gap-md">
+
+                {/* Recommended pinned card */}
+                {recommended && rating && mobilityAid && (
+                  <RecommendedRouteCard
+                    accessiblePercent={rating.accessiblePercent}
+                    reviewCount={rating.reviewCount}
+                    mobilityAidLabel={MOBILITY_AID_LABELS[mobilityAid]}
+                  >
+                    <RouteCard route={recommended} onSelect={onRouteSelect} />
+                  </RecommendedRouteCard>
+                )}
+
+                {/* Regular sorted list */}
+                {regularRoutes.map((route) => (
+                  <RouteCard key={route.id} route={route} onSelect={onRouteSelect} />
+                ))}
+
+              </div>
+            )
+          })()}
         </div>
 
         {/* Sort sheet — outside scrollable area */}
