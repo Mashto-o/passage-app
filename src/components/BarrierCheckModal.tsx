@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './index'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -22,6 +23,8 @@ export const BarrierCheckModal: React.FC<BarrierCheckModalProps> = ({
   onNo,
   onSkip,
 }) => {
+  const { t } = useTranslation()
+
   if (!isOpen) return null
 
   return (
@@ -33,7 +36,7 @@ export const BarrierCheckModal: React.FC<BarrierCheckModalProps> = ({
 
         {/* Title */}
         <span className="text-neutral-900 font-semibold text-[16px] leading-[1.4] text-center">
-          Is this barrier still there?
+          {t('barrierCheck.title')}
         </span>
 
         {/* Barrier photo + label */}
@@ -57,7 +60,7 @@ export const BarrierCheckModal: React.FC<BarrierCheckModalProps> = ({
           {/* Yes — primary */}
           <Button
             variant="primary"
-            label="Yes, still there"
+            label={t('barrierCheck.yesStillThere')}
             className="w-full"
             onClick={onYes}
           />
@@ -65,7 +68,7 @@ export const BarrierCheckModal: React.FC<BarrierCheckModalProps> = ({
           {/* No — success variant */}
           <Button
             variant="success"
-            label="No, it's gone"
+            label={t('barrierCheck.noItsGone')}
             className="w-full"
             onClick={onNo}
           />
@@ -76,14 +79,14 @@ export const BarrierCheckModal: React.FC<BarrierCheckModalProps> = ({
             className="text-neutral-500 font-semibold text-[16px] h-[48px] transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
             onClick={onSkip}
           >
-            Skip — I'm not sure
+            {t('barrierCheck.skipNotSure')}
           </button>
 
         </div>
 
         {/* Footer note */}
         <span className="text-neutral-700 text-[14px] font-normal leading-[1.5] text-center">
-          Your answer helps other users on this route
+          {t('barrierCheck.helpOthers')}
         </span>
 
       </div>

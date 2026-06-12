@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BadgeCheck } from 'lucide-react'
 import {
   Button, AccessibilityCard, ToggleButton, Chip, CommentInput, MediaInputButton,
 } from '../components'
+import { formatDistance, formatDuration } from '../utils/formatUnits'
 
 // ── Section label style (matches FilterScreen) ─────────────────────────────
 
@@ -14,6 +16,8 @@ const sectionLabel = 'font-medium text-[14px] leading-[1.4] tracking-[0.56px] up
 export const RouteCompleteScreen: React.FC = () => {
   const navigate  = useNavigate()
   const location  = useLocation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const { distanceKm, durationMin } = (location.state as { distanceKm?: number; durationMin?: number }) ?? {}
 
   // ── Local state ──────────────────────────────────────────────────────────
@@ -24,8 +28,8 @@ export const RouteCompleteScreen: React.FC = () => {
 
   // Trigger slide-up after initial hidden state is painted
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 10)
-    return () => clearTimeout(t)
+    const timerId = setTimeout(() => setVisible(true), 10)
+    return () => clearTimeout(timerId)
   }, [])
 
   const handleRatingClick = (value: 'accessible' | 'partiallyAccessible' | 'inaccessible') => {
@@ -54,17 +58,21 @@ export const RouteCompleteScreen: React.FC = () => {
 
           {/* Title */}
           <h1 className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900">
-            Route complete!
+            {t('routeComplete.title')}
           </h1>
 
           {/* Subtitle row — distance · duration */}
           <div className="flex items-center gap-[8px]">
             <span className="text-neutral-700 text-[14px] font-normal leading-[1.5]">
-              {distanceKm ?? '—'} km
+              {distanceKm !== undefined
+                ? formatDistance(distanceKm * 1000, lang)
+                : '—'}
             </span>
             <div className="w-px h-[10px] bg-neutral-200" />
             <span className="text-neutral-700 text-[14px] font-normal leading-[1.5]">
-              {durationMin ?? '—'} min
+              {durationMin !== undefined
+                ? formatDuration(durationMin, lang)
+                : '—'}
             </span>
           </div>
 
@@ -72,7 +80,7 @@ export const RouteCompleteScreen: React.FC = () => {
 
         {/* ── How was the route ───────────────────────────────────────────── */}
         <div className="flex flex-col gap-[16px]">
-          <span className={sectionLabel}>How was the route</span>
+          <span className={sectionLabel}>{t('routeComplete.howWasRoute')}</span>
           <div className="flex flex-row gap-[8px]">
             <AccessibilityCard
               accessibility="accessible"
@@ -94,19 +102,19 @@ export const RouteCompleteScreen: React.FC = () => {
 
         {/* ── Barriers ───────────────────────────────────────────────────── */}
         <div className="flex flex-col gap-[16px]">
-          <span className={sectionLabel}>Barriers</span>
+          <span className={sectionLabel}>{t('routeComplete.barriers')}</span>
           <div className="flex flex-col gap-[4px]">
             <span className="text-neutral-700 text-[14px] font-normal leading-[1.5]">
-              Were the barriers we warned you about accurate?
+              {t('routeComplete.barriersQuestion')}
             </span>
             <span className="text-neutral-700 text-[14px] font-normal leading-[1.5]">
-              Optional - but helpful to others
+              {t('routeComplete.optional')}
             </span>
           </div>
           {/* Barrier row */}
           <div className="flex items-center justify-between w-full">
             <span className="text-neutral-900 text-[16px] font-normal leading-[1.5] w-[189px]">
-              Kerb without dropped kerb
+              {t('onboarding3.barriers.kerb')}
             </span>
             <ToggleButton
               value={barrierAnswer}
@@ -120,29 +128,29 @@ export const RouteCompleteScreen: React.FC = () => {
 
         {/* ── Add a comment ──────────────────────────────────────────────── */}
         <div className="flex flex-col gap-[16px]">
-          <span className={sectionLabel}>Add a comment</span>
+          <span className={sectionLabel}>{t('routeComplete.addComment')}</span>
           <span className="text-neutral-700 text-[14px] font-normal leading-[1.5]">
-            Optional - but helpful to others
+            {t('routeComplete.optional')}
           </span>
 
           {/* Prompt chips */}
           <div className="flex flex-row gap-[12px]">
-            <Chip variant="secondary" label="The main barrier was..." />
-            <Chip variant="secondary" label="Helpful for users who..." />
+            <Chip variant="secondary" label={t('routeComplete.mainBarrierChip')} />
+            <Chip variant="secondary" label={t('routeComplete.helpfulForChip')} />
           </div>
 
           {/* Text comment */}
           <CommentInput
             value={comment}
             onChange={setComment}
-            placeholder="Anything others should know before they go?..."
+            placeholder={t('routeComplete.commentPlaceholder')}
           />
 
           {/* OR divider + voice */}
           <div className="flex flex-col gap-[8px]">
-            <span className={`${sectionLabel} text-center`}>OR</span>
+            <span className={`${sectionLabel} text-center`}>{t('routeComplete.or')}</span>
             <span className="text-neutral-700 text-[14px] font-normal leading-[1.5] text-center">
-              Leave a voice comment. Our AI assistant will sum it up for you.
+              {t('routeComplete.voiceComment')}
             </span>
             <MediaInputButton
               variant="voice"
@@ -156,13 +164,13 @@ export const RouteCompleteScreen: React.FC = () => {
         <div className="flex flex-col gap-[12px] items-center w-full">
           <Button
             variant="primary"
-            label="Submit"
+            label={t('routeComplete.submit')}
             fullWidth
             onClick={() => navigate('/profile')}
           />
           <Button
             variant="ghost"
-            label="Skip"
+            label={t('common.skip')}
             fullWidth
             onClick={() => navigate('/map')}
           />

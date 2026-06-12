@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button, NavigationCard, BarrierCheckModal } from './index'
 import type { Route } from './RoutePlanningSheet'
 import kerbImage from '../assets/images/kerb.png'
@@ -26,6 +27,7 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
   onNavStateChange,
   onPanelHeightChange,
 }) => {
+  const { t } = useTranslation()
   const [navState,          setNavState]          = useState<NavState>('default')
   const [displayedNavState, setDisplayedNavState] = useState<NavState>('default')
   const [cardVisible,       setCardVisible]       = useState(true)
@@ -90,13 +92,13 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
                       : displayedNavState === 'noHazard' ? 'turn-right' as const
                       : undefined
 
-  const cardInstruction = displayedNavState === 'arrived' ? 'You have arrived'
-                        : displayedNavState === 'noHazard' ? 'Turn right'
-                        : 'Turn left'
+  const cardInstruction = displayedNavState === 'arrived'  ? t('navigation.youHaveArrived')
+                        : displayedNavState === 'noHazard' ? t('navigation.turnRight')
+                        : t('navigation.turnLeft')
 
-  const cardStreetName = displayedNavState === 'arrived' ? destinationName
-                       : displayedNavState === 'noHazard' ? 'onto vul. Baseyna'
-                       : 'onto vul. Khreschyatyk'
+  const cardStreetName = displayedNavState === 'arrived'  ? destinationName
+                       : displayedNavState === 'noHazard' ? t('navigation.ontoStreet', { street: t('navigation.streetBaseyna') })
+                       : t('navigation.ontoStreet', { street: t('navigation.streetKhreschyatyk') })
 
   const cardDistance = displayedNavState === 'arrived' ? undefined
                      : displayedNavState === 'noHazard' ? '120m'
@@ -127,8 +129,8 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
                 instruction={cardInstruction}
                 streetName={cardStreetName}
                 distanceToTurn={cardDistance}
-                hazardBoldPrefix={displayedNavState === 'default' ? 'Moderate incline' : undefined}
-                hazardText={displayedNavState === 'default' ? 'Moderate incline ahead in 10m' : undefined}
+                hazardBoldPrefix={displayedNavState === 'default' ? t('navigation.hazardBoldPrefix') : undefined}
+                hazardText={displayedNavState === 'default' ? t('navigation.hazardText') : undefined}
               />
             </div>
 
@@ -156,13 +158,15 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
               </span>
               <div className="flex items-center gap-[16px]">
                 <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
-                  {navState === 'arrived' ? 'You have arrived' : `Arriving ${route?.arrivalTime}`}
+                  {navState === 'arrived'
+                    ? t('navigation.youHaveArrived')
+                    : t('navigation.arriving', { time: route?.arrivalTime })}
                 </span>
                 {navState !== 'arrived' && (
                   <>
                     <div className="w-px h-[10px] bg-neutral-200" />
                     <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
-                      {route?.distanceKm} km left
+                      {t('navigation.kmLeft', { km: route?.distanceKm })}
                     </span>
                   </>
                 )}
@@ -173,13 +177,13 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
             <div className="flex gap-[24px] items-center w-full">
               <Button
                 variant="secondary"
-                label="Report Difficulty"
+                label={t('navigation.reportDifficulty')}
                 className="w-[165px]"
                 onClick={() => console.log('Report difficulty')}
               />
               <Button
                 variant="destructive"
-                label="End route"
+                label={t('navigation.endRoute')}
                 className="flex-1"
                 onClick={onClose}
               />
@@ -192,7 +196,7 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
       {/* Barrier check modal — z-110, above the navigation sheet */}
       <BarrierCheckModal
         isOpen={barrierCheckOpen}
-        barrierLabel="Kerb without dropped kerb"
+        barrierLabel={t('onboarding3.barriers.kerb')}
         barrierImageSrc={kerbImage}
         onYes={() => { console.log('Barrier: Yes, still there'); setBarrierCheckOpen(false) }}
         onNo={() => { console.log('Barrier: No, it\'s gone'); setBarrierCheckOpen(false) }}

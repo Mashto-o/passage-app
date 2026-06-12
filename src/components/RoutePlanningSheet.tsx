@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatDistance, formatDuration } from '../utils/formatUnits'
 import { Zap, Construction, Bus, TramFront, Train, Car, CarTaxiFront, Accessibility } from 'lucide-react'
 import {
   Button, SortControl, SortSheet, TransportSwitcher, AccessibilityBadge,
@@ -48,8 +49,11 @@ export type Route = {
   coordinates: RouteCoordinates
   stationNames?: {
     boardAt?: string
+    boardAtUk?: string
     direction?: string
+    directionUk?: string
     alightAt?: string
+    alightAtUk?: string
   }[]
 }
 
@@ -70,7 +74,7 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'walk', durationMin: 3,  hasBarriers: true },
     ],
     stationNames: [
-      { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Lukyanivska', alightAt: 'Palats Sportu' },
+      { boardAt: 'Maidan Nezalezhnosti', boardAtUk: 'Майдан Незалежності', direction: 'towards Lukyanivska', directionUk: 'у напрямку Лук\'янівська', alightAt: 'Palats Sportu', alightAtUk: 'Палац Спорту' },
     ],
     coordinates: {
       segments: [
@@ -122,8 +126,8 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'walk',  durationMin: 4,  hasBarriers: true },
     ],
     stationNames: [
-      { boardAt: 'Khreschatyk', direction: 'towards Teatralna', alightAt: 'Teatralna' },
-      { boardAt: 'Teatralna',   direction: 'towards Universytet', alightAt: 'Universytet' },
+      { boardAt: 'Khreschatyk', boardAtUk: 'Хрещатик', direction: 'towards Teatralna', directionUk: 'у напрямку Театральна', alightAt: 'Teatralna', alightAtUk: 'Театральна' },
+      { boardAt: 'Teatralna', boardAtUk: 'Театральна', direction: 'towards Universytet', directionUk: 'у напрямку Університет', alightAt: 'Universytet', alightAtUk: 'Університет' },
     ],
     coordinates: {
       segments: [
@@ -175,7 +179,7 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'walk', durationMin: 3,  hasBarriers: false },
     ],
     stationNames: [
-      { boardAt: 'Sahaidachnoho', direction: 'towards Kontraktova', alightAt: 'Kontraktova Ploscha' },
+      { boardAt: 'Sahaidachnoho', boardAtUk: 'Сагайдачного', direction: 'towards Kontraktova', directionUk: 'у напрямку Контрактова', alightAt: 'Kontraktova Ploscha', alightAtUk: 'Контрактова площа' },
     ],
     coordinates: {
       segments: [
@@ -229,8 +233,8 @@ const TRANSIT_ROUTES: Route[] = [
       { type: 'walk', durationMin: 3,  hasBarriers: true },
     ],
     stationNames: [
-      { boardAt: 'Maidan Nezalezhnosti', direction: 'towards Pechersk',  alightAt: 'Klovska' },
-      { boardAt: 'Klovska',              direction: 'towards Vydubychi', alightAt: 'Slavy Square' },
+      { boardAt: 'Maidan Nezalezhnosti', boardAtUk: 'Майдан Незалежності', direction: 'towards Pechersk', directionUk: 'у напрямку Печерськ', alightAt: 'Klovska', alightAtUk: 'Кловська' },
+      { boardAt: 'Klovska', boardAtUk: 'Кловська', direction: 'towards Vydubychi', directionUk: 'у напрямку Видубичі', alightAt: 'Slavy Square', alightAtUk: 'Площа Слави' },
     ],
     coordinates: {
       segments: [
@@ -503,14 +507,14 @@ function getSegmentWidthPercent(segmentDuration: number, totalDuration: number):
 // ── Shared helpers for transit / walking cards ─────────────────────────────
 
 const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const vehicleSegment = route.segments.find(s => s.type !== 'walk' && s.type !== 'car')
 
   return (
     <div className="flex gap-[10px] items-center flex-wrap">
       <div className="flex items-center px-[8px] py-[4px] bg-primary-100 rounded-[24px]">
         <span className="text-[12px] font-medium leading-[1.4] tracking-[0.12px] text-primary-700">
-          {route.distanceKm} km
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
         </span>
       </div>
 
@@ -556,12 +560,12 @@ const BadgeRow: React.FC<{ route: Route }> = ({ route }) => {
 }
 
 const TimeRow: React.FC<{ route: Route }> = ({ route }) => {
-  const { t } = useTranslation()
+  const { i18n } = useTranslation()
   return (
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.departureTime}</span>
       <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">
-        {t('routePlanning.durationMin', { count: route.durationMin })}
+        {formatDuration(route.durationMin, i18n.language)}
       </span>
       <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.arrivalTime}</span>
     </div>
@@ -682,7 +686,7 @@ const RouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
 // ── Car tab — own car card ─────────────────────────────────────────────────
 
 const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   return (
   <button
     type="button"
@@ -693,7 +697,7 @@ const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }
     <div className="flex items-center gap-[10px]">
       <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
         <span className="text-[12px] font-medium text-primary-700 tracking-[0.12px]">
-          {route.distanceKm} km
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
         </span>
       </div>
       {route.barrierCount > 0 && (
@@ -710,7 +714,7 @@ const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
       <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-        {t('routePlanning.durationMin', { count: route.durationMin })}
+        {formatDuration(route.durationMin, i18n.language)}
       </span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
@@ -724,14 +728,14 @@ const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }
 // ── Car tab — Uklon card ───────────────────────────────────────────────────
 
 const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
     {/* Top row: distance badge left, Uklon logo right */}
     <div className="flex items-center justify-between">
       <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
         <span className="text-[12px] font-medium text-primary-700 tracking-[0.12px]">
-          {route.distanceKm} km
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
         </span>
       </div>
       <img
@@ -745,7 +749,7 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
       <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-        {t('routePlanning.durationMin', { count: route.durationMin })}
+        {formatDuration(route.durationMin, i18n.language)}
       </span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
@@ -771,14 +775,14 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
 // ── Car tab — Social Taxi card ─────────────────────────────────────────────
 
 const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
     {/* Top row: distance badge left, Social Taxi logo right */}
     <div className="flex items-center justify-between">
       <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
         <span className="text-[12px] font-medium text-primary-700 tracking-[0.12px]">
-          {route.distanceKm} km
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
         </span>
       </div>
       <img
@@ -792,7 +796,7 @@ const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> =
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
       <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-        {t('routePlanning.durationMin', { count: route.durationMin })}
+        {formatDuration(route.durationMin, i18n.language)}
       </span>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>

@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { formatDistance } from '../utils/formatUnits'
+import { getLocalizedField } from '../utils/localizedField'
 import {
   Bookmark, Share2, Zap, Construction,
   DoorOpen, Sofa, ChevronUp, ChevronDown, ThumbsUp, ThumbsDown,
@@ -131,7 +133,8 @@ type PlaceDetailSheetProps = {
 
 export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpen, onClose, onBuildRoute }) => {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [entranceOpen, setEntranceOpen] = useState(true)
   const [toiletOpen,   setToiletOpen]   = useState(true)
   const [insideOpen,   setInsideOpen]   = useState(true)
@@ -250,15 +253,15 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
 
                 <div className="flex items-baseline justify-between gap-xs">
                   <span className="text-display-md text-neutral-900 flex-1">
-                    {place.name}
+                    {getLocalizedField(place, 'name', lang)}
                   </span>
                   <span className="text-heading-sm text-neutral-900 shrink-0">
-                    {place.distance}
+                    {formatDistance(place.distanceM, lang)}
                   </span>
                 </div>
 
                 <span className="text-body-sm text-neutral-900">
-                  {place.address}
+                  {getLocalizedField(place, 'address', lang)}
                 </span>
               </div>
 
@@ -269,7 +272,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     variant="primary"
                     label={t('map.buildRoute')}
                     fullWidth
-                    onClick={() => onBuildRoute(place.name)}
+                    onClick={() => onBuildRoute(getLocalizedField(place, 'name', lang))}
                   />
                 </div>
                 <button
@@ -447,7 +450,11 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               label={t('placeDetail.leaveReview')}
               fullWidth
               onClick={() => place && navigate('/review', {
-              state: { placeId: place.id, placeName: place.name, address: place.address },
+              state: {
+                placeId:   place.id,
+                placeName: getLocalizedField(place, 'name', lang),
+                address:   getLocalizedField(place, 'address', lang),
+              },
             })}
             />
           </div>

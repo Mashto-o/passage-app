@@ -233,5 +233,71 @@
     "daysAgo_other": "{{count}}d ago",
     "weeksAgo_one": "{{count}}w ago",
     "weeksAgo_other": "{{count}}w ago"
+  },
+  "navigation": {
+    "turnLeft": "Turn left",
+    "turnRight": "Turn right",
+    "youHaveArrived": "You have arrived",
+    "ontoStreet": "onto {{street}}",
+    "streetBaseyna": "vul. Baseyna",
+    "streetKhreschyatyk": "vul. Khreschyatyk",
+    "hazardBoldPrefix": "Moderate incline",
+    "hazardText": "Moderate incline ahead in 10m",
+    "arriving": "Arriving {{time}}",
+    "kmLeft": "{{km}} km left",
+    "reportDifficulty": "Report Difficulty",
+    "endRoute": "End route"
+  },
+  "barrierCheck": {
+    "title": "Is this barrier still there?",
+    "yesStillThere": "Yes, still there",
+    "noItsGone": "No, it's gone",
+    "skipNotSure": "Skip — I'm not sure",
+    "helpOthers": "Your answer helps other users on this route"
+  },
+  "routeComplete": {
+    "title": "Route complete!",
+    "howWasRoute": "How was the route",
+    "barriers": "Barriers",
+    "barriersQuestion": "Were the barriers we warned you about accurate?",
+    "optional": "Optional — but helpful to others",
+    "addComment": "Add a comment",
+    "commentPlaceholder": "Anything others should know before they go?...",
+    "or": "OR",
+    "voiceComment": "Leave a voice comment. Our AI assistant will sum it up for you.",
+    "submit": "Submit",
+    "mainBarrierChip": "The main barrier was...",
+    "helpfulForChip": "Helpful for users who..."
+  },
+  "reviewScreen": {
+    "aiBanner": "AI-assisted review — Passage analyzes your photos to pre-fill accessibility details. Please check and correct anything that's wrong.",
+    "commentTitle": "Add a comment",
+    "commentOptional": "Optional — but helpful to others",
+    "mainBarrierChip": "The main barrier was...",
+    "helpfulForChip": "Helpful for users who...",
+    "postReview": "Post review",
+    "uploadPhotoFor": "Upload photo for {{section}} accessibility",
+    "defaultTitle": "Leave a review",
+    "sections": {
+      "entrance": {
+        "label": "Entrance",
+        "q1": "I could enter without help",
+        "q2": "The door width was wide enough",
+        "q3": "I could open the door independently",
+        "q4": "The slope of the ramp was manageable"
+      },
+      "toilet": {
+        "label": "Toilet",
+        "q1": "My chair could fit inside",
+        "q2": "There is a space for manoeuvre",
+        "q3": "There were grab bars present"
+      },
+      "inside": {
+        "label": "Inside",
+        "q1": "There was enough space to move between furniture",
+        "q2": "The main service is on the ground floor",
+        "q3": "I could reach the second floor without any help"
+      }
+    }
   }
 }

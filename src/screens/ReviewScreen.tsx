@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Sparkles, MessageCircle, Sofa, Toilet } from 'lucide-react'
 import { Button, CommentInput, ReviewSection } from '../components'
 import type { ReviewSectionQuestion } from '../components'
 import { analyzePhoto } from '../utils/mockAI'
 import DoorWidth100 from '../assets/icons/door-width-100.svg?react'
 
-// ── Types ──────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────
 
 type SectionId        = 'entrance' | 'toilet' | 'inside'
 type AccessibilityVal = 'accessible' | 'partiallyAccessible' | 'inaccessible' | null
@@ -20,65 +21,39 @@ interface SectionState {
   questions:          ReviewSectionQuestion[]
 }
 
-// ── Section config ─────────────────────────────────────────────────
+// ── Section config (keys only — labels resolved via t()) ───────────────
 
-const SECTION_CONFIG: {
-  id:        SectionId
-  label:     string
-  questions: { id: string; label: string }[]
-}[] = [
-  {
-    id:    'entrance',
-    label: 'Entrance',
-    questions: [
-      { id: 'e1', label: 'I could enter without help'              },
-      { id: 'e2', label: 'The door width was wide enough'          },
-      { id: 'e3', label: 'I could open the door independently'     },
-      { id: 'e4', label: 'The slope of the ramp was manageable'    },
-    ],
-  },
-  {
-    id:    'toilet',
-    label: 'Toilet',
-    questions: [
-      { id: 't1', label: 'My chair could fit inside'          },
-      { id: 't2', label: 'There is a space for manoeuvre'     },
-      { id: 't3', label: 'There were grab bars present'       },
-    ],
-  },
-  {
-    id:    'inside',
-    label: 'Inside',
-    questions: [
-      { id: 'i1', label: 'There was enough space to move between furniture' },
-      { id: 'i2', label: 'The main service is on the ground floor'          },
-      { id: 'i3', label: 'I could reach the second floor without any help'  },
-    ],
-  },
-]
+const SECTION_IDS: SectionId[] = ['entrance', 'toilet', 'inside']
 
-// ── Initial state ──────────────────────────────────────────────────
+const QUESTION_KEYS: Record<SectionId, string[]> = {
+  entrance: ['q1', 'q2', 'q3', 'q4'],
+  toilet:   ['q1', 'q2', 'q3'],
+  inside:   ['q1', 'q2', 'q3'],
+}
+
+// ── Initial state ──────────────────────────────────────────────────────
 
 function initSections(): Record<SectionId, SectionState> {
   const out = {} as Record<SectionId, SectionState>
-  for (const cfg of SECTION_CONFIG) {
-    out[cfg.id] = {
+  for (const id of SECTION_IDS) {
+    out[id] = {
       status:             'empty',
       photoSrc:           null,
       accessibilityValue: null,
       aiSetAccessibility: false,
       isOpen:             false,
-      questions:          cfg.questions.map(q => ({ ...q, value: null, aiSet: false })),
+      questions:          QUESTION_KEYS[id].map(qKey => ({ id: qKey, label: qKey, value: null, aiSet: false })),
     }
   }
   return out
 }
 
-// ── Screen ─────────────────────────────────────────────────────────
+// ── Screen ─────────────────────────────────────────────────────────────
 
 export const ReviewScreen: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useTranslation()
   const state = (location.state ?? {}) as {
     placeId?:   string
     placeName?: string
@@ -88,7 +63,15 @@ export const ReviewScreen: React.FC = () => {
   const [sections, setSections] = useState<Record<SectionId, SectionState>>(initSections)
   const [comment,  setComment]  = useState('')
 
-  const allDone = SECTION_CONFIG.every(cfg => sections[cfg.id].status === 'done')
+  const allDone = SECTION_IDS.every(id => sections[id].status === 'done')
+
+  // ── Helpers to resolve localized question labels ─────────────────
+
+  const getQuestions = (id: SectionId): ReviewSectionQuestion[] =>
+    sections[id].questions.map(q => ({
+      ...q,
+      label: t(`reviewScreen.sections.${id}.${q.id}`),
+    }))
 
   // ── Handlers ──────────────────────────────────────────────────
 
@@ -168,9 +151,9 @@ export const ReviewScreen: React.FC = () => {
 
         {/* ── Header ──────────────────────────────────────────── */}
         <div className="flex flex-col gap-xs">
-          <Button variant="back" label="Back" onClick={() => navigate(-1)} />
+          <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
           <h1 className="text-display-md text-neutral-900">
-            {state.placeName ?? 'Leave a review'}
+            {state.placeName ?? t('reviewScreen.defaultTitle')}
           </h1>
           {state.address && (
             <p className="text-body-sm text-neutral-700">{state.address}</p>
@@ -181,31 +164,31 @@ export const ReviewScreen: React.FC = () => {
         <div className="bg-primary-100 rounded-lg p-md flex gap-sm items-start">
           <Sparkles size={20} strokeWidth={1.5} className="text-primary-500 shrink-0" />
           <p className="text-body-sm text-neutral-900">
-            AI-assisted review — Passage analyzes your photos to pre-fill accessibility
-            details. Please check and correct anything that's wrong.
+            {t('reviewScreen.aiBanner')}
           </p>
         </div>
 
         {/* ── Accordion sections ──────────────────────────────── */}
         <div className="flex flex-col gap-xl">
-          {SECTION_CONFIG.map(cfg => {
-            const s = sections[cfg.id]
+          {SECTION_IDS.map(id => {
+            const s = sections[id]
+            const label = t(`reviewScreen.sections.${id}.label`)
             return (
               <ReviewSection
-                key={cfg.id}
-                icon={sectionIcons[cfg.id]}
-                label={cfg.label}
-                inputLabel={`Upload photo for ${cfg.label.toLowerCase()} accessibility`}
+                key={id}
+                icon={sectionIcons[id]}
+                label={label}
+                inputLabel={t('reviewScreen.uploadPhotoFor', { section: label.toLowerCase() })}
                 photoSrc={s.photoSrc}
                 status={s.status}
                 accessibilityValue={s.accessibilityValue}
                 aiSetAccessibility={s.aiSetAccessibility}
-                onAccessibilityChange={v => handleAccessibilityChange(cfg.id, v)}
-                onPhotoSelect={file => handlePhotoSelect(cfg.id, file)}
-                questions={s.questions}
-                onQuestionChange={(qId, v) => handleQuestionChange(cfg.id, qId, v)}
+                onAccessibilityChange={v => handleAccessibilityChange(id, v)}
+                onPhotoSelect={file => handlePhotoSelect(id, file)}
+                questions={getQuestions(id)}
+                onQuestionChange={(qId, v) => handleQuestionChange(id, qId, v)}
                 isOpen={s.isOpen}
-                onToggle={() => handleToggle(cfg.id)}
+                onToggle={() => handleToggle(id)}
               />
             )
           })}
@@ -216,24 +199,24 @@ export const ReviewScreen: React.FC = () => {
           <div className="flex items-center gap-xs">
             <MessageCircle size={24} strokeWidth={1.5} className="text-neutral-700" />
             <span className="text-caption-md uppercase tracking-caption-md text-neutral-700">
-              Add a comment
+              {t('reviewScreen.commentTitle')}
             </span>
           </div>
-          <p className="text-body-sm text-neutral-700">Optional - but helpful to others</p>
+          <p className="text-body-sm text-neutral-700">{t('reviewScreen.commentOptional')}</p>
           <div className="flex flex-row gap-xs flex-wrap">
             <button
               type="button"
-              onClick={() => console.log('Chip: The main barrier was...')}
+              onClick={() => console.log('Chip: mainBarrierChip')}
               className="bg-neutral-200 text-neutral-700 text-caption-sm tracking-caption-sm px-xs py-2xs rounded-full whitespace-nowrap"
             >
-              The main barrier was...
+              {t('reviewScreen.mainBarrierChip')}
             </button>
             <button
               type="button"
-              onClick={() => console.log('Chip: Helpful for users who...')}
+              onClick={() => console.log('Chip: helpfulForChip')}
               className="bg-neutral-200 text-neutral-700 text-caption-sm tracking-caption-sm px-xs py-2xs rounded-full whitespace-nowrap"
             >
-              Helpful for users who...
+              {t('reviewScreen.helpfulForChip')}
             </button>
           </div>
           <CommentInput value={comment} onChange={setComment} />
@@ -245,7 +228,7 @@ export const ReviewScreen: React.FC = () => {
       <div className="fixed bottom-lg left-lg right-lg z-40">
         <Button
           variant="primary"
-          label="Post review"
+          label={t('reviewScreen.postReview')}
           fullWidth
           disabled={!allDone}
           onClick={handleSubmit}

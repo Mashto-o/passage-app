@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatDistance, formatDuration } from '../utils/formatUnits'
+import { getLocalizedField } from '../utils/localizedField'
 import {
   Users, Bookmark, Share2, Construction, Accessibility,
   Bus, TramFront, Train, Car, ChevronDown,
@@ -9,8 +11,10 @@ import type { Route } from './RoutePlanningSheet'
 
 // ── Static dropdown content ────────────────────────────────────────────────
 
-const STATIONS = ['Maidan Nezalezhnosti', 'Khreschatyk', 'Teatralna', 'Palats Sportu']
-const BARRIERS = ['Uneven pavement near Khreschatyk St.', 'Narrow kerb at pedestrian crossing']
+const STATIONS_EN = ['Maidan Nezalezhnosti', 'Khreschatyk', 'Teatralna', 'Palats Sportu']
+const STATIONS_UK = ['Майдан Незалежності', 'Хрещатик', 'Театральна', 'Палац Спорту']
+const BARRIERS_EN = ['Uneven pavement near Khreschatyk St.', 'Narrow kerb at pedestrian crossing']
+const BARRIERS_UK = ['Нерівне покриття біля вул. Хрещатик', 'Вузький бордюр на пішохідному переході']
 
 // ── Props ──────────────────────────────────────────────────────────────────
 
@@ -113,7 +117,10 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
   const [openDropdowns,  setOpenDropdowns]  = useState<Record<string, boolean>>({})
   const DRAG_THRESHOLD = 80
 
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang    = i18n.language
+  const STATIONS = lang === 'uk' ? STATIONS_UK : STATIONS_EN
+  const BARRIERS = lang === 'uk' ? BARRIERS_UK : BARRIERS_EN
 
   const toggleDropdown = (key: string) =>
     setOpenDropdowns(prev => ({ ...prev, [key]: !prev[key] }))
@@ -195,10 +202,10 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           items.push(
             <StationRow
               key={nextKey()}
-              label={sName?.boardAt ?? t('routeDetail.boardHere')}
+              label={sName ? getLocalizedField(sName, 'boardAt', lang) : t('routeDetail.boardHere')}
               time={time}
               iconType="starting-point"
-              lineInfo={{ line: seg.line, direction: sName?.direction }}
+              lineInfo={{ line: seg.line, direction: sName ? getLocalizedField(sName, 'direction', lang) : undefined }}
             />
           )
         }
@@ -210,30 +217,32 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
           items.push(
             <StationRow
               key={nextKey()}
-              label={sName?.boardAt ?? t('routeDetail.boardHere')}
+              label={sName ? getLocalizedField(sName, 'boardAt', lang) : t('routeDetail.boardHere')}
               time={time}
               iconType="starting-point"
-              lineInfo={{ line: seg.line, direction: sName?.direction }}
+              lineInfo={{ line: seg.line, direction: sName ? getLocalizedField(sName, 'direction', lang) : undefined }}
             />
           )
         } else if (prev.type !== 'walk' && seg.type !== 'walk') {
           // Transport → Transport: transfer station with dot icon
-          const nextSName = stationNames[transportIdx]
+          const nextSName  = stationNames[transportIdx]
+          const prevSName  = stationNames[transportIdx - 1]
           items.push(
             <StationRow
               key={nextKey()}
-              label={stationNames[transportIdx - 1]?.alightAt ?? t('routeDetail.transfer')}
+              label={prevSName ? getLocalizedField(prevSName, 'alightAt', lang) : t('routeDetail.transfer')}
               time={time}
               iconType="dot"
-              lineInfo={{ line: seg.line, direction: nextSName?.direction }}
+              lineInfo={{ line: seg.line, direction: nextSName ? getLocalizedField(nextSName, 'direction', lang) : undefined }}
             />
           )
         } else if (prev.type !== 'walk' && seg.type === 'walk') {
           // Transport → Walk: alight station
+          const prevSName = stationNames[transportIdx - 1]
           items.push(
             <StationRow
               key={nextKey()}
-              label={stationNames[transportIdx - 1]?.alightAt ?? t('routeDetail.alightHere')}
+              label={prevSName ? getLocalizedField(prevSName, 'alightAt', lang) : t('routeDetail.alightHere')}
               time={time}
               iconType="starting-point"
             />
@@ -347,10 +356,11 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
     const lastSeg = segments[segments.length - 1]
     if (lastSeg.type !== 'walk') {
       const finalTime = getSegmentTime(route, segments.length)
+      const lastSName = stationNames[transportIdx - 1]
       items.push(
         <StationRow
           key={nextKey()}
-          label={stationNames[transportIdx - 1]?.alightAt ?? t('routeDetail.alightHere')}
+          label={lastSName ? getLocalizedField(lastSName, 'alightAt', lang) : t('routeDetail.alightHere')}
           time={finalTime}
           iconType="starting-point"
         />
@@ -433,7 +443,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
                       </span>
                       <div className="w-px h-[10px] bg-neutral-200" />
                       <span className="font-normal text-[14px] text-neutral-700">
-                        {route.distanceKm} km
+                        {formatDistance(route.distanceKm * 1000, lang)}
                       </span>
                     </div>
                   </div>
