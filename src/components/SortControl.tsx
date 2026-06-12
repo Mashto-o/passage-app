@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 
 export interface SortControlProps {
@@ -12,6 +13,8 @@ export const SortControl: React.FC<SortControlProps> = ({
   onPress,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
   return (
     <button
       type="button"
@@ -25,9 +28,9 @@ export const SortControl: React.FC<SortControlProps> = ({
         .filter(Boolean)
         .join(' ')}
     >
-      <span className="text-body-md text-neutral-900">Sort by</span>
+      <span className="text-body-md text-neutral-900">{t('sort.sortBy')}</span>
 
-      <div className="flex items-center gap-[8px]">
+      <div className="flex items-center gap-xs">
         <span className="text-heading-sm text-neutral-900 text-right">{value}</span>
         <ChevronRight size={20} strokeWidth={1.5} className="text-neutral-900 shrink-0" />
       </div>

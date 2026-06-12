@@ -3,7 +3,10 @@
     "next": "Next",
     "back": "Back",
     "skip": "Skip",
-    "onboardingLabel": "Onboarding"
+    "onboardingLabel": "Onboarding",
+    "close": "Close",
+    "bookmark": "Bookmark",
+    "share": "Share"
   },
   "onboarding1": {
     "title": "Passage",
@@ -61,5 +64,90 @@
     "signUpPhone": "Sign up with phone",
     "signUpEmail": "Sign up with e-mail",
     "continueGuest": "Continue as guest"
+  },
+  "accessibility": {
+    "accessible": "Accessible",
+    "inaccessible": "Not accessible",
+    "partial": "Partially accessible",
+    "unknown": "Accessibility unknown"
+  },
+  "sort": {
+    "sortBy": "Sort by",
+    "most-accessible": "Most accessible first",
+    "nearest": "Nearest first",
+    "recently-verified": "Recently verified"
+  },
+  "map": {
+    "search": "Search places...",
+    "backToMap": "Back to map",
+    "filterButton": "Filter",
+    "noResultsTitle": "No results found",
+    "noResultsSubtitle": "Try a different name or address",
+    "noPlacesFound": "No places found",
+    "currentLocation": "Current location",
+    "startMarker": "Start",
+    "endMarker": "End",
+    "buildRoute": "Build a route",
+    "barriers_one": "{{count}} barrier",
+    "barriers_other": "{{count}} barriers",
+    "accessiblePercent": "{{score}}% Accessible",
+    "categories": {
+      "shelter": "Shelter",
+      "toilet": "Toilet",
+      "hospital": "Hospital",
+      "restaurant": "Restaurant",
+      "landmark": "Landmark",
+      "supermarket": "Supermarket",
+      "park": "Park",
+      "bank": "Bank",
+      "pharmacy": "Pharmacy"
+    }
+  },
+  "placeDetail": {
+    "liftWarning": "This place has a lift. Check conditions before relying on it.",
+    "factorsConfirmed": "8/10 key factors confirmed for your profile",
+    "sections": {
+      "entrance": "Entrance",
+      "toilet": "Toilet",
+      "inside": "Inside"
+    },
+    "sectionSummaries": {
+      "entrance": "3 confirmed · 1 issue · 1 to check",
+      "toilet": "2 confirmed · 1 to check",
+      "inside": "2 confirmed · 1 to check"
+    },
+    "factors": {
+      "entrance": {
+        "stepFreeTitle": "Step-free entry confirmed",
+        "stepFreeSubtitle": "Reported by 2 manual wheelchair users",
+        "doorWidthTitle": "Door width comfortable for your chair",
+        "doorWidthSubtitle": "Reported by 3 manual wheelchair users",
+        "doorOpenTitle": "Door can be opened independently",
+        "doorOpenSubtitle": "Reported by 2 manual wheelchair users",
+        "rampSlopeTitle": "Ramp slope reported as steep",
+        "rampSlopeSubtitle": "1 of 3 manual wheelchair users flagged this"
+      },
+      "toilet": {
+        "confirmedTitle": "Accessible toilet confirmed available",
+        "confirmedSubtitle": "Reported by 4 users",
+        "spaceTitle": "Space to manoeuvre beside toilet",
+        "spaceSubtitle": "Reported by 3 manual wheelchair users",
+        "grabBarsTitle": "Grab bars present",
+        "grabBarsSubtitle": "No data yet for your wheelchair type"
+      },
+      "inside": {
+        "confirmedTitle": "Accessible space confirmed",
+        "confirmedSubtitle": "Reported by 4 users",
+        "spaceTitle": "Space to manoeuvre inside",
+        "spaceSubtitle": "Reported by 3 manual wheelchair users",
+        "grabBarsTitle": "Support features present",
+        "grabBarsSubtitle": "No data yet for your wheelchair type"
+      }
+    },
+    "beFirstToCheck": "Be the first to check",
+    "comments": "Comments",
+    "notHelpful": "Not helpful",
+    "helpful": "Helpful",
+    "leaveReview": "Leave a review"
   }
 }

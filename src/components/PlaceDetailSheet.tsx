@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Bookmark, Share2, Zap, Construction,
   DoorOpen, Sofa, ChevronUp, ChevronDown, ThumbsUp, ThumbsDown,
   Toilet,
 } from 'lucide-react'
 import WheelchairManual from '../assets/illustrations/wheelchair-manual.svg?react'
-import { PLACES, Place, getAccessibilityVariant } from '../screens/MapScreen'
+import { Place, getAccessibilityVariant } from '../screens/MapScreen'
 import { getCategoryIcon } from '../utils/categoryIcon'
 import {
   AccessibilityBadge, StatusBadge, Button, Divider,
@@ -32,17 +33,24 @@ interface FactorRowProps {
   title: string
   subtitle: string
   showFirstToCheck?: boolean
+  firstToCheckLabel?: string
 }
 
-const FactorRow: React.FC<FactorRowProps> = ({ variant, title, subtitle, showFirstToCheck }) => (
-  <div className="flex gap-[12px] items-start">
+const FactorRow: React.FC<FactorRowProps> = ({
+  variant,
+  title,
+  subtitle,
+  showFirstToCheck,
+  firstToCheckLabel = '',
+}) => (
+  <div className="flex gap-sm items-start">
     <AccessibilityBadge variant={variant} size="sm" />
-    <div className="flex flex-col gap-[4px]">
-      <span className="font-semibold text-[16px] leading-[1.4] text-neutral-900">{title}</span>
-      <span className="font-normal text-[14px] leading-[1.5] text-neutral-500">{subtitle}</span>
+    <div className="flex flex-col gap-2xs">
+      <span className="text-heading-sm text-neutral-900">{title}</span>
+      <span className="text-body-sm text-neutral-500">{subtitle}</span>
       {showFirstToCheck && (
-        <span className="font-semibold text-[14px] text-primary-500 underline">
-          Be the first to check
+        <span className="text-body-sm font-semibold text-primary-500 underline">
+          {firstToCheckLabel}
         </span>
       )}
     </div>
@@ -59,20 +67,20 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggle, children }) => (
-  <div className="flex flex-col gap-[16px]">
+  <div className="flex flex-col gap-md">
     <button
       type="button"
       onClick={onToggle}
       className="flex items-center justify-between w-full focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
-      <div className="flex flex-col gap-[4px] items-start">
-        <div className="flex items-center gap-[8px]">
+      <div className="flex flex-col gap-2xs items-start">
+        <div className="flex items-center gap-xs">
           <span className="text-neutral-700">{icon}</span>
-          <span className="font-medium text-[14px] leading-[1.4] tracking-[0.56px] uppercase text-neutral-700">
+          <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
             {label}
           </span>
         </div>
-        <span className="font-normal text-[14px] leading-[1.5] text-neutral-700">{summary}</span>
+        <span className="text-body-sm text-neutral-700">{summary}</span>
       </div>
       {isOpen
         ? <ChevronUp size={20} strokeWidth={1.5} className="text-neutral-500 shrink-0" />
@@ -81,8 +89,8 @@ const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggl
     </button>
 
     {isOpen && (
-      <div className="flex flex-col gap-[24px]">
-        <div className="flex gap-[24px] overflow-x-auto [&::-webkit-scrollbar]:hidden">
+      <div className="flex flex-col gap-lg">
+        <div className="flex gap-lg overflow-x-auto [&::-webkit-scrollbar]:hidden">
           <PlacePhotoCard
             src={undefined}
             location={label}
@@ -102,7 +110,7 @@ const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggl
             className="w-[165px] shrink-0"
           />
         </div>
-        <div className="flex flex-col gap-[12px]">
+        <div className="flex flex-col gap-sm">
           {children}
         </div>
       </div>
@@ -123,6 +131,7 @@ type PlaceDetailSheetProps = {
 
 export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpen, onClose, onBuildRoute }) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [entranceOpen, setEntranceOpen] = useState(true)
   const [toiletOpen,   setToiletOpen]   = useState(true)
   const [insideOpen,   setInsideOpen]   = useState(true)
@@ -189,7 +198,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
         {/* Drag handle — shrink-0, never scrolls */}
         <div
           aria-hidden="true"
-          className="flex justify-center pt-[24px] pb-[8px] shrink-0 cursor-grab active:cursor-grabbing"
+          className="flex justify-center pt-lg pb-xs shrink-0 cursor-grab active:cursor-grabbing"
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
@@ -203,59 +212,62 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
         {/* Scrollable content */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto px-[24px] flex flex-col gap-[24px]"
+          className="flex-1 overflow-y-auto px-lg flex flex-col gap-lg"
         >
           {place && (
             <>
               {/* Back button — first item */}
-              <div className="pt-[8px]">
-                <Button variant="back" onClick={onClose}>Back</Button>
+              <div className="pt-xs">
+                <Button variant="back" onClick={onClose}>{t('common.back')}</Button>
               </div>
 
               {/* Lift warning banner */}
               {place.isLiftDependent && (
-                <div className="flex items-center gap-[12px] bg-warning-100 rounded-[48px] p-[16px] w-full">
+                <div className="flex items-center gap-sm bg-warning-100 rounded-[48px] p-md w-full">
                   <Zap size={16} strokeWidth={1.5} className="text-warning-700 shrink-0" />
-                  <p className="text-[14px] font-normal leading-[1.5] text-warning-700 flex-1">
-                    This place has a lift. Check conditions before relying on it.
+                  <p className="text-body-sm text-warning-700 flex-1">
+                    {t('placeDetail.liftWarning')}
                   </p>
                 </div>
               )}
 
               {/* Header block */}
-              <div className="flex flex-col gap-[8px]">
-                <div className="flex items-center gap-[10px] h-[36px]">
+              <div className="flex flex-col gap-xs">
+                <div className="flex items-center gap-xs h-[36px]">
                   <AccessibilityBadge variant={a11yVariant} size="sm" icon={categoryIcon} />
-                  <StatusBadge variant={scoreVariant} label={`${place.accessibilityScore}% Accessible`} />
+                  <StatusBadge
+                    variant={scoreVariant}
+                    label={t('map.accessiblePercent', { score: place.accessibilityScore })}
+                  />
                   {place.barrierCount > 0 && (
                     <StatusBadge
                       variant="warning"
-                      label={`${place.barrierCount} barriers`}
+                      label={t('map.barriers', { count: place.barrierCount })}
                       icon={<Construction size={16} strokeWidth={1.5} className="text-warning-500" />}
                     />
                   )}
                 </div>
 
-                <div className="flex items-baseline justify-between gap-[8px]">
-                  <span className="font-medium text-[24px] leading-[1.3] tracking-[-0.48px] text-neutral-900 flex-1">
+                <div className="flex items-baseline justify-between gap-xs">
+                  <span className="text-display-md text-neutral-900 flex-1">
                     {place.name}
                   </span>
-                  <span className="font-semibold text-[14px] leading-[1.5] text-neutral-900 shrink-0">
+                  <span className="text-heading-sm text-neutral-900 shrink-0">
                     {place.distance}
                   </span>
                 </div>
 
-                <span className="font-normal text-[14px] leading-[1.5] text-neutral-900">
+                <span className="text-body-sm text-neutral-900">
                   {place.address}
                 </span>
               </div>
 
               {/* Action row */}
-              <div className="flex gap-[12px] items-center">
+              <div className="flex gap-sm items-center">
                 <div className="flex-1">
                   <Button
                     variant="primary"
-                    label="Build a route"
+                    label={t('map.buildRoute')}
                     fullWidth
                     onClick={() => onBuildRoute(place.name)}
                   />
@@ -264,11 +276,11 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                   type="button"
                   className={[
                     'w-[48px] h-[48px] flex items-center justify-center shrink-0',
-                    'border border-neutral-200 rounded-[48px]',
+                    'border border-neutral-200 rounded-full',
                     'transition-colors duration-200',
                     'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                   ].join(' ')}
-                  aria-label="Bookmark"
+                  aria-label={t('common.bookmark')}
                   onClick={() => console.log('Bookmark', place.id)}
                 >
                   <Bookmark size={20} strokeWidth={1.5} className="text-neutral-900" />
@@ -277,11 +289,11 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                   type="button"
                   className={[
                     'w-[48px] h-[48px] flex items-center justify-center shrink-0',
-                    'border border-neutral-200 rounded-[48px]',
+                    'border border-neutral-200 rounded-full',
                     'transition-colors duration-200',
                     'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                   ].join(' ')}
-                  aria-label="Share"
+                  aria-label={t('common.share')}
                   onClick={() => console.log('Share', place.id)}
                 >
                   <Share2 size={20} strokeWidth={1.5} className="text-neutral-900" />
@@ -291,35 +303,35 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               <Divider />
 
               {/* Profile match banner */}
-              <div className="bg-primary-100 flex items-center justify-center p-[8px] rounded-[24px] w-full">
-                <p className="font-semibold text-[14px] leading-[1.4] text-neutral-900">
-                  8/10 key factors confirmed for your profile
+              <div className="bg-primary-100 flex items-center justify-center p-xs rounded-[24px] w-full">
+                <p className="text-heading-sm text-neutral-900">
+                  {t('placeDetail.factorsConfirmed')}
                 </p>
               </div>
 
               {/* Entrance section */}
               <Section
                 icon={<DoorOpen size={16} strokeWidth={1.5} />}
-                label="Entrance"
-                summary="3 confirmed · 1 issue · 1 to check"
+                label={t('placeDetail.sections.entrance')}
+                summary={t('placeDetail.sectionSummaries.entrance')}
                 isOpen={entranceOpen}
                 onToggle={() => setEntranceOpen(v => !v)}
               >
                 <FactorRow variant="accessible"
-                  title="Step-free entry confirmed"
-                  subtitle="Reported by 2 manual wheelchair users" />
+                  title={t('placeDetail.factors.entrance.stepFreeTitle')}
+                  subtitle={t('placeDetail.factors.entrance.stepFreeSubtitle')} />
                 <Divider />
                 <FactorRow variant="accessible"
-                  title="Door width comfortable for your chair"
-                  subtitle="Reported by 3 manual wheelchair users" />
+                  title={t('placeDetail.factors.entrance.doorWidthTitle')}
+                  subtitle={t('placeDetail.factors.entrance.doorWidthSubtitle')} />
                 <Divider />
                 <FactorRow variant="accessible"
-                  title="Door can be opened independently"
-                  subtitle="Reported by 2 manual wheelchair users" />
+                  title={t('placeDetail.factors.entrance.doorOpenTitle')}
+                  subtitle={t('placeDetail.factors.entrance.doorOpenSubtitle')} />
                 <Divider />
                 <FactorRow variant="partial"
-                  title="Ramp slope reported as steep"
-                  subtitle="1 of 3 manual wheelchair users flagged this" />
+                  title={t('placeDetail.factors.entrance.rampSlopeTitle')}
+                  subtitle={t('placeDetail.factors.entrance.rampSlopeSubtitle')} />
               </Section>
 
               <Divider />
@@ -327,23 +339,24 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               {/* Toilet section */}
               <Section
                 icon={<Toilet size={16} strokeWidth={1.5} />}
-                label="Toilet"
-                summary="2 confirmed · 1 to check"
+                label={t('placeDetail.sections.toilet')}
+                summary={t('placeDetail.sectionSummaries.toilet')}
                 isOpen={toiletOpen}
                 onToggle={() => setToiletOpen(v => !v)}
               >
                 <FactorRow variant="accessible"
-                  title="Accessible toilet confirmed available"
-                  subtitle="Reported by 4 users" />
+                  title={t('placeDetail.factors.toilet.confirmedTitle')}
+                  subtitle={t('placeDetail.factors.toilet.confirmedSubtitle')} />
                 <Divider />
                 <FactorRow variant="accessible"
-                  title="Space to manoeuvre beside toilet"
-                  subtitle="Reported by 3 manual wheelchair users" />
+                  title={t('placeDetail.factors.toilet.spaceTitle')}
+                  subtitle={t('placeDetail.factors.toilet.spaceSubtitle')} />
                 <Divider />
                 <FactorRow variant="unknown"
-                  title="Grab bars present"
-                  subtitle="No data yet for your wheelchair type"
-                  showFirstToCheck />
+                  title={t('placeDetail.factors.toilet.grabBarsTitle')}
+                  subtitle={t('placeDetail.factors.toilet.grabBarsSubtitle')}
+                  showFirstToCheck
+                  firstToCheckLabel={t('placeDetail.beFirstToCheck')} />
               </Section>
 
               <Divider />
@@ -351,33 +364,34 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               {/* Inside section */}
               <Section
                 icon={<Sofa size={16} strokeWidth={1.5} />}
-                label="Inside"
-                summary="2 confirmed · 1 to check"
+                label={t('placeDetail.sections.inside')}
+                summary={t('placeDetail.sectionSummaries.inside')}
                 isOpen={insideOpen}
                 onToggle={() => setInsideOpen(v => !v)}
               >
                 <FactorRow variant="accessible"
-                  title="Accessible toilet confirmed available"
-                  subtitle="Reported by 4 users" />
+                  title={t('placeDetail.factors.inside.confirmedTitle')}
+                  subtitle={t('placeDetail.factors.inside.confirmedSubtitle')} />
                 <Divider />
                 <FactorRow variant="accessible"
-                  title="Space to manoeuvre beside toilet"
-                  subtitle="Reported by 3 manual wheelchair users" />
+                  title={t('placeDetail.factors.inside.spaceTitle')}
+                  subtitle={t('placeDetail.factors.inside.spaceSubtitle')} />
                 <Divider />
                 <FactorRow variant="unknown"
-                  title="Grab bars present"
-                  subtitle="No data yet for your wheelchair type"
-                  showFirstToCheck />
+                  title={t('placeDetail.factors.inside.grabBarsTitle')}
+                  subtitle={t('placeDetail.factors.inside.grabBarsSubtitle')}
+                  showFirstToCheck
+                  firstToCheckLabel={t('placeDetail.beFirstToCheck')} />
               </Section>
 
               <Divider />
 
               {/* Comments */}
-              <p className="font-medium text-[14px] leading-[1.4] tracking-[0.56px] uppercase text-neutral-700 text-left">
-                Comments
+              <p className="text-caption-md tracking-caption-md uppercase text-neutral-700 text-left">
+                {t('placeDetail.comments')}
               </p>
 
-              <div className="flex flex-col gap-[16px]">
+              <div className="flex flex-col gap-md">
                 <ReviewCard
                   authorName="Name"
                   mobilityIcon={<WheelchairManual width={16} height={16} aria-hidden />}
@@ -392,24 +406,24 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                 />
               </div>
 
-              <div className="pb-[24px]" />
+              <div className="pb-lg" />
             </>
           )}
         </div>
 
         {/* Feedback row — pinned to bottom, never scrolls */}
-        <div className="shrink-0 px-[24px] py-[16px] flex gap-[16px] items-center border-t border-neutral-200 bg-neutral-0">
+        <div className="shrink-0 px-lg py-md flex gap-md items-center border-t border-neutral-200 bg-neutral-0">
           <button
             type="button"
             onClick={() => place && console.log('Thumbs down', place.id)}
             className={[
-              'w-[48px] h-[48px] shrink-0 rounded-[48px]',
+              'w-[48px] h-[48px] shrink-0 rounded-full',
               'bg-danger-100 border border-danger-500',
               'flex items-center justify-center',
               'transition-colors duration-200',
               'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
             ].join(' ')}
-            aria-label="Not helpful"
+            aria-label={t('placeDetail.notHelpful')}
           >
             <ThumbsDown size={24} strokeWidth={1.5} className="text-danger-500" />
           </button>
@@ -417,20 +431,20 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
             type="button"
             onClick={() => place && console.log('Thumbs up', place.id)}
             className={[
-              'w-[48px] h-[48px] shrink-0 rounded-[48px]',
+              'w-[48px] h-[48px] shrink-0 rounded-full',
               'bg-success-100 border border-success-500',
               'flex items-center justify-center',
               'transition-colors duration-200',
               'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
             ].join(' ')}
-            aria-label="Helpful"
+            aria-label={t('placeDetail.helpful')}
           >
             <ThumbsUp size={24} strokeWidth={1.5} className="text-success-500" />
           </button>
           <div className="flex-1">
             <Button
               variant="primary"
-              label="Leave a review"
+              label={t('placeDetail.leaveReview')}
               fullWidth
               onClick={() => place && navigate('/review', {
               state: { placeId: place.id, placeName: place.name, address: place.address },

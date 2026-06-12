@@ -3,24 +3,27 @@
     "next": "Далі",
     "back": "Назад",
     "skip": "Пропустити",
-    "onboardingLabel": "Налаштування"
+    "onboardingLabel": "Онбординг",
+    "close": "Закрити",
+    "bookmark": "Закладка",
+    "share": "Поділитись"
   },
   "onboarding1": {
     "title": "Passage",
-    "subtitle": "Маршрути, що адаптуються до вас",
-    "getStarted": "Почати",
-    "setupTime": "Налаштування займе менше 2 хвилин"
+    "subtitle": "Маршрути під ваші потреби",
+    "getStarted": "Вперед",
+    "setupTime": "Налаштування профілю займає менше 2 хвилин"
   },
   "onboarding2": {
     "title": "Як ви зазвичай пересуваєтесь?",
-    "subtitle": "Розкажіть нам про засіб пересування, яким ви користуєтесь",
-    "wheelchairSection": "Інвалідний візок",
+    "subtitle": "Оберіть засоби, що допомагають вам у русі",
+    "wheelchairSection": "Крісло колісне",
     "otherSection": "Інше",
-    "manual": "Ручний",
-    "electric": "Електричний",
+    "manual": "Ручне",
+    "electric": "Електро",
     "cane": "Тростина",
     "limbAid": "Протез",
-    "stroller": "Коляска",
+    "stroller": "Візок",
     "noAid": "Без засобів"
   },
   "onboarding3": {
@@ -61,5 +64,92 @@
     "signUpPhone": "Зареєструватись із телефоном",
     "signUpEmail": "Зареєструватись з email",
     "continueGuest": "Продовжити як гість"
+  },
+  "accessibility": {
+    "accessible": "Доступно",
+    "inaccessible": "Недоступно",
+    "partial": "Частково доступно",
+    "unknown": "Доступність невідома"
+  },
+  "sort": {
+    "sortBy": "Сортувати за",
+    "most-accessible": "Найдоступніші",
+    "nearest": "Найближчі",
+    "recently-verified": "Нещодавно перевірені"
+  },
+  "map": {
+    "search": "Пошук місць...",
+    "backToMap": "Назад на карту",
+    "filterButton": "Фільтр",
+    "noResultsTitle": "Нічого не знайдено",
+    "noResultsSubtitle": "Спробуйте іншу назву або адресу",
+    "noPlacesFound": "Місця не знайдено",
+    "currentLocation": "Поточне місце",
+    "startMarker": "Старт",
+    "endMarker": "Фініш",
+    "buildRoute": "Побудувати маршрут",
+    "barriers_one": "{{count}} перешкода",
+    "barriers_few": "{{count}} перешкоди",
+    "barriers_many": "{{count}} перешкод",
+    "barriers_other": "{{count}} перешкод",
+    "accessiblePercent": "{{score}}% Доступно",
+    "categories": {
+      "shelter": "Укриття",
+      "toilet": "Туалет",
+      "hospital": "Лікарня",
+      "restaurant": "Ресторан",
+      "landmark": "Пам'ятка",
+      "supermarket": "Супермаркет",
+      "park": "Парк",
+      "bank": "Банк",
+      "pharmacy": "Аптека"
+    }
+  },
+  "placeDetail": {
+    "liftWarning": "У цьому місці є ліфт. Перевірте його стан перед тим, як на нього покластись.",
+    "factorsConfirmed": "8/10 ключових факторів підтверджено для вашого профілю",
+    "sections": {
+      "entrance": "Вхід",
+      "toilet": "Туалет",
+      "inside": "Всередині"
+    },
+    "sectionSummaries": {
+      "entrance": "3 підтверджено · 1 проблема · 1 потребує перевірки",
+      "toilet": "2 підтверджено · 1 потребує перевірки",
+      "inside": "2 підтверджено · 1 потребує перевірки"
+    },
+    "factors": {
+      "entrance": {
+        "stepFreeTitle": "Вхід без ступенів підтверджено",
+        "stepFreeSubtitle": "Повідомили 2 користувачі ручного візка",
+        "doorWidthTitle": "Ширина дверей підходить для вашого візка",
+        "doorWidthSubtitle": "Повідомили 3 користувачі ручного візка",
+        "doorOpenTitle": "Двері можна відчинити самостійно",
+        "doorOpenSubtitle": "Повідомили 2 користувачі ручного візка",
+        "rampSlopeTitle": "Ухил пандуса — крутий",
+        "rampSlopeSubtitle": "1 з 3 користувачів ручного візка відзначили це"
+      },
+      "toilet": {
+        "confirmedTitle": "Доступний туалет підтверджено",
+        "confirmedSubtitle": "Повідомили 4 користувачі",
+        "spaceTitle": "Місце для маневрування біля унітазу",
+        "spaceSubtitle": "Повідомили 3 користувачі ручного візка",
+        "grabBarsTitle": "Поручні присутні",
+        "grabBarsSubtitle": "Даних для вашого типу візка ще немає"
+      },
+      "inside": {
+        "confirmedTitle": "Доступний простір підтверджено",
+        "confirmedSubtitle": "Повідомили 4 користувачі",
+        "spaceTitle": "Місце для маневрування всередині",
+        "spaceSubtitle": "Повідомили 3 користувачі ручного візка",
+        "grabBarsTitle": "Засоби підтримки присутні",
+        "grabBarsSubtitle": "Даних для вашого типу візка ще немає"
+      }
+    },
+    "beFirstToCheck": "Будьте першим, хто перевірить",
+    "comments": "Коментарі",
+    "notHelpful": "Не корисно",
+    "helpful": "Корисно",
+    "leaveReview": "Залишити відгук"
   }
 }

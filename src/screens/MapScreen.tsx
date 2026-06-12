@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Map, { Marker } from 'react-map-gl/mapbox'
 import type { MapRef } from 'react-map-gl/mapbox'
 import mapboxgl from 'mapbox-gl'
@@ -98,6 +99,9 @@ export const PLACES: Place[] = [
 
 // ── Sort helper ────────────────────────────────────────────────────────────
 
+export type SortKey = 'most-accessible' | 'nearest' | 'recently-verified'
+export const SORT_KEYS: SortKey[] = ['most-accessible', 'nearest', 'recently-verified']
+
 function parseDistanceToMetres(distance: string): number {
   const value = parseFloat(distance)
   if (distance.toLowerCase().includes('km')) {
@@ -106,14 +110,14 @@ function parseDistanceToMetres(distance: string): number {
   return value
 }
 
-function sortPlaces(places: Place[], sortValue: string): Place[] {
+function sortPlaces(places: Place[], sortKey: SortKey): Place[] {
   const sorted = [...places]
-  switch (sortValue) {
-    case 'Most accessible first':
+  switch (sortKey) {
+    case 'most-accessible':
       return sorted.sort((a, b) => b.accessibilityScore - a.accessibilityScore)
-    case 'Nearest first':
+    case 'nearest':
       return sorted.sort((a, b) => parseDistanceToMetres(a.distance) - parseDistanceToMetres(b.distance))
-    case 'Recently verified':
+    case 'recently-verified':
       return sorted.sort((a, b) => b.verifiedAt.getTime() - a.verifiedAt.getTime())
     default:
       return sorted
@@ -189,21 +193,18 @@ function PlaceMarker({ place, selected }: { place: Place; selected: boolean }) {
 
 type CategoryKey = Place['category']
 
-const CHIPS: { key: CategoryKey; label: string; icon: React.ReactNode }[] = [
-  { key: 'shelter',     label: 'Shelter',     icon: <ShelterIcon  width={14} height={14} stroke="currentColor" strokeWidth={1} aria-hidden /> },
-  { key: 'toilet',     label: 'Toilet',      icon: <Toilet       size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
-  { key: 'hospital',   label: 'Hospital',    icon: <Hospital     size={14} strokeWidth={1} aria-hidden /> },
-  { key: 'restaurant', label: 'Restaurant',  icon: <Utensils     size={14} strokeWidth={1} aria-hidden /> },
-  { key: 'landmark',   label: 'Landmark',    icon: <Landmark     size={14} strokeWidth={1} aria-hidden /> },
-  { key: 'supermarket',label: 'Supermarket', icon: <ShoppingCart size={14} strokeWidth={1} aria-hidden /> },
-  { key: 'park',       label: 'Park',        icon: <Trees        size={14} strokeWidth={1} aria-hidden /> },
-  { key: 'bank',       label: 'Bank',        icon: <Landmark     size={14} strokeWidth={1} aria-hidden /> },
-  { key: 'pharmacy',   label: 'Pharmacy',    icon: <Pill         size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
+// Icons only — labels are resolved via t() inside the component
+const CHIP_DEFS: { key: CategoryKey; icon: React.ReactNode }[] = [
+  { key: 'shelter',     icon: <ShelterIcon  width={14} height={14} stroke="currentColor" strokeWidth={1} aria-hidden /> },
+  { key: 'toilet',      icon: <Toilet       size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
+  { key: 'hospital',    icon: <Hospital     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'restaurant',  icon: <Utensils     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'landmark',    icon: <Landmark     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'supermarket', icon: <ShoppingCart size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'park',        icon: <Trees        size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'bank',        icon: <Landmark     size={14} strokeWidth={1} aria-hidden /> },
+  { key: 'pharmacy',    icon: <Pill         size={14} strokeWidth={1} className="text-neutral-700" aria-hidden /> },
 ]
-
-// ── Sort options ───────────────────────────────────────────────────────────
-
-const PLACE_SORT_OPTIONS = ['Most accessible first', 'Nearest first', 'Recently verified']
 
 // ── Bottom sheet snap positions ────────────────────────────────────────────
 
@@ -227,6 +228,7 @@ const SNAP_HEIGHT: Record<SnapPoint, number> = {
 export const MapScreen: React.FC = () => {
   const navigate                          = useNavigate()
   const location                          = useLocation()
+  const { t }                             = useTranslation()
   const mapRef                            = useRef<MapRef>(null)
   const [searchQuery, setSearchQuery]    = useState('')
   const [searchActive, setSearchActive]  = useState(false)
@@ -235,7 +237,7 @@ export const MapScreen: React.FC = () => {
   const [sheetSnap, setSheetSnap]        = useState<SnapPoint>('closed')
   const [sheetVisible, setSheetVisible]  = useState(false)
   const [sortSheetOpen, setSortSheetOpen] = useState(false)
-  const [sortValue, setSortValue]        = useState('Most accessible first')
+  const [sortValue, setSortValue]        = useState<SortKey>('most-accessible')
   const [selectedPlaceForDetail, setSelectedPlaceForDetail] = useState<Place | null>(null)
   const [placeDetailOpen, setPlaceDetailOpen] = useState(false)
   const [routePlanningOpen, setRoutePlanningOpen] = useState(false)
@@ -535,12 +537,25 @@ export const MapScreen: React.FC = () => {
     }
   }
 
+  // ── i18n-derived values ───────────────────────────────────────────
+  const chips = CHIP_DEFS.map(({ key, icon }) => ({
+    key,
+    label: t(`map.categories.${key}`),
+    icon,
+  }))
+
+  const sortOptions = SORT_KEYS.map(key => ({
+    key,
+    label: t(`sort.${key}`),
+  }))
+
   // ── Filtered / search places ──────────────────────────────────────
   const filteredPlaces = activeCategory ? PLACES.filter(p => p.category === activeCategory) : []
   const displayPlaces  = sortPlaces(filterPlaces(filteredPlaces, filterState), sortValue)
   const searchResults  = searchPlaces(filterPlaces(PLACES, filterState), searchQuery)
 
-  const sheetTitle = CHIPS.find(c => c.key === activeCategory)?.label ?? ''
+  const sheetTitle     = chips.find(c => c.key === activeCategory)?.label ?? ''
+  const sortLabel      = sortOptions.find(o => o.key === sortValue)?.label ?? sortValue
 
   return (
     <main className="relative w-full h-screen overflow-hidden">
@@ -588,7 +603,7 @@ export const MapScreen: React.FC = () => {
             >
               <img
                 src="/src/assets/icons/starting-point-icon.svg"
-                alt="Start"
+                alt={t('map.startMarker')}
                 className="w-[24px] h-[24px]"
               />
             </Marker>
@@ -602,7 +617,7 @@ export const MapScreen: React.FC = () => {
             >
               <img
                 src="/src/assets/icons/end-point-icon.svg"
-                alt="End"
+                alt={t('map.endMarker')}
                 className="w-[24px] h-[24px]"
               />
             </Marker>
@@ -615,8 +630,8 @@ export const MapScreen: React.FC = () => {
       {routePlanningOpen && !routeDetailOpen ? (
         <div className="absolute top-[56px] left-[24px] right-[24px] z-[20]">
           <RouteDestination
-            from={routeSwapped ? routeDestinationName : 'Current location'}
-            to={routeSwapped ? 'Current location' : routeDestinationName}
+            from={routeSwapped ? routeDestinationName : t('map.currentLocation')}
+            to={routeSwapped ? t('map.currentLocation') : routeDestinationName}
             onFromChange={() => {}}
             onToChange={() => {}}
             onSwap={() => setRouteSwapped(prev => !prev)}
@@ -634,7 +649,7 @@ export const MapScreen: React.FC = () => {
                     value={searchQuery}
                     onChange={handleSearchChange}
                     onFocus={handleSearchFocus}
-                    placeholder="Search places..."
+                    placeholder={t('map.search')}
                     leftSlot={searchActive ? (
                       <button
                         onClick={() => {
@@ -642,7 +657,7 @@ export const MapScreen: React.FC = () => {
                           setSearchActive(false)
                         }}
                         className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                        aria-label="Back to map"
+                        aria-label={t('map.backToMap')}
                       >
                         <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
                       </button>
@@ -660,7 +675,7 @@ export const MapScreen: React.FC = () => {
                     'transition-colors duration-200',
                     'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                   ].join(' ')}
-                  aria-label="Filter"
+                  aria-label={t('map.filterButton')}
                   onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
                 >
                   <Funnel size={20} strokeWidth={1.5} aria-hidden />
@@ -670,7 +685,7 @@ export const MapScreen: React.FC = () => {
               {/* ── Category chips ───────────────────────────────────── */}
               {!searchActive && !placeDetailOpen && (
                 <div className="absolute top-[124px] left-lg right-0 z-10 flex flex-row flex-nowrap gap-xs overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                  {CHIPS.map(({ key, label, icon }: { key: CategoryKey; label: string; icon: React.ReactNode }) => {
+                  {chips.map(({ key, label, icon }) => {
                     const active = activeCategory === key
                     return (
                       <Chip
@@ -702,10 +717,10 @@ export const MapScreen: React.FC = () => {
           onClick={e => e.stopPropagation()}
         >
           {searchResults.length === 0 && searchQuery.trim() ? (
-            <div className="flex flex-col items-center justify-center pt-[48px] gap-[8px]">
-              <p className="text-[16px] font-semibold text-neutral-900">No results found</p>
-              <p className="text-[14px] font-normal text-neutral-500 text-center">
-                Try a different name or address
+            <div className="flex flex-col items-center justify-center pt-2xl gap-xs">
+              <p className="text-heading-sm text-neutral-900">{t('map.noResultsTitle')}</p>
+              <p className="text-body-sm text-neutral-500 text-center">
+                {t('map.noResultsSubtitle')}
               </p>
             </div>
           ) : (
@@ -772,13 +787,13 @@ export const MapScreen: React.FC = () => {
           {/* Sheet header */}
           <div className="px-lg flex flex-col gap-sm shrink-0">
             <span className="text-display-md text-neutral-900">{sheetTitle}</span>
-            <SortControl value={sortValue} onPress={() => setSortSheetOpen(true)} />
+            <SortControl value={sortLabel} onPress={() => setSortSheetOpen(true)} />
           </div>
 
           {/* Place list */}
           <div className="overflow-y-auto flex-1 pb-[144px] px-lg mt-[34px]">
             {displayPlaces.length === 0 ? (
-              <p className="py-xl text-body-md text-neutral-500">No places found.</p>
+              <p className="py-xl text-body-md text-neutral-500">{t('map.noPlacesFound')}</p>
             ) : (
               displayPlaces.map((place, idx) => (
                 <React.Fragment key={place.id}>
@@ -854,9 +869,9 @@ export const MapScreen: React.FC = () => {
       {/* ── Sort sheet ──────────────────────────────────────────────── */}
       <SortSheet
         isOpen={sortSheetOpen && !activeNavigationOpen}
-        options={PLACE_SORT_OPTIONS}
+        options={sortOptions}
         value={sortValue}
-        onChange={(val) => setSortValue(val)}
+        onChange={(key) => setSortValue(key as SortKey)}
         onClose={() => setSortSheetOpen(false)}
         height={SNAP_HEIGHT[sheetSnap]}
       />

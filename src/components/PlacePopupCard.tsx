@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Bookmark, Share2 } from 'lucide-react'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
@@ -41,6 +42,8 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
   onShare,
   onCardClick,
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div
       className={[
@@ -63,7 +66,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
               'transition-colors duration-200',
               'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
             ].join(' ')}
-            aria-label="Close"
+            aria-label={t('common.close')}
           >
             <X size={20} aria-hidden />
           </button>
@@ -92,7 +95,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
               />
               <StatusBadge
                 variant={scoreVariant}
-                label={`${accessibilityScore}% Accessible`}
+                label={t('map.accessiblePercent', { score: accessibilityScore })}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -101,7 +104,9 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-body-sm text-neutral-500 flex-1">{address}</span>
-              <span className="text-body-sm text-neutral-500">{barrierCount} barriers</span>
+              <span className="text-body-sm text-neutral-500">
+                {t('map.barriers', { count: barrierCount })}
+              </span>
             </div>
           </div>
         </button>
@@ -111,7 +116,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
           <div className="flex-1">
             <Button
               variant="primary"
-              label="Build a route"
+              label={t('map.buildRoute')}
               fullWidth
               onClick={onRoute}
             />
@@ -126,7 +131,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
               'transition-colors duration-200',
               'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
             ].join(' ')}
-            aria-label="Bookmark"
+            aria-label={t('common.bookmark')}
           >
             <Bookmark size={20} aria-hidden />
           </button>
@@ -140,7 +145,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
               'transition-colors duration-200',
               'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
             ].join(' ')}
-            aria-label="Share"
+            aria-label={t('common.share')}
           >
             <Share2 size={20} aria-hidden />
           </button>
