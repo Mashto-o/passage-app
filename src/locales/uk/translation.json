@@ -7,7 +7,9 @@
     "onboardingLabel": "Онбординг",
     "close": "Закрити",
     "bookmark": "Закладка",
-    "share": "Поділитись"
+    "share": "Поділитись",
+    "madeOnLocation": "Зроблено на локації",
+    "uploadedFromGallery": "Завантажено з галереї"
   },
   "onboarding1": {
     "title": "Passage",
@@ -227,7 +229,8 @@
   "navBar": {
     "discover": "Пошук",
     "map": "Карта",
-    "profile": "Профіль"
+    "profile": "Профіль",
+    "review": "Відгук"
   },
   "placeListItem": {
     "liftDependent": "Із ліфтом",

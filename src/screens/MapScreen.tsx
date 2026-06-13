@@ -13,7 +13,7 @@ import { getLocalizedField } from '../utils/localizedField'
 import type { FilterState } from '../context/FilterContext'
 import { useFilterContext } from '../context/FilterContext'
 import {
-  SearchBar, Chip, AccessibilityBadge, NavBar,
+  SearchBar, Chip, AccessibilityBadge, NavBar, Button,
   PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
   PlaceDetailSheet, RoutePlanningSheet, RouteDestination, RouteDetailSheet,
   ActiveNavigationSheet,
@@ -232,6 +232,7 @@ export const MapScreen: React.FC = () => {
   const mapRef                            = useRef<MapRef>(null)
   const [searchQuery, setSearchQuery]    = useState('')
   const [searchActive, setSearchActive]  = useState(false)
+  const [reviewMode, setReviewMode]      = useState(false)
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null)
   const [sheetSnap, setSheetSnap]        = useState<SnapPoint>('closed')
@@ -253,9 +254,10 @@ export const MapScreen: React.FC = () => {
     start: [number, number] | null
     end: [number, number] | null
   }>({ start: null, end: null })
-  const dotIndexRef    = useRef(0)
-  const dotMarkerRef   = useRef<mapboxgl.Marker | null>(null)
-  const dotIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const dotIndexRef          = useRef(0)
+  const dotMarkerRef         = useRef<mapboxgl.Marker | null>(null)
+  const dotIntervalRef       = useRef<ReturnType<typeof setInterval> | null>(null)
+  const handledLocationKey   = useRef<string | null>(null)
   const { filterState }                  = useFilterContext()
 
   // touch tracking refs
@@ -337,11 +339,18 @@ export const MapScreen: React.FC = () => {
   }, [filterState, selectedPlace])
 
   // ── Restore search state when returning from FilterScreen ─────────
+  // Uses location.key so re-fires on same-path navigations without double-triggering.
   useEffect(() => {
+    if (location.key === handledLocationKey.current) return
+    handledLocationKey.current = location.key
+    if (location.state?.reviewMode) {
+      setReviewMode(true)
+      setSearchActive(true)
+    }
     if (location.state?.returnToSearch) {
       setSearchActive(true)
     }
-  }, [])
+  }, [location.key])
 
   // ── Reset map padding on mount ───────────────────────────────────
   useEffect(() => {
@@ -552,17 +561,20 @@ export const MapScreen: React.FC = () => {
   // ── Filtered / search places ──────────────────────────────────────
   const filteredPlaces = activeCategory ? PLACES.filter(p => p.category === activeCategory) : []
   const displayPlaces  = sortPlaces(filterPlaces(filteredPlaces, filterState), sortValue)
-  const searchResults  = searchPlaces(filterPlaces(PLACES, filterState), searchQuery)
+  const rawSearchResults = searchPlaces(filterPlaces(PLACES, filterState), searchQuery)
+  const searchResults    = reviewMode && !searchQuery.trim()
+    ? sortPlaces(rawSearchResults, 'nearest')
+    : rawSearchResults
 
   const sheetTitle     = chips.find(c => c.key === activeCategory)?.label ?? ''
   const sortLabel      = sortOptions.find(o => o.key === sortValue)?.label ?? sortValue
 
   return (
     <main className="relative w-full h-screen overflow-hidden">
-      <h1 className="sr-only">Map</h1>
+      <h1 className="sr-only">{reviewMode ? t('placeDetail.leaveReview') : t('map.search')}</h1>
 
-      {/* ── Search mode background ──────────────────────────────────── */}
-      {searchActive && (
+      {/* ── Search mode background (non-reviewMode only) ───────────── */}
+      {searchActive && !reviewMode && (
         <>
           <div className="fixed inset-0 z-[8] bg-neutral-50" />
           <div
@@ -642,45 +654,48 @@ export const MapScreen: React.FC = () => {
           {/* ── Search + filter bar + chips — hidden during active navigation */}
           {!activeNavigationOpen && (
             <>
-              {/* ── Search + filter bar ─────────────────────────────── */}
-              <div className="absolute top-[56px] left-lg right-lg z-[10] flex items-center gap-xs">
-                <div className="flex-1">
-                  <SearchBar
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onFocus={handleSearchFocus}
-                    placeholder={t('map.search')}
-                    leftSlot={searchActive ? (
-                      <button
-                        onClick={() => {
-                          setSearchQuery('')
-                          setSearchActive(false)
-                        }}
-                        className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                        aria-label={t('map.backToMap')}
-                      >
-                        <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
-                      </button>
-                    ) : undefined}
-                  />
+              {/* ── Search + filter bar (non-reviewMode) ────────────── */}
+              {!reviewMode && (
+                <div className="absolute top-[56px] left-lg right-lg z-[10]">
+                  <div className="flex items-center gap-xs">
+                    <div className="flex-1">
+                      <SearchBar
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onFocus={handleSearchFocus}
+                        placeholder={t('map.search')}
+                        leftSlot={searchActive ? (
+                          <button
+                            onClick={() => {
+                              setSearchQuery('')
+                              setSearchActive(false)
+                            }}
+                            className="shrink-0 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                            aria-label={t('map.backToMap')}
+                          >
+                            <ChevronLeft size={24} strokeWidth={1.5} className="text-neutral-500" />
+                          </button>
+                        ) : undefined}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className={[
+                        'flex items-center justify-center shrink-0',
+                        'w-[48px] h-[48px] rounded-xl',
+                        'bg-neutral-0 border border-neutral-200',
+                        'text-neutral-500',
+                        'transition-colors duration-200',
+                        'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
+                      ].join(' ')}
+                      aria-label={t('map.filterButton')}
+                      onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
+                    >
+                      <Funnel size={20} strokeWidth={1.5} aria-hidden />
+                    </button>
+                  </div>
                 </div>
-
-                <button
-                  type="button"
-                  className={[
-                    'flex items-center justify-center shrink-0',
-                    'w-[48px] h-[48px] rounded-xl',
-                    'bg-neutral-0 border border-neutral-200',
-                    'text-neutral-500',
-                    'transition-colors duration-200',
-                    'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-                  ].join(' ')}
-                  aria-label={t('map.filterButton')}
-                  onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
-                >
-                  <Funnel size={20} strokeWidth={1.5} aria-hidden />
-                </button>
-              </div>
+              )}
 
               {/* ── Category chips ───────────────────────────────────── */}
               {!searchActive && !placeDetailOpen && (
@@ -708,8 +723,8 @@ export const MapScreen: React.FC = () => {
         </>
       )}
 
-      {/* ── Search results ──────────────────────────────────────────── */}
-      {searchActive && (
+      {/* ── Search results (non-reviewMode) ─────────────────────────── */}
+      {searchActive && !reviewMode && (
         // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- propagation stopper only, not an interactive control
         <div
           className="absolute top-[136px] left-lg right-lg z-[10] overflow-y-auto"
@@ -735,15 +750,25 @@ export const MapScreen: React.FC = () => {
                   verifiedAt={place.verifiedAt}
                   isLiftDependent={place.isLiftDependent}
                   onPress={() => {
-                    setSearchQuery(getLocalizedField(place, 'name', lang))
-                    setSearchActive(false)
-                    mapRef.current?.getMap().flyTo({
-                      center: place.coordinates,
-                      zoom: 16,
-                      offset: [0, -80],
-                    })
-                    setSelectedPlaceForDetail(place)
-                    setPlaceDetailOpen(true)
+                    if (reviewMode) {
+                      navigate('/review', {
+                        state: {
+                          placeId: place.id,
+                          placeName: getLocalizedField(place, 'name', lang),
+                          address: getLocalizedField(place, 'address', lang),
+                        },
+                      })
+                    } else {
+                      setSearchQuery(getLocalizedField(place, 'name', lang))
+                      setSearchActive(false)
+                      mapRef.current?.getMap().flyTo({
+                        center: place.coordinates,
+                        zoom: 16,
+                        offset: [0, -80],
+                      })
+                      setSelectedPlaceForDetail(place)
+                      setPlaceDetailOpen(true)
+                    }
                   }}
                 />
                 {idx < searchResults.length - 1 && (
@@ -754,6 +779,84 @@ export const MapScreen: React.FC = () => {
               </React.Fragment>
             ))
           )}
+        </div>
+      )}
+
+      {/* ── Review-mode full-page overlay ───────────────────────────── */}
+      {searchActive && reviewMode && (
+        <div className="fixed inset-0 z-[10] bg-neutral-50 flex flex-col px-lg pt-xl overflow-hidden">
+          {/* Back */}
+          <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
+
+          {/* Heading */}
+          <h2 className="text-display-md text-neutral-900 mt-lg">
+            {t('placeDetail.leaveReview')}
+          </h2>
+
+          {/* Search bar + filter */}
+          <div className="flex items-center gap-xs mt-md">
+            <div className="flex-1">
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
+                placeholder={t('map.search')}
+              />
+            </div>
+            <button
+              type="button"
+              className={[
+                'flex items-center justify-center shrink-0',
+                'w-[48px] h-[48px] rounded-xl',
+                'bg-neutral-0 border border-neutral-200',
+                'text-neutral-500',
+                'transition-colors duration-200',
+                'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
+              ].join(' ')}
+              aria-label={t('map.filterButton')}
+              onClick={() => navigate('/filter', { state: { from: 'search' } })}
+            >
+              <Funnel size={20} strokeWidth={1.5} aria-hidden />
+            </button>
+          </div>
+
+          {/* Results */}
+          <div className="flex-1 overflow-y-auto mt-md">
+            {searchResults.length === 0 && searchQuery.trim() ? (
+              <div className="flex flex-col items-center justify-center pt-2xl gap-xs">
+                <p className="text-heading-sm text-neutral-900">{t('map.noResultsTitle')}</p>
+                <p className="text-body-sm text-neutral-500 text-center">
+                  {t('map.noResultsSubtitle')}
+                </p>
+              </div>
+            ) : (
+              searchResults.map((place, idx) => (
+                <React.Fragment key={place.id}>
+                  <PlaceListItem
+                    name={getLocalizedField(place, 'name', lang)}
+                    address={getLocalizedField(place, 'address', lang)}
+                    distance={formatDistance(place.distanceM, lang)}
+                    accessibilityScore={place.accessibilityScore}
+                    category={place.category}
+                    verifiedAt={place.verifiedAt}
+                    isLiftDependent={place.isLiftDependent}
+                    onPress={() => navigate('/review', {
+                      state: {
+                        placeId: place.id,
+                        placeName: getLocalizedField(place, 'name', lang),
+                        address: getLocalizedField(place, 'address', lang),
+                      },
+                    })}
+                  />
+                  {idx < searchResults.length - 1 && (
+                    <div className="py-md">
+                      <Divider />
+                    </div>
+                  )}
+                </React.Fragment>
+              ))
+            )}
+          </div>
         </div>
       )}
 

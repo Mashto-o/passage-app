@@ -5,6 +5,7 @@ export interface ChipProps {
   variant?: 'primary' | 'secondary' | 'neutral' | 'active' | 'success'
   size?: 'sm' | 'md'
   icon?: React.ReactNode
+  wrap?: boolean
   className?: string
   onClick?: () => void
 }
@@ -22,6 +23,7 @@ export const Chip: React.FC<ChipProps> = ({
   variant = 'primary',
   size = 'sm',
   icon,
+  wrap = false,
   className = '',
   onClick,
 }) => {
@@ -32,7 +34,8 @@ export const Chip: React.FC<ChipProps> = ({
     <Tag
       {...(onClick ? { type: 'button' as const, onClick } : {})}
       className={[
-        'flex items-center gap-[8px] px-[8px] py-[4px] rounded-[24px]',
+        'flex gap-[8px] px-[8px] py-[4px] rounded-[24px]',
+        wrap ? 'items-start' : 'items-center',
         container,
         onClick ? 'cursor-pointer transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none' : '',
         className,
@@ -41,13 +44,13 @@ export const Chip: React.FC<ChipProps> = ({
         .join(' ')}
     >
       {icon && (
-        <span className="shrink-0 w-[14px] h-[14px] flex items-center justify-center">
+        <span className="shrink-0 w-[14px] h-[14px] flex items-center justify-center mt-[1px]">
           {icon}
         </span>
       )}
       <span className={[
         size === 'md' ? 'text-body-sm' : 'text-caption-sm tracking-[0.12px]',
-        'whitespace-nowrap',
+        wrap ? 'text-center' : 'whitespace-nowrap',
       ].join(' ')}>
         {label}
       </span>

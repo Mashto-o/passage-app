@@ -65,10 +65,39 @@ interface SectionProps {
   summary: string
   isOpen: boolean
   onToggle: () => void
+  lang: string
   children: React.ReactNode
 }
 
-const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggle, children }) => (
+const PLACE_REVIEWS: {
+  authorName: string
+  timestamp: string
+  timestampUk: string
+  reviewText: string
+  isVerified?: boolean
+}[] = [
+  {
+    authorName:   'Name',
+    timestamp:    '1 week ago',
+    timestampUk:  'тиждень тому',
+    reviewText:   'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
+    isVerified:   true,
+  },
+  {
+    authorName:  'Name',
+    timestamp:   '3 weeks ago',
+    timestampUk: '3 тижні тому',
+    reviewText:  'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
+  },
+]
+
+const SECTION_PHOTOS: { updatedAt: string; updatedAtUk: string; isVerified?: boolean }[] = [
+  { updatedAt: '1 week ago',  updatedAtUk: 'тиждень тому', isVerified: true },
+  { updatedAt: '2 weeks ago', updatedAtUk: '2 тижні тому' },
+  { updatedAt: '1 month ago', updatedAtUk: 'місяць тому'  },
+]
+
+const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggle, lang, children }) => (
   <div className="flex flex-col gap-md">
     <button
       type="button"
@@ -93,24 +122,15 @@ const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggl
     {isOpen && (
       <div className="flex flex-col gap-lg">
         <div className="flex gap-lg overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          <PlacePhotoCard
-            src={undefined}
-            location={label}
-            updatedAt="1 week ago"
-            className="w-[165px] shrink-0"
-          />
-          <PlacePhotoCard
-            src={undefined}
-            location={label}
-            updatedAt="1 week ago"
-            className="w-[165px] shrink-0"
-          />
-          <PlacePhotoCard
-            src={undefined}
-            location={label}
-            updatedAt="1 week ago"
-            className="w-[165px] shrink-0"
-          />
+          {SECTION_PHOTOS.map((photo, i) => (
+            <PlacePhotoCard
+              key={i}
+              src={undefined}
+              updatedAt={getLocalizedField(photo, 'updatedAt', lang)}
+              isVerified={photo.isVerified}
+              className="w-[165px] shrink-0"
+            />
+          ))}
         </div>
         <div className="flex flex-col gap-sm">
           {children}
@@ -319,6 +339,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                 summary={t('placeDetail.sectionSummaries.entrance')}
                 isOpen={entranceOpen}
                 onToggle={() => setEntranceOpen(v => !v)}
+                lang={lang}
               >
                 <FactorRow variant="accessible"
                   title={t('placeDetail.factors.entrance.stepFreeTitle')}
@@ -346,6 +367,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                 summary={t('placeDetail.sectionSummaries.toilet')}
                 isOpen={toiletOpen}
                 onToggle={() => setToiletOpen(v => !v)}
+                lang={lang}
               >
                 <FactorRow variant="accessible"
                   title={t('placeDetail.factors.toilet.confirmedTitle')}
@@ -371,6 +393,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                 summary={t('placeDetail.sectionSummaries.inside')}
                 isOpen={insideOpen}
                 onToggle={() => setInsideOpen(v => !v)}
+                lang={lang}
               >
                 <FactorRow variant="accessible"
                   title={t('placeDetail.factors.inside.confirmedTitle')}
@@ -395,18 +418,16 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               </p>
 
               <div className="flex flex-col gap-md">
-                <ReviewCard
-                  authorName="Name"
-                  mobilityIcon={<WheelchairManual width={16} height={16} aria-hidden />}
-                  timestamp="1 week ago"
-                  reviewText="Smooth ramp at the entrance. Aisles inside are wide enough for an active chair."
-                />
-                <ReviewCard
-                  authorName="Name"
-                  mobilityIcon={<WheelchairManual width={16} height={16} aria-hidden />}
-                  timestamp="1 week ago"
-                  reviewText="Smooth ramp at the entrance. Aisles inside are wide enough for an active chair."
-                />
+                {PLACE_REVIEWS.map((review, i) => (
+                  <ReviewCard
+                    key={i}
+                    authorName={review.authorName}
+                    mobilityIcon={<WheelchairManual width={16} height={16} aria-hidden />}
+                    timestamp={getLocalizedField(review, 'timestamp', lang)}
+                    reviewText={review.reviewText}
+                    isVerified={review.isVerified}
+                  />
+                ))}
               </div>
 
               <div className="pb-lg" />

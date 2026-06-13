@@ -50,6 +50,8 @@ const FRIEND_ACTIVITY: {
   friendName: string
   mobilityAid: MobilityAid
   timeAgoHours: number
+  timeAgo: string
+  timeAgoUk: string
   placeName: string
   placeNameUk: string
   address: string
@@ -57,12 +59,15 @@ const FRIEND_ACTIVITY: {
   accessibilityScore: number
   reviewText: string
   reviewTextUk: string
+  isVerified?: boolean
 }[] = [
   {
     id: '1',
     friendName:        'Olena K.',
     mobilityAid:       'wheelchair-manual',
     timeAgoHours:      1,
+    timeAgo:           '1h ago',
+    timeAgoUk:         'годину тому',
     placeName:         'Veterano Pizza',
     placeNameUk:       'Ветерано Піцца',
     address:           'vul. Horodetskoho 10',
@@ -70,12 +75,15 @@ const FRIEND_ACTIVITY: {
     accessibilityScore: 75,
     reviewText:   'Wide entrance, accessible restroom on the ground floor. Staff were very helpful!',
     reviewTextUk: 'Широкий вхід, доступний туалет на першому поверсі. Персонал був дуже привітний!',
+    isVerified:   true,
   },
   {
     id: '2',
     friendName:        'Dmytro P.',
     mobilityAid:       'cane',
     timeAgoHours:      3,
+    timeAgo:           '3h ago',
+    timeAgoUk:         '3 години тому',
     placeName:         'Shevchenko Park',
     placeNameUk:       'Парк Шевченка',
     address:           'bulv. Tarasa Shevchenka 1',
@@ -184,11 +192,12 @@ export const DiscoverScreen: React.FC = () => {
                   key={item.id}
                   friendName={item.friendName}
                   mobilityAid={item.mobilityAid}
-                  timeAgo={t('placeListItem.hoursAgo', { count: item.timeAgoHours })}
+                  timeAgo={getLocalizedField(item, 'timeAgo', lang)}
                   placeName={getLocalizedField(item, 'placeName', lang)}
                   address={getLocalizedField(item, 'address', lang)}
                   accessibilityLabel={t('map.accessiblePercent', { score: item.accessibilityScore })}
                   reviewText={getLocalizedField(item, 'reviewText', lang)}
+                  isVerified={item.isVerified}
                 />
               ))}
             </div>

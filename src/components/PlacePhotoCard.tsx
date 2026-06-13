@@ -1,20 +1,20 @@
 import React from 'react'
-import { ImageIcon } from 'lucide-react'
+import { ImageIcon, MapPinCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 export interface PlacePhotoCardProps {
   src?: string
   alt?: string
-  location: string
   updatedAt: string
+  isVerified?: boolean
   className?: string
 }
 
 export const PlacePhotoCard: React.FC<PlacePhotoCardProps> = ({
   src,
   alt,
-  location,
   updatedAt,
+  isVerified = false,
   className = '',
 }) => {
   const { t } = useTranslation()
@@ -32,19 +32,21 @@ export const PlacePhotoCard: React.FC<PlacePhotoCardProps> = ({
           </div>
         )}
 
-        {/* Location chip */}
-        <div className="absolute top-[4px] left-1/2 -translate-x-1/2 bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
-          <span className="text-caption-sm text-primary-500 tracking-[0.12px] whitespace-nowrap">
-            {location}
+        {/* Date pill — top-left, always shown. Icon+date when verified, date-only when not */}
+        <div className="absolute top-[8px] left-1/2 -translate-x-1/2 flex items-center gap-[4px] bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
+          {isVerified && (
+            <MapPinCheck size={14} aria-hidden="true" className="text-primary-500 shrink-0" />
+          )}
+          <span className="text-caption-sm tracking-[0.12px] text-primary-500 whitespace-nowrap">
+            {updatedAt}
           </span>
         </div>
       </div>
 
-      {/* Text area */}
-      <div className="flex flex-col items-start w-full">
-        <span className="text-body-sb text-neutral-900">{t('placePhotoCard.lastUpdated')}</span>
-        <span className="text-body-sm text-neutral-700 w-[165px]">{updatedAt}</span>
-      </div>
+      {/* Caption — single descriptive line */}
+      <span className="text-body-sm text-neutral-700">
+        {isVerified ? t('common.madeOnLocation') : t('common.uploadedFromGallery')}
+      </span>
 
     </div>
   )

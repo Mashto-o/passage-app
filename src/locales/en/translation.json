@@ -7,7 +7,9 @@
     "onboardingLabel": "Onboarding",
     "close": "Close",
     "bookmark": "Bookmark",
-    "share": "Share"
+    "share": "Share",
+    "madeOnLocation": "Made on location",
+    "uploadedFromGallery": "Uploaded from gallery"
   },
   "onboarding1": {
     "title": "Passage",
@@ -221,7 +223,8 @@
   "navBar": {
     "discover": "Discover",
     "map": "Map",
-    "profile": "Profile"
+    "profile": "Profile",
+    "review": "Review"
   },
   "placeListItem": {
     "liftDependent": "Lift-dependent",

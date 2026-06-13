@@ -1,4 +1,5 @@
 import React from 'react'
+import { MapPinCheck } from 'lucide-react'
 import { StatusBadge } from './StatusBadge'
 import type { MobilityAid } from '../context/OnboardingContext'
 
@@ -26,6 +27,7 @@ export interface FriendActivityCardProps {
   address: string
   accessibilityLabel: string
   reviewText: string
+  isVerified?: boolean
 }
 
 export const FriendActivityCard: React.FC<FriendActivityCardProps> = ({
@@ -36,6 +38,7 @@ export const FriendActivityCard: React.FC<FriendActivityCardProps> = ({
   address,
   accessibilityLabel,
   reviewText,
+  isVerified = false,
 }) => {
   const mobilityIcon = MOBILITY_ICONS[mobilityAid] ?? (
     <WheelchairManual width={22} height={22} aria-hidden className="text-primary-500" />
@@ -50,7 +53,16 @@ export const FriendActivityCard: React.FC<FriendActivityCardProps> = ({
         <div className="size-[36px] rounded-full bg-neutral-200 shrink-0" />
         <span className="text-heading-sm text-neutral-900 whitespace-nowrap">{friendName}</span>
         <span className="shrink-0">{mobilityIcon}</span>
-        <span className="text-body-sm text-neutral-700 whitespace-nowrap ml-auto">{timeAgo}</span>
+
+        {/* Right side: icon+time when verified, plain time when not */}
+        {isVerified ? (
+          <div className="ml-auto shrink-0 flex items-center gap-[4px] text-primary-500">
+            <MapPinCheck size={14} aria-hidden="true" />
+            <span className="text-body-sm whitespace-nowrap">{timeAgo}</span>
+          </div>
+        ) : (
+          <span className="text-body-sm text-neutral-700 whitespace-nowrap ml-auto">{timeAgo}</span>
+        )}
       </div>
 
       {/* Place row */}
