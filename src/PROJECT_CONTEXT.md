@@ -78,6 +78,26 @@ src/
   + i18n.language (from useTranslation()'s i18n object).
 - aria-label values are also translated via t() — screen reader
   output must be localized too.
+- Time-ago strings in PlaceDetailSheet ReviewCard mock data and
+  PlacePhotoCard mock data have *Uk counterparts (timestampUk,
+  updatedAtUk) read via getLocalizedField — not a new utility,
+  just the existing *Uk suffix pattern applied to these fields.
+- FriendActivityCard mock data (FRIEND_ACTIVITY in DiscoverScreen)
+  has timeAgoUk fields added, read via getLocalizedField.
+
+## Translation keys added since initial build
+Under "common" namespace:
+- back: "Back" / "Назад"
+- madeOnLocation: "Made on location" / "Зроблено на локації"
+- uploadedFromGallery: "Uploaded from gallery" / "Завантажено з галереї"
+- verified: "Verified" / "Перевірено" (short form for tight spaces)
+
+Under "reviewCard" namespace:
+- verifiedAt key removed — no longer used (replaced by inline
+  MapPinCheck icon + timestamp pattern)
+
+Under "navBar" namespace:
+- review: "Review" / Ukrainian equivalent
 
 ## Accessibility (a11y) conventions
 - src/utils/a11y.ts exports clickableCardProps(onClick) — spreads
@@ -116,12 +136,31 @@ src/
   × sm/md, pulse animation, optional custom icon prop)
 - SelectionCard (default/selected, SVG illustrations,
   icon left + label right, no description)
-- ReviewCard (display only)
+- ReviewCard (display only. Props: authorName, avatarUrl?,
+  mobilityIcon, timestamp, reviewText, isVerified?: boolean,
+  className?.
+  Layout: single-column (matches FriendActivityCard pattern).
+  Header row: 36px avatar (initial-letter fallback) + authorName +
+  mobilityIcon + right-side date slot.
+  Date slot: if isVerified → MapPinCheck icon (size 14,
+  text-primary-500) + timestamp in text-primary-500; else plain
+  timestamp in text-neutral-700.
+  No placeName/address/accessibility badge — context provided by
+  PlaceDetailSheet or FriendActivityCard.)
 - PreferenceCard (default/selected, custom SVG icons)
 - AccessibilityCard (accessible/partiallyAccessible/inaccessible
   × default/selected)
 - PhotoCard (src, label, selected with primary/500 overlay)
-- PlacePhotoCard (optional src, location chip, last updated)
+- PlacePhotoCard (optional src, isVerified?: boolean,
+  updatedAt: string.
+  Location prop REMOVED — was redundant with section header.
+  When isVerified: centered pill on photo shows MapPinCheck icon
+  + updatedAt text (both text-primary-500).
+  When not verified: pill shows updatedAt text only (no icon).
+  Caption below photo: t('common.madeOnLocation') when isVerified,
+  else t('common.uploadedFromGallery').
+  updatedAt strings localized via *Uk suffix + getLocalizedField
+  at call site.)
 - Chip (primary/secondary, optional icon)
 - StatusBadge (positive/warning/negative, optional icon,
   rounded-[24px])
@@ -132,8 +171,17 @@ src/
 - RouteDestination (From + To TextInputs + swap button.
   onSwap swaps values. stopPropagation on swap button.)
 - CommentInput (textarea, 280 char limit, aria-label)
-- NavBar (Discover/Map/Profile, lucide icons, active pill.
-  activeTab: 'discover' | 'map' | 'profile')
+- NavBar (Discover/Map/Profile tabs + separate "Review" circular
+  button.
+  activeTab: 'discover' | 'map' | 'profile'.
+  Optional reviewActive?: boolean — when true, none of the three
+  tabs render as active; the Review circle button renders with
+  primary-500 icon + bg-primary-100 label pill instead of neutral.
+  Review button: internally uses useNavigate() to call
+  navigate('/map', { state: { reviewMode: true } }). Sits outside
+  the main pill, same height as pill via self-stretch, rounded-full,
+  Plus icon + t('navBar.review') label.
+  Rendered on Discover, Map, and Profile screens.)
 - OnboardingProgress (currentStep/totalSteps, animated fill)
 - RadioButton (inset box-shadow: 3px default, 6px selected)
 - PlaceListItem (name, address, distance, accessibilityScore,
@@ -153,8 +201,8 @@ src/
   default: hazard warning banner (warning-100), ArrowLeft,
     turn instruction + distance, "Moderate incline ahead in 10m".
   noHazard: ArrowRight, turn instruction + distance, no banner.
-  arrived: MapPin icon, "You have arrived!" (translated), destinationName
-    as sublabel (NOT hardcoded "Your destination").
+  arrived: MapPin icon, "You have arrived!" (translated),
+    destinationName as sublabel (NOT hardcoded "Your destination").
   All instruction/arrival text translated (navigation namespace,
   {{street}} interpolation).
   Slide animation on state change: slides out downward, updates
@@ -180,8 +228,8 @@ src/
   per option. transition-transform duration-300. aria-hidden
   backdrop + Escape listener.)
 - ToggleButton (Yes/No pair, success/danger selected)
-- Toggle (on/off, role="switch", aria-checked, optional `label` prop
-  → aria-label, thumb slides with translate-x)
+- Toggle (on/off, role="switch", aria-checked, optional `label`
+  prop → aria-label, thumb slides with translate-x)
 - SearchBar (Search icon + input. searchActive: ArrowLeft
   replaces Search icon, tapping clears and closes search)
 - TransportSwitcher (transit/car/walking tabs + header label,
@@ -192,7 +240,11 @@ src/
   Sticky feedback footer (thumbs/"Leave a review" →
   navigate('/review', { state: { placeId, placeName, address } })).
   Sections: Entrance/Toilet/Inside — collapsible, photo
-  cards + factor list. Lift warning if isLiftDependent.
+  cards (PlacePhotoCard, location prop removed, isVerified prop
+  added, updatedAt localized via *Uk suffix) + factor list.
+  Lift warning if isLiftDependent.
+  Review cards (ReviewCard): single-column layout, isVerified prop
+  added, timestamp localized via *Uk suffix.
   No NavBar. aria-hidden backdrop + Escape listener.)
 - RoutePlanningSheet (overlay in MapScreen. Props: isOpen,
   destinationName, onClose, onRouteSelect, overrideTop.
@@ -240,8 +292,8 @@ src/
   Place markers hidden when routeDetailOpen or activeNavigationOpen.
   Only end point marker remains visible during route.)
 - ActiveNavigationSheet (overlay in MapScreen. Props: isOpen,
-  route, destinationName, onClose, onNavStateChange, onPanelHeightChange,
-  maxHeight.
+  route, destinationName, onClose, onNavStateChange,
+  onPanelHeightChange, maxHeight.
   z-[100] — highest in stack, true full-screen takeover.
   bg-neutral-50 covers everything including map.
   NavigationCard floats top-[56px] left/right-[24px] z-[101].
@@ -251,19 +303,50 @@ src/
   non-scrolling. Shows destination, arrivalTime, distanceKm.
   "Report Difficulty" (secondary Button, console.log) +
   "End route" (danger Button, calls onClose).
-  On arrival: bottom panel slides down and disappears (translate-y-full,
-  duration-500). NavigationCard remains visible showing arrived state.
-  Auto-advancing timers (halved): default 7.5s → noHazard 13.5s → arrived.
+  On arrival: bottom panel slides down and disappears
+  (translate-y-full, duration-500). NavigationCard remains
+  visible showing arrived state.
+  Auto-advancing timers (halved): default 7.5s → noHazard
+  13.5s → arrived.
   BarrierCheckModal appears at 4s (hardcoded kerb photo).
   onNavStateChange called on every navState change.
-  onPanelHeightChange: measures bottom panel height via ResizeObserver.
+  onPanelHeightChange: measures bottom panel height via
+  ResizeObserver.
   maxHeight: when set, clamps sheet height so it cannot exceed
   ActiveNavigationSheet panel when navigation is active.
   Timers cleared on close. navState resets to 'default' on open.)
-- UpdateCard, FriendActivityCard, EventCard (DiscoverScreen cards —
-  see DiscoverScreen section below)
+- UpdateCard, FriendActivityCard, EventCard (DiscoverScreen cards)
+  FriendActivityCard: isVerified?: boolean prop added. When true,
+  timeAgo in the friend row shows MapPinCheck icon (size 14,
+  text-primary-500) + timeAgo in text-primary-500. When false,
+  plain timeAgo in text-neutral-700. No separate badge row.
+  timeAgoUk field added to mock data, read via getLocalizedField.
 - ReviewSection (accordion section for ReviewScreen — see below)
 - DevLanguageToggle (see i18n section above)
+
+## "Made on location" provenance system
+Addresses the user-interview finding that existing solutions (e.g.
+LUN) suffer from distrust due to off-site/fabricated data.
+Design concept: reviews and photos submitted while physically at a
+location carry a visual provenance signal (MapPinCheck icon,
+text-primary-500) vs. content submitted remotely (plain date, no
+icon). Deliberately NOT framed as "verified/unverified" (which
+implies the absence is a negative) — instead framed as metadata
+("made on location" vs "uploaded from gallery").
+
+Implementation:
+- isVerified: boolean prop on ReviewCard, PlacePhotoCard,
+  FriendActivityCard
+- ReviewCard + FriendActivityCard: date slot shows MapPinCheck +
+  date in primary-500 (verified) vs plain date in neutral-700
+- PlacePhotoCard: centered pill on photo shows MapPinCheck + date
+  (verified) vs date only; caption below switches between
+  "Made on location" and "Uploaded from gallery"
+- All new submissions via ReviewScreen hardcoded as isVerified:true
+  (entry point is PlaceDetailSheet → implies user engaged with a
+  specific place; real-world version would use geolocation check)
+- Mock data in PlaceDetailSheet shows mix of verified/unverified
+  ReviewCards and PlacePhotoCards for demo purposes
 
 ## Map popup behaviour
 - Tapping a marker opens PlacePopupCard
@@ -283,7 +366,8 @@ When navState reaches 'arrived' in ActiveNavigationSheet:
 3. ActiveNavigationSheet bottom panel slides down (hidden)
 4. NavigationCard stays visible showing arrived state + destinationName
 5. Route polyline remains drawn on map
-6. After 3 seconds: setActiveNavigationOpen(false), setSelectedRoute(null),
+6. After 3 seconds: setActiveNavigationOpen(false),
+   setSelectedRoute(null),
    navigate('/route-complete', { state: { distanceKm, durationMin } })
 "End route" button: closes ActiveNavigationSheet only, returns to
 RouteDetailSheet. Does NOT trigger route-complete flow.
@@ -291,7 +375,8 @@ RouteDetailSheet. Does NOT trigger route-complete flow.
 ## Route progress animation (during active navigation)
 - Animated pulse dot (bg-primary-500, animate-ping ring bg-primary-300
   opacity-75) moves along flattened route coords as a Mapbox Marker
-- Moves via setInterval every 300ms, stepPerTick = ceil(allCoords.length / 45)
+- Moves via setInterval every 300ms, stepPerTick =
+  ceil(allCoords.length / 45)
 - Timed to reach the end coordinate at exactly 13,500ms — the same
   moment navState becomes 'arrived' (matches timer2 in
   ActiveNavigationSheet)
@@ -318,8 +403,8 @@ min-h-screen overflow-y-auto, gap-xl between sections.
   description, verifiedCount, timeAgo, optional imageSrc placeholder).
 - FRIENDS' ACTIVITY: stacked FriendActivityCard (friendName,
   mobilityAid → illustration icon via same lookup/fallback as
-  ProfileScreen, timeAgo, placeName, address, accessibilityLabel,
-  reviewText).
+  ProfileScreen, timeAgo/timeAgoUk, placeName, address,
+  accessibilityLabel, reviewText, isVerified).
 - ACCESSIBLE EVENTS: stacked EventCard (title, date Chip, organizer,
   attendeeCount — "{{count}} going", second row uses justify-between
   so attendee count is right-aligned).
@@ -331,7 +416,8 @@ min-h-screen overflow-y-auto, gap-xl between sections.
 Full-page scrollable screen, bg-neutral-50. Slide-up entrance
 animation (translate-y-full → translate-y-0, duration-500).
 Receives route stats via React Router location state:
-{ distanceKm, durationMin } (formatted via formatDistance/formatDuration).
+{ distanceKm, durationMin } (formatted via formatDistance/
+formatDuration).
 Sections:
 - Header: BadgeCheck icon (bg-primary-100 rounded-[48px] p-[16px]),
   "Route complete!" h1 (display/md), distance · duration
@@ -354,10 +440,11 @@ Stores AND persists to localStorage:
   same option types as Onboarding4's PreferenceCard groups.
   setX(null) removes the key.
 Exposes useOnboarding() with all values + setters.
-Used by: Onboarding2 (mobilityAid selection), Onboarding4 (preference
-selections — now context-backed, not local state), ProfileScreen
-(mobilityAid display), AccessibilityPreferencesScreen (preference
-selections — now context-backed, initialized from persisted values),
+Used by: Onboarding2 (mobilityAid selection), Onboarding4
+(preference selections — context-backed, not local state),
+ProfileScreen (mobilityAid display),
+AccessibilityPreferencesScreen (preference selections —
+context-backed, initialized from persisted values),
 RoutePlanningSheet (getBestMatch uses mobilityAid).
 Exported MobilityAid type is single source of truth.
 
@@ -374,25 +461,29 @@ Layout: px-lg, pt-[56px], pb-[120px] (scrollable, overflow-y-auto,
 min-h-screen — clears fixed NavBar), gap-xl/gap-lg/gap-md spacing.
 h1 = page title (display/md). NavBar fixed bottom-[24px] left-[24px]
 right-[24px], activeTab="profile".
-"My accessibility preferences" list item → navigate('/profile/preferences')
+"My accessibility preferences" list item →
+navigate('/profile/preferences')
 All text translated EN/UK incl. plural counts.
 
 ## AccessibilityPreferencesScreen (/profile/preferences)
 Subpage of ProfileScreen — same four preference groups as Onboarding4
-(Door width, Stairs, Slope, Surface) using PreferenceCard, but without
-Logo, OnboardingProgress, or onboarding heading/intro.
+(Door width, Stairs, Slope, Surface) using PreferenceCard, but
+without Logo, OnboardingProgress, or onboarding heading/intro.
 Back button (variant="back") → navigate('/profile')
 h1: "Accessibility preferences" (text-display-lg)
 Save button (primary, fullWidth) → navigate('/profile')
-State is now context-backed via useOnboarding() (doorWidth/stairs/
+State is context-backed via useOnboarding() (doorWidth/stairs/
 slope/surface + setters) — persists across reloads, shared with
 Onboarding4.
 
 ## ReviewScreen (/review) — AI-assisted review
 Full-page route, bg-neutral-50, px-lg, pt-[56px], pb-[120px],
 min-h-screen overflow-y-auto, gap-2xl between major blocks.
-Entry point: PlaceDetailSheet's "Leave a review" footer action →
-navigate('/review', { state: { placeId, placeName, address } }).
+Entry points:
+  1. PlaceDetailSheet's "Leave a review" footer →
+     navigate('/review', { state: { placeId, placeName, address } })
+  2. NavBar "Review" button → MapScreen reviewMode → place selection
+     → navigate('/review', { state: { placeId, placeName, address } })
 - Header: Back button + placeName (h1, display/md) + address (body/sm)
 - AI banner: bg-primary-100 rounded-[24px] p-md, Sparkles icon +
   "AI-assisted review..." explanatory text (translated)
@@ -400,10 +491,10 @@ navigate('/review', { state: { placeId, placeName, address } }).
   door-width-100 [stroke-width fixed to 1.5 to match icon set],
   wc, lucide Sofa):
   - status: 'empty' (MediaInputButton only) → 'analyzing' (photo
-    preview + pulsing Sparkles "Analyzing photo..." card, ~1600ms) →
-    'done' (auto-opens; photo + 3 AccessibilityCard ratings + Yes/No
-    ToggleButton questions, AI-prefilled with Sparkles badges; user
-    can override any value, removing its badge)
+    preview + pulsing Sparkles "Analyzing photo..." card, ~1600ms)
+    → 'done' (auto-opens; photo + 3 AccessibilityCard ratings +
+    Yes/No ToggleButton questions, AI-prefilled with Sparkles badges;
+    user can override any value, removing its badge)
   - Mock AI (src/utils/mockAI.ts → analyzePhoto(sectionId)): predicts
     accessibility rating; answers derived from rating — accessible→
     all yes, inaccessible→all no, partiallyAccessible→half yes/half no.
@@ -412,8 +503,9 @@ navigate('/review', { state: { placeId, placeName, address } }).
   - Header row shows Check (success-500) + chevron once 'done'.
 - Comment section: "ADD A COMMENT" + MessageCircle icon, 2 Chips,
   CommentInput (280 char, aria-label).
-- Submit "Post review": enabled only when all 3 sections status==='done';
-  console.logs all state + comment, then navigate(-1).
+- Submit "Post review": enabled only when all 3 sections
+  status==='done'; console.logs all state + comment, then
+  navigate(-1). All new submissions treated as isVerified:true.
 - All strings + AI banner translated EN/UK (review namespace).
 
 ## Routing
@@ -457,18 +549,19 @@ All sort option labels translated (sort.places.* / sort.routes.*).
 ## Sort logic (MapScreen)
 - displayPlaces = sortPlaces(filterPlaces(filteredPlaces,
   filterState), sortValue) — computed once, used everywhere
-- Distance comparisons use raw metres (see formatUnits — Place.distance
-  is now a number, formatted at render time)
+- Distance comparisons use raw metres (see formatUnits —
+  Place.distance is now a number, formatted at render time)
 
 ## Accessibility badge colour (unified, score-based)
 80+→accessible(green), 40-79→partial(orange), <40→red
 Everywhere: markers, popups, lists, filter cards, badges.
 
 ## getCategoryIcon / category labels
-Location: src/utils/categoryIcon.tsx — getCategoryIcon(category, size).
-Category display names are translated via t('categories.' + category)
-in the components that render them (PlaceListItem, PlacePopupCard,
-PlaceDetailSheet) — categoryIcon.tsx itself stays a pure icon lookup.
+Location: src/utils/categoryIcon.tsx — getCategoryIcon(category,
+size). Category display names are translated via
+t('categories.' + category) in the components that render them
+(PlaceListItem, PlacePopupCard, PlaceDetailSheet) —
+categoryIcon.tsx itself stays a pure icon lookup.
 
 ## Place data shape (exported from MapScreen.tsx)
 type Place = {
@@ -513,8 +606,8 @@ DEFAULT: accessibility=new Set(['accessible','inaccessible',
 CRITICAL: always create new Set on update, never mutate.
 handleReset must create new Set, never reuse DEFAULT ref.
 FilterScreen: h1 = "Filter" (translated), Toggle components have
-translated `label` props (Avoid lift-dependent places / I'm travelling
-with a companion).
+translated `label` props (Avoid lift-dependent places / I'm
+travelling with a companion).
 
 ## filterPlaces (MapScreen)
 Applies to map markers AND list. Checks getAccessibilityVariant
@@ -527,9 +620,12 @@ selectedPlaceForDetail, placeDetailOpen,
 routePlanningOpen, routeDestinationName, routeSwapped,
 selectedRoute, routeDetailOpen, routeDetailSnapTop,
 activeNavigationOpen, navPanelHeight, routeEndedAt,
-routeProgress
-h1: sr-only "Map" (no natural visible title on this screen).
-activeTab="map" on NavBar.
+routeProgress, reviewMode
+h1: sr-only "Map" in normal mode. When reviewMode=true: h1
+becomes t('placeDetail.leaveReview') (or equivalent key) —
+both sr-only and visible heading update.
+activeTab="map" on NavBar; reviewActive={reviewMode} passed
+to NavBar.
 
 ## MapScreen overlay z-index stack (bottom to top)
 Map:z-0, chips backdrop:z-[45], bottom sheet:z-[50],
@@ -538,12 +634,14 @@ PlaceDetailSheet backdrop:z-[55] sheet:z-[60],
 RoutePlanningSheet backdrop:z-[65] sheet:z-[70],
 RouteDetailSheet backdrop:z-[75] sheet:z-[80],
 ActiveNavigationSheet:z-[100] card:z-[101],
-BarrierCheckModal:z-[110]
+BarrierCheckModal:z-[110],
+Review-mode overlay: z-[10] (above search bg z-[8]/z-[9],
+below all sheets)
 
 ## MapScreen UI visibility rules
 - Chips hidden: searchActive OR placeDetailOpen OR
   routePlanningOpen OR activeNavigationOpen
-- Search bar hidden: activeNavigationOpen
+- Search bar hidden: activeNavigationOpen OR reviewMode
 - Search replaced by RouteDestination:
   routePlanningOpen AND NOT routeDetailOpen
   AND NOT activeNavigationOpen
@@ -556,14 +654,39 @@ BarrierCheckModal:z-[110]
   AND NOT activeNavigationOpen
 - RoutePlanningSheet overrideTop: routeDetailSnapTop
   when routeDetailOpen, else null
-- Place markers visible: NOT routeDetailOpen AND NOT activeNavigationOpen
+- Place markers visible: NOT routeDetailOpen AND NOT
+  activeNavigationOpen
+
+## Search behaviour
+Tap bar→searchActive=true. ArrowLeft→clears+closes (normal mode).
+Result tap→searchQuery=name, searchActive=false,
+map flyTo, PlaceDetailSheet opens.
+Filter from search: navigate with {from:'search'}.
+FilterScreen back→/map with {returnToSearch:true}.
+
+reviewMode: activated by navigate('/map', { state: {
+reviewMode:true } }) from NavBar "Review" button. Works from
+any screen including Map itself — useEffect depends on
+location.state (not just mount) to handle same-route navigation.
+When reviewMode=true:
+- Full-screen overlay (z-[10], bg-neutral-50) with "Leave a
+  review" heading + back button (variant="back") renders
+- Back button onClick: setReviewMode(false) +
+  setSearchActive(false) + setSearchQuery('') + navigate(-1)
+- Search results sorted by 'nearest' when query is empty
+  (sortPlaces(searchResults, 'nearest'))
+- Result tap → navigate('/review', { state: { placeId,
+  placeName, address } }) instead of opening PlaceDetailSheet
+- NavBar shows reviewActive=true (Review button highlighted,
+  tabs unselected)
 
 ## Escape-key handling (MapScreen)
-Single useEffect, priority order: searchActive → popup (selectedPlace
-&& no sheet open) → bottom sheet (sheetVisible && no sheet open).
+Single useEffect, priority order: searchActive → popup
+(selectedPlace && no sheet open) → bottom sheet (sheetVisible
+&& no sheet open).
 Individual sheet components (PlaceDetailSheet, RoutePlanningSheet,
-RouteDetailSheet, SortSheet) have their own Escape listeners for
-their own onClose.
+RouteDetailSheet, SortSheet) have their own Escape listeners
+for their own onClose.
 
 ## Mapbox flyTo convention
 All marker/search flyTo calls use offset:[0,-80], zoom:16.
@@ -572,16 +695,9 @@ map.setPadding zeros on mount and in RouteDetailSheet cleanup.
 Mapbox free tier: 50,000 map loads/month, 100,000 Directions
 API requests/month. GeoJSON layers do not count as extra loads.
 
-## Search behaviour
-Tap bar→searchActive=true. ArrowLeft→clears+closes.
-Result tap→searchQuery=name, searchActive=false,
-map flyTo, PlaceDetailSheet opens.
-Filter from search: navigate with {from:'search'}.
-FilterScreen back→/map with {returnToSearch:true}.
-
 ## Onboarding → Map handoff
-Every CTA button on Onboarding5 (final step), regardless of which
-one is tapped, calls navigate('/map').
+Every CTA button on Onboarding5 (final step), regardless of
+which one is tapped, calls navigate('/map').
 
 ## Code conventions
 - Named exports only
@@ -589,22 +705,24 @@ one is tapped, calls navigate('/map').
   (exceptions: brand colours, Mapbox line-color with comment)
 - No inline styles except dynamic numeric values
 - No data-node-id attributes
-- <button> for interactive, role="switch"+aria-checked for toggles
-  (NOT aria-pressed)
+- <button> for interactive, role="switch"+aria-checked for
+  toggles (NOT aria-pressed)
 - focus-visible:ring-2 focus-visible:ring-primary-500
   focus-visible:ring-offset-2 focus-visible:outline-none
 - transition-colors duration-200
 - whitespace-nowrap on dropdown labels, shrink-0 on triggers
 - Import from src/components/index.ts — never rebuild
-- All user-visible strings (and translated aria-labels) go through
-  useTranslation()'s t() — no hardcoded UI text. New strings get
-  added to BOTH src/locales/en/translation.json and uk/translation.json.
-  Use plural forms (_one/_few/_many/_other) for counts. Use
-  getLocalizedField for data-driven name/address/text fields (nameUk
-  etc.). Use formatDistance/formatDuration for any metres/minutes display.
-- clickableCardProps (src/utils/a11y.ts) only on genuinely tappable
-  content — never backdrops/drag handles/propagation wrappers (those
-  get aria-hidden="true" + plain onClick + Escape listener instead).
+- All user-visible strings (and translated aria-labels) go
+  through useTranslation()'s t() — no hardcoded UI text. New
+  strings get added to BOTH src/locales/en/translation.json
+  and uk/translation.json. Use plural forms
+  (_one/_few/_many/_other) for counts. Use getLocalizedField
+  for data-driven name/address/text fields (nameUk etc.). Use
+  formatDistance/formatDuration for any metres/minutes display.
+- clickableCardProps (src/utils/a11y.ts) only on genuinely
+  tappable content — never backdrops/drag handles/propagation
+  wrappers (those get aria-hidden="true" + plain onClick +
+  Escape listener instead).
 
 ## Prompt conventions for Claude Code
 - Model: claude-sonnet-4-6
@@ -620,24 +738,52 @@ one is tapped, calls navigate('/map').
 - utils→src/utils/
 - context→src/context/
 - New user-visible strings → add to both locale JSON files
+- When touching translation files: use grep/targeted search,
+  never read the entire file — locale files are large and
+  reading them whole is expensive
+
+## Pending / not yet implemented
+- ReviewsContext: submitted reviews from ReviewScreen do not
+  yet persist to PlaceDetailSheet. Planned: new
+  src/context/ReviewsContext.tsx with addReview(placeId,
+  reviewData) + getReviews(placeId), wired into main.tsx,
+  ReviewScreen submit calls addReview, PlaceDetailSheet reads
+  and renders submitted reviews via ReviewCard above mock
+  reviews. New review author: "You" (translated), mobilityIcon
+  from useOnboarding().mobilityAid, timestamp: t('common.justNow'),
+  isVerified: true (hardcoded).
 
 ## Research alignment (for thesis write-up)
-- RQ3 (Collaborative feedback) + RQ4 (User profiling): strongly
-  addressed — ReviewScreen's AI-assisted accordion + DiscoverScreen's
-  Updates/Friends activity (RQ3); OnboardingContext mobilityAid +
-  accessibility preferences (RQ4).
+- RQ3 (Collaborative feedback): addressed via ReviewScreen's
+  AI-assisted accordion + DiscoverScreen's Updates/Friends
+  activity. Also addressed by the "Made on location" provenance
+  system (isVerified on ReviewCard/PlacePhotoCard/FriendActivityCard
+  — MapPinCheck icon signals on-site submission vs. plain date
+  for remote). Directly responds to user interview finding about
+  distrust of off-site/fabricated data (LUN problem). NavBar
+  "Review" button provides always-accessible entry point to
+  leave a review from any screen.
+- RQ4 (User profiling): OnboardingContext mobilityAid +
+  accessibility preferences.
 - RQ1 (Adaptive personalisation): addressed via BestMatchCard
   (profile-vs-route-segment-data scoring) — explicitly NOT via
   fabricated crowd-rating data (documented reasoning in
   accessibilityMatch.ts comments).
-- RQ2 (Engaging onboarding): Onboarding1-5 covers mobility-aid +
-  preference capture, one decision per screen + progress indicator.
-  Notion brief's voice guidance / location permission / route-teaser /
-  sign-up steps are NOT in the coded prototype (documented gap).
-- Accessibility of the prototype itself: eslint-plugin-jsx-a11y +
-  axe-core audits both pass with 0 issues (see Accessibility section
-  above) — relevant for the "prototype demonstrates accessible
-  design practice" angle.
+- RQ2 (Engaging onboarding): Onboarding1-5 covers mobility-aid
+  + preference capture, one decision per screen + progress
+  indicator. Notion brief's voice guidance / location permission
+  / route-teaser / sign-up steps are NOT in the coded prototype
+  (documented gap).
+- Accessibility of the prototype itself: eslint-plugin-jsx-a11y
+  + axe-core audits both pass with 0 issues (see Accessibility
+  section above) — relevant for the "prototype demonstrates
+  accessible design practice" angle.
+- Data realism: barrier/accessibility data is pre-authored mock
+  data. Community verification loop (verifiedAt, BarrierCheckModal,
+  RouteCompleteScreen barrier toggle, ReviewScreen) demonstrates
+  the interaction pattern but does not write to any data store.
+  Plausible as a future product; documented as a prototype
+  limitation.
 
 ## Git / dev
 Terminal 1: npm run dev. Terminal 2: git.

@@ -126,7 +126,7 @@ function filterPlaces(places: Place[], filter: FilterState): Place[] {
   return places.filter((place) => {
     const variant = getAccessibilityVariant(place.accessibilityScore)
     if (!filter.accessibility.has(variant)) return false
-    // avoidLifts and hasCompanion: wired to state, filtering logic pending place-level data
+    if (filter.avoidLifts && place.isLiftDependent) return false
     return true
   })
 }
@@ -350,7 +350,7 @@ export const MapScreen: React.FC = () => {
     if (location.state?.returnToSearch) {
       setSearchActive(true)
     }
-  }, [location.key])
+  }, [location.key, location.state])
 
   // ── Reset map padding on mount ───────────────────────────────────
   useEffect(() => {
@@ -689,7 +689,7 @@ export const MapScreen: React.FC = () => {
                         'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
                       ].join(' ')}
                       aria-label={t('map.filterButton')}
-                      onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map' } })}
+                      onClick={() => navigate('/filter', { state: { from: searchActive ? 'search' : 'map', reviewMode: reviewMode } })}
                     >
                       <Funnel size={20} strokeWidth={1.5} aria-hidden />
                     </button>
@@ -786,7 +786,7 @@ export const MapScreen: React.FC = () => {
       {searchActive && reviewMode && (
         <div className="fixed inset-0 z-[10] bg-neutral-50 flex flex-col px-lg pt-xl overflow-hidden">
           {/* Back */}
-          <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
+          <Button variant="back" label={t('common.back')} onClick={() => { setReviewMode(false); setSearchActive(false); setSearchQuery(''); navigate('/map', { replace: true }) }} />
 
           {/* Heading */}
           <h2 className="text-display-md text-neutral-900 mt-lg">
@@ -814,7 +814,7 @@ export const MapScreen: React.FC = () => {
                 'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
               ].join(' ')}
               aria-label={t('map.filterButton')}
-              onClick={() => navigate('/filter', { state: { from: 'search' } })}
+              onClick={() => navigate('/filter', { state: { from: 'search', reviewMode: reviewMode } })}
             >
               <Funnel size={20} strokeWidth={1.5} aria-hidden />
             </button>
@@ -965,7 +965,7 @@ export const MapScreen: React.FC = () => {
       {/* ── NavBar ──────────────────────────────────────────────────── */}
       {!activeNavigationOpen && (
         <div className="absolute bottom-lg left-lg right-lg z-40">
-          <NavBar activeTab="map" onTabChange={(tab) => navigate('/' + tab)} />
+          <NavBar activeTab="map" onTabChange={(tab) => navigate('/' + tab)} reviewActive={reviewMode} />
         </div>
       )}
 

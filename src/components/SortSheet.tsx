@@ -49,7 +49,7 @@ export const SortSheet: React.FC<SortSheetProps> = ({
       {/* Backdrop */}
       <div
         className={[
-          'fixed inset-0 z-[45] bg-transparent',
+          'fixed inset-0 z-[66] bg-transparent',
           isOpen ? '' : 'pointer-events-none',
         ].filter(Boolean).join(' ')}
         aria-hidden="true"
@@ -62,7 +62,7 @@ export const SortSheet: React.FC<SortSheetProps> = ({
           'fixed bottom-0 left-0 right-0',
           'bg-neutral-0',
           'rounded-tl-[48px] rounded-tr-[48px]',
-          'z-[50] flex flex-col items-center px-lg',
+          'z-[71] flex flex-col items-center px-lg',
           'transition-transform duration-300 ease-in-out',
           isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
         ].join(' ')}

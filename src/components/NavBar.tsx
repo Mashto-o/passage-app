@@ -8,6 +8,7 @@ type Tab = 'discover' | 'map' | 'profile'
 export interface NavBarProps {
   activeTab: Tab
   onTabChange: (tab: Tab) => void
+  reviewActive?: boolean
   className?: string
 }
 
@@ -20,6 +21,7 @@ const TAB_DEFS: { id: Tab; Icon: LucideIcon }[] = [
 export const NavBar: React.FC<NavBarProps> = ({
   activeTab,
   onTabChange,
+  reviewActive = false,
   className = '',
 }) => {
   const { t } = useTranslation()
@@ -40,7 +42,7 @@ export const NavBar: React.FC<NavBarProps> = ({
       {/* Main tab pill */}
       <div className="flex items-center justify-between bg-neutral-0 border border-neutral-200 rounded-full py-[20px] px-md">
         {tabs.map(({ id, label, Icon }) => {
-          const active = activeTab === id
+          const active = !reviewActive && activeTab === id
           return (
             <button
               key={id}
@@ -92,10 +94,18 @@ export const NavBar: React.FC<NavBarProps> = ({
             'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
           ].join(' ')}
         >
-          <Plus size={24} strokeWidth={1.5} className="text-neutral-500" aria-hidden />
-          <span className="text-caption-sm tracking-[0.12px] text-neutral-500">
-            {t('navBar.review')}
-          </span>
+          <Plus size={24} strokeWidth={1.5} className={reviewActive ? 'text-primary-500' : 'text-neutral-500'} aria-hidden />
+          {reviewActive ? (
+            <div className="bg-primary-100 px-2xs rounded-xs">
+              <span className="text-caption-sm tracking-[0.12px] text-primary-500">
+                {t('navBar.review')}
+              </span>
+            </div>
+          ) : (
+            <span className="text-caption-sm tracking-[0.12px] text-neutral-500">
+              {t('navBar.review')}
+            </span>
+          )}
         </button>
       </div>
     </div>

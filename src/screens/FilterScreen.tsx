@@ -20,6 +20,7 @@ export const FilterScreen: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from ?? 'map'
+  const reviewMode = location.state?.reviewMode ?? false
   const { filterState, toggleAccessibility, setAvoidLifts, setHasCompanion, handleReset } = useFilterContext()
 
   const ACCESSIBILITY_OPTIONS: {
@@ -43,7 +44,7 @@ export const FilterScreen: React.FC = () => {
             variant="back"
             onClick={() => {
               if (from === 'search') {
-                navigate('/map', { state: { returnToSearch: true } })
+                navigate('/map', { state: { returnToSearch: true, reviewMode: reviewMode } })
               } else {
                 navigate(-1)
               }

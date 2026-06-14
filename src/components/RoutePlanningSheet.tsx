@@ -853,7 +853,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   const [activeTab,      setActiveTab]      = useState<'transit' | 'car' | 'walking'>('transit')
   const [dragStartY,     setDragStartY]     = useState(0)
   const [dragDelta,      setDragDelta]      = useState(0)
-  const [sheetHeight,    setSheetHeight]    = useState(600)
+  const [sheetHeight,    setSheetHeight]    = useState(() => window.innerHeight)
   const DRAG_THRESHOLD = 80
 
   const { mobilityAid } = useOnboarding()
@@ -866,11 +866,11 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   const sheetRef   = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (isOpen && scrollRef.current) {
-      scrollRef.current.scrollTop = 0
-    }
+    if (!isOpen) return
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
     if (sheetRef.current) {
-      setSheetHeight(sheetRef.current.getBoundingClientRect().height)
+      const h = sheetRef.current.getBoundingClientRect().height
+      if (h > 0) setSheetHeight(h)
     }
   }, [isOpen])
 
@@ -1031,17 +1031,17 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
             )
           })()}
         </div>
-
-        {/* Sort sheet — outside scrollable area */}
-        <SortSheet
-          isOpen={routeSortOpen}
-          options={routeSortOptions}
-          value={routeSortValue}
-          onChange={(key) => setRouteSortValue(key as RouteSortKey)}
-          onClose={() => setRouteSortOpen(false)}
-          height={sheetHeight}
-        />
       </div>
+
+      {/* SortSheet — must be outside sheet div to avoid overflow:hidden clipping */}
+      <SortSheet
+        isOpen={routeSortOpen}
+        options={routeSortOptions}
+        value={routeSortValue}
+        onChange={(key) => setRouteSortValue(key as RouteSortKey)}
+        onClose={() => setRouteSortOpen(false)}
+        height={sheetHeight}
+      />
     </>
   )
 }

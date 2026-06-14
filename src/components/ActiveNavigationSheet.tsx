@@ -153,22 +153,19 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
 
             {/* Destination row */}
             <div className="flex items-center justify-between w-full">
-              <span className="font-semibold text-[16px] leading-[1.4] text-neutral-900 whitespace-nowrap">
+              <span className="font-semibold text-[16px] leading-[1.4] text-neutral-900 flex-1">
                 {destinationName}
               </span>
-              <div className="flex items-center gap-[16px]">
+              <div className="flex flex-col items-end shrink-0">
                 <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
                   {navState === 'arrived'
                     ? t('navigation.youHaveArrived')
                     : t('navigation.arriving', { time: route?.arrivalTime })}
                 </span>
                 {navState !== 'arrived' && (
-                  <>
-                    <div className="w-px h-[10px] bg-neutral-200" />
-                    <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
-                      {t('navigation.kmLeft', { km: route?.distanceKm })}
-                    </span>
-                  </>
+                  <span className="font-normal text-[14px] leading-[1.5] text-neutral-700 whitespace-nowrap">
+                    {t('navigation.kmLeft', { km: route?.distanceKm })}
+                  </span>
                 )}
               </div>
             </div>
