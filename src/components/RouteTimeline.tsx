@@ -1,5 +1,5 @@
 import React from 'react'
-import { Bus, TramFront, Train, CarTaxiFront, Car } from 'lucide-react'
+import { Bus, TramFront, Train, CarTaxiFront, Car, type LucideIcon } from 'lucide-react'
 import WheelchairManual   from '../assets/illustrations/wheelchair-manual.svg?react'
 import WheelchairElectric from '../assets/illustrations/wheelchair-electric.svg?react'
 import Cane               from '../assets/illustrations/cane.svg?react'
@@ -50,7 +50,7 @@ const mobilityIllustrations: Record<MobilityAid, React.FC<React.SVGProps<SVGSVGE
   'none':                NoWheelchair,
 }
 
-const transportIcons: Record<TransportSegment['mode'], React.ComponentType<{ size: number; strokeWidth: number; className?: string }>> = {
+const transportIcons: Record<TransportSegment['mode'], LucideIcon> = {
   bus:   Bus,
   tram:  TramFront,
   metro: Train,
