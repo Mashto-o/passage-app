@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button, NavigationCard, BarrierCheckModal } from './index'
+import { Button, NavigationCard } from './index'
 import type { Route } from './RoutePlanningSheet'
-import kerbImage from '../assets/images/kerb.png'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -32,7 +31,6 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
   const [displayedNavState, setDisplayedNavState] = useState<NavState>('default')
   const [cardVisible,       setCardVisible]       = useState(true)
   const [panelVisible,      setPanelVisible]      = useState(true)
-  const [barrierCheckOpen,  setBarrierCheckOpen]  = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Measure bottom panel height and report it to parent
@@ -58,14 +56,12 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
     }
     setNavState('default')
 
-    const timer1       = setTimeout(() => { setNavState('noHazard'); onNavStateChange('noHazard') }, 7500)
-    const timer2       = setTimeout(() => { setNavState('arrived');  onNavStateChange('arrived')  }, 13500)
-    const timerBarrier = setTimeout(() => setBarrierCheckOpen(true), 4000)
+    const timer1 = setTimeout(() => { setNavState('noHazard'); onNavStateChange('noHazard') }, 7500)
+    const timer2 = setTimeout(() => { setNavState('arrived');  onNavStateChange('arrived')  }, 13500)
 
     return () => {
       clearTimeout(timer1)
       clearTimeout(timer2)
-      clearTimeout(timerBarrier)
     }
   }, [isOpen])
 
@@ -171,12 +167,12 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-[24px] items-center w-full">
+            <div className="flex gap-md w-full">
               <Button
                 variant="secondary"
-                label={t('navigation.reportDifficulty')}
-                className="w-[165px]"
-                onClick={() => console.log('Report difficulty')}
+                label={t('navigation.reportBarrier')}
+                className="flex-1"
+                onClick={() => console.log('Report barrier')}
               />
               <Button
                 variant="destructive"
@@ -189,16 +185,6 @@ export const ActiveNavigationSheet: React.FC<ActiveNavigationSheetProps> = ({
           </div>
         </div>
       )}
-
-      {/* Barrier check modal — z-110, above the navigation sheet */}
-      <BarrierCheckModal
-        isOpen={barrierCheckOpen}
-        barrierLabel={t('onboarding3.barriers.kerb')}
-        barrierImageSrc={kerbImage}
-        onYes={() => { console.log('Barrier: Yes, still there'); setBarrierCheckOpen(false) }}
-        onNo={() => { console.log('Barrier: No, it\'s gone'); setBarrierCheckOpen(false) }}
-        onSkip={() => { console.log('Barrier: Skip'); setBarrierCheckOpen(false) }}
-      />
     </>
   )
 }

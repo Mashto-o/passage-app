@@ -249,7 +249,15 @@ export const MapScreen: React.FC = () => {
   const [routeDetailSnapTop, setRouteDetailSnapTop] = useState<number | null>(null)
   const [activeNavigationOpen, setActiveNavigationOpen] = useState(false)
   const [navPanelHeight, setNavPanelHeight] = useState(0)
-  const [routeEndedAt, setRouteEndedAt] = useState<number | null>(null)
+  const [routeEndedAt, setRouteEndedAt] = useState<{
+    ts:            number
+    placeId?:      string
+    placeName?:    string
+    placeNameUk?:  string
+    address?:      string
+    addressUk?:    string
+    destinationName: string
+  } | null>(null)
   const [routeMarkers, setRouteMarkers] = useState<{
     start: [number, number] | null
     end: [number, number] | null
@@ -508,8 +516,14 @@ export const MapScreen: React.FC = () => {
       setSelectedRoute(null)
       navigate('/route-complete', {
         state: {
-          distanceKm: selectedRoute?.distanceKm,
-          durationMin: selectedRoute?.durationMin,
+          distanceKm:      selectedRoute?.distanceKm,
+          durationMin:     selectedRoute?.durationMin,
+          placeId:         routeEndedAt.placeId,
+          placeName:       routeEndedAt.placeName,
+          placeNameUk:     routeEndedAt.placeNameUk,
+          address:         routeEndedAt.address,
+          addressUk:       routeEndedAt.addressUk,
+          destinationName: routeEndedAt.destinationName,
         },
       })
       setRouteEndedAt(null)
@@ -1032,12 +1046,25 @@ export const MapScreen: React.FC = () => {
         onClose={() => setActiveNavigationOpen(false)}
         onNavStateChange={(state) => {
           if (state === 'arrived') {
+            const arrivedPlaceId      = selectedPlace?.id
+            const arrivedPlaceName    = selectedPlace?.name
+            const arrivedPlaceNameUk  = selectedPlace?.nameUk
+            const arrivedAddress      = selectedPlace?.address
+            const arrivedAddressUk    = selectedPlace?.addressUk
             setRouteDetailOpen(false)
             setRoutePlanningOpen(false)
             setPlaceDetailOpen(false)
             setSelectedPlace(null)
             closeSheet()
-            setRouteEndedAt(Date.now())
+            setRouteEndedAt({
+              ts:            Date.now(),
+              placeId:       arrivedPlaceId,
+              placeName:     arrivedPlaceName,
+              placeNameUk:   arrivedPlaceNameUk,
+              address:       arrivedAddress,
+              addressUk:     arrivedAddressUk,
+              destinationName: routeDestinationName,
+            })
           }
         }}
         onPanelHeightChange={setNavPanelHeight}

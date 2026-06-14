@@ -1,6 +1,5 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Chip } from './Chip'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -13,34 +12,25 @@ export interface BestMatchCardProps {
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export const BestMatchCard: React.FC<BestMatchCardProps> = ({ tags, children }) => {
+export const BestMatchCard: React.FC<BestMatchCardProps> = ({ children }) => {
   const { t } = useTranslation()
   return (
-  <div className="bg-success-100 border border-success-500 rounded-[24px] p-md flex flex-col gap-md">
+    <div className="relative">
 
-    {/* "Best match" badge */}
-    <div className="self-start">
+      {/* "Recommended" badge — overlaps top border */}
       <span className={[
-        'bg-success-500 text-neutral-0 rounded-full',
-        'px-sm py-2xs',
-        'text-caption-md',
+        'absolute top-0 left-[24px] -translate-y-1/2',
+        'bg-success-500 text-neutral-0 font-semibold text-[14px]',
+        'px-md py-[6px] rounded-full',
       ].join(' ')}>
         {t('bestMatch.badge')}
       </span>
-    </div>
 
-    {/* Route card (RouteCard / StandardRouteCard — preserves interactive behaviour) */}
-    {children}
-
-    {/* Tags row */}
-    {tags.length > 0 && (
-      <div className="flex flex-wrap gap-xs">
-        {tags.map(tag => (
-          <Chip key={tag} label={tag} variant="success" size="sm" />
-        ))}
+      {/* Card */}
+      <div className="bg-success-100 border-2 border-success-500 rounded-[32px] pt-[24px] px-md pb-md">
+        {children}
       </div>
-    )}
 
-  </div>
+    </div>
   )
 }

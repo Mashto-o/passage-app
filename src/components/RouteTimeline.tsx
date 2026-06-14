@@ -41,7 +41,7 @@ export interface RouteTimelineProps {
 
 // ── Icon maps ──────────────────────────────────────────────────────────────
 
-const mobilityIllustrations: Record<MobilityAid, React.ComponentType<{ width: number; height: number; className?: string }>> = {
+const mobilityIllustrations: Record<MobilityAid, React.FC<React.SVGProps<SVGSVGElement>>> = {
   'wheelchair-manual':   WheelchairManual,
   'wheelchair-electric': WheelchairElectric,
   'cane':                Cane,
@@ -97,13 +97,13 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
         return (
           <div
             key={i}
-            className="flex items-center justify-center gap-[8px] bg-primary-500 rounded-[48px] px-[12px] py-[6px] h-full"
+            className="flex items-center justify-center gap-[8px] bg-primary-200 rounded-[48px] px-[12px] py-[6px] h-full"
             style={{ flexGrow }}
           >
             <AccessibilityBadge variant={segment.accessibility} size="sm" />
-            <TransportIcon size={20} strokeWidth={1.5} className="text-neutral-0 shrink-0" />
+            <TransportIcon size={20} strokeWidth={1.5} className="text-primary-500 shrink-0" />
             {segment.routeNumber && (
-              <span className="text-body-sb text-neutral-0 whitespace-nowrap">
+              <span className="text-body-sb text-primary-500 whitespace-nowrap">
                 {segment.routeNumber}
               </span>
             )}

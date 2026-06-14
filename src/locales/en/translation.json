@@ -314,6 +314,7 @@
     "arriving": "Arriving {{time}}",
     "kmLeft": "{{km}} km left",
     "reportDifficulty": "Report Difficulty",
+    "reportBarrier": "Report barrier",
     "endRoute": "End route"
   },
   "barrierCheck": {
@@ -325,17 +326,9 @@
   },
   "routeComplete": {
     "title": "Route complete!",
-    "howWasRoute": "How was the route",
-    "barriers": "Barriers",
-    "barriersQuestion": "Were the barriers we warned you about accurate?",
-    "optional": "Optional — but helpful to others",
-    "addComment": "Add a comment",
-    "commentPlaceholder": "Anything others should know before they go?...",
-    "or": "OR",
-    "voiceComment": "Leave a voice comment. Our AI assistant will sum it up for you.",
-    "submit": "Submit",
-    "mainBarrierChip": "The main barrier was...",
-    "helpfulForChip": "Helpful for users who..."
+    "leaveReview": "Leave a review for {{name}}",
+    "reportProblem": "Report a problem with this route",
+    "backToMap": "Back to map"
   },
   "reviewScreen": {
     "aiBanner": "AI-assisted review — Passage analyzes your photos to pre-fill accessibility details. Please check and correct anything that's wrong.",
@@ -344,6 +337,10 @@
     "mainBarrierChip": "The main barrier was...",
     "helpfulForChip": "Helpful for users who...",
     "postReview": "Post review",
+    "skipSection": "Skip this section",
+    "fillManually": "Fill in manually",
+    "resetSection": "Reset section",
+    "skipped": "Skipped",
     "uploadPhotoFor": "Upload photo for {{section}} accessibility",
     "defaultTitle": "Leave a review",
     "sections": {

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Sparkles, Check, ChevronDown } from 'lucide-react'
+import { Sparkles, Check, ChevronDown, RotateCcw } from 'lucide-react'
 import { AccessibilityCard } from './AccessibilityCard'
 import { MediaInputButton } from './MediaInputButton'
 import { ToggleButton } from './ToggleButton'
@@ -18,14 +18,22 @@ export interface ReviewSectionProps {
   icon: React.ReactNode
   label: string
   inputLabel?: string
+  skipLabel?: string
+  fillManuallyLabel?: string
+  resetSectionLabel?: string
+  skippedLabel?: string
   photoSrc: string | null
-  status: 'empty' | 'analyzing' | 'done'
+  status: 'empty' | 'analyzing' | 'done' | 'skipped'
   accessibilityValue: 'accessible' | 'partiallyAccessible' | 'inaccessible' | null
   aiSetAccessibility: boolean
   onAccessibilityChange: (value: 'accessible' | 'partiallyAccessible' | 'inaccessible') => void
   onPhotoSelect: (file: File) => void
+  onFillManually?: () => void
+  onSkip?: () => void
+  onReset?: () => void
   questions: ReviewSectionQuestion[]
   onQuestionChange: (id: string, value: 'yes' | 'no') => void
+  isComplete?: boolean
   isOpen: boolean
   onToggle: () => void
 }
@@ -36,14 +44,22 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   icon,
   label,
   inputLabel,
+  skipLabel,
+  fillManuallyLabel,
+  resetSectionLabel,
+  skippedLabel,
   photoSrc,
   status,
   accessibilityValue,
   aiSetAccessibility,
   onAccessibilityChange,
   onPhotoSelect,
+  onFillManually,
+  onSkip,
+  onReset,
   questions,
   onQuestionChange,
+  isComplete = false,
   isOpen,
   onToggle,
 }) => {
@@ -61,15 +77,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
     <div className="flex flex-col">
 
       {/* ── Header row ──────────────────────────────────────── */}
-      <button
-        type="button"
-        onClick={status === 'done' ? onToggle : undefined}
-        className={[
-          'flex items-center justify-between w-full',
-          'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-          status === 'done' ? 'cursor-pointer' : 'cursor-default',
-        ].join(' ')}
-      >
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-xs">
           <span className="text-neutral-700">{icon}</span>
           <span className="text-caption-md uppercase tracking-caption-md text-neutral-700">
@@ -77,24 +85,50 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           </span>
         </div>
 
-        {status === 'done' && (
-          <div className="flex items-center gap-xs">
-            <Check size={16} strokeWidth={2} className="text-success-500" />
-            <ChevronDown
-              size={16}
-              strokeWidth={1.5}
-              className={[
-                'text-neutral-500 transition-transform duration-300',
-                isOpen ? 'rotate-180' : '',
-              ].join(' ')}
-            />
-          </div>
-        )}
-      </button>
+        <div className="flex items-center gap-xs">
+          {/* Reset button — shown when done or skipped */}
+          {(status === 'done' || status === 'skipped') && onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              aria-label={resetSectionLabel}
+              className="text-neutral-400 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded-sm"
+            >
+              <RotateCcw size={16} strokeWidth={1.5} />
+            </button>
+          )}
+
+          {/* Toggle button — done state */}
+          {status === 'done' && (
+            <button
+              type="button"
+              onClick={onToggle}
+              className="flex items-center gap-xs focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded-sm"
+            >
+              {isComplete && <Check size={16} strokeWidth={2} className="text-success-500" />}
+              <ChevronDown
+                size={16}
+                strokeWidth={1.5}
+                className={[
+                  'text-neutral-500 transition-transform duration-300',
+                  isOpen ? 'rotate-180' : '',
+                ].join(' ')}
+              />
+            </button>
+          )}
+
+          {/* Skipped label */}
+          {status === 'skipped' && (
+            <span className="text-caption-md text-neutral-400">
+              {skippedLabel}
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* ── Empty state ─────────────────────────────────────── */}
       {status === 'empty' && (
-        <div className="mt-md">
+        <div className="mt-md flex flex-col gap-sm">
           <input
             type="file"
             accept="image/*"
@@ -107,6 +141,37 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
             variant="camera"
             onPress={() => fileInputRef.current?.click()}
           />
+          {(onFillManually || onSkip) && (
+            <div className="flex items-center justify-between">
+              {onFillManually && (
+                <button
+                  type="button"
+                  onClick={onFillManually}
+                  className={[
+                    'border border-neutral-300 rounded-full px-md py-xs',
+                    'text-neutral-900 text-body-sm',
+                    'transition-colors duration-200',
+                    'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
+                  ].join(' ')}
+                >
+                  {fillManuallyLabel}
+                </button>
+              )}
+              {onSkip && (
+                <button
+                  type="button"
+                  onClick={onSkip}
+                  className={[
+                    'text-neutral-500 text-body-sm',
+                    'transition-colors duration-200',
+                    'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded-sm',
+                  ].join(' ')}
+                >
+                  {skipLabel}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 

@@ -32,10 +32,10 @@ type RouteDetailSheetProps = {
 
 function getTransportIcon(type: string) {
   switch (type) {
-    case 'bus':   return <Bus      size={16} strokeWidth={1.5} className="text-neutral-0" />
-    case 'tram':  return <TramFront size={16} strokeWidth={1.5} className="text-neutral-0" />
-    case 'metro': return <Train    size={16} strokeWidth={1.5} className="text-neutral-0" />
-    default:      return <Car      size={16} strokeWidth={1.5} className="text-neutral-0" />
+    case 'bus':   return <Bus      size={16} strokeWidth={1.5} className="text-primary-500" />
+    case 'tram':  return <TramFront size={16} strokeWidth={1.5} className="text-primary-500" />
+    case 'metro': return <Train    size={16} strokeWidth={1.5} className="text-primary-500" />
+    default:      return <Car      size={16} strokeWidth={1.5} className="text-primary-500" />
   }
 }
 
@@ -75,8 +75,8 @@ const StationRow: React.FC<StationRowProps> = ({ label, time, iconType, lineInfo
             <span className="font-normal text-[16px] leading-[1.5] text-neutral-900">{label}</span>
             <div className="flex items-center gap-[4px]">
               {lineInfo.line && (
-                <div className="bg-primary-500 px-[4px] py-[2px] rounded-[4px]">
-                  <span className="text-[12px] font-medium text-primary-100 tracking-[0.12px]">
+                <div className="bg-primary-200 px-[4px] py-[2px] rounded-[4px]">
+                  <span className="text-[12px] font-medium text-primary-500 tracking-[0.12px]">
                     {lineInfo.line}
                   </span>
                 </div>
@@ -303,7 +303,7 @@ export const RouteDetailSheet: React.FC<RouteDetailSheetProps> = ({
         items.push(
           <div key={nextKey()} className="flex gap-[0px]">
             {/* Left bar — transport icon only */}
-            <div className="w-[26px] shrink-0 bg-primary-500 rounded-[24px] flex flex-col items-center justify-center py-[48px]">
+            <div className="w-[26px] shrink-0 bg-primary-200 rounded-[24px] flex flex-col items-center justify-center py-[48px]">
               {getTransportIcon(seg.type)}
             </div>
             {/* Right content */}

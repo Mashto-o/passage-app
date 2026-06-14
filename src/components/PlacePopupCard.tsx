@@ -86,7 +86,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
           />
 
           {/* Info section */}
-          <div className="flex flex-col gap-xs pt-xs w-full">
+          <div className="flex flex-col gap-sm pt-xs w-full">
             <div className="flex items-center gap-xs">
               <AccessibilityBadge
                 variant={accessibilityVariant}
@@ -98,15 +98,14 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
                 label={t('map.accessiblePercent', { score: accessibilityScore })}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-heading-sm text-neutral-900 flex-1">{name}</span>
-              <span className="text-body-sb text-neutral-900">{distance}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-body-sm text-neutral-500 flex-1">{address}</span>
-              <span className="text-body-sm text-neutral-500">
-                {t('map.barriers', { count: barrierCount })}
-              </span>
+            <div className="flex flex-col gap-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-heading-sm text-neutral-900 flex-1">{name}</span>
+                <span className="text-body-sb text-neutral-900">{distance}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-body-sm text-neutral-500 flex-1">{address}</span>
+              </div>
             </div>
           </div>
         </button>

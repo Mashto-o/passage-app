@@ -6,6 +6,8 @@ import {
   Button, SortControl, SortSheet, TransportSwitcher, AccessibilityBadge,
   BestMatchCard,
 } from './index'
+import { RouteTimeline } from './RouteTimeline'
+import type { RouteSegment as TimelineSegment, MobilityAid } from './RouteTimeline'
 import { useOnboarding } from '../context/OnboardingContext'
 import { getBestMatch } from '../utils/accessibilityMatch'
 
@@ -564,9 +566,15 @@ const TimeRow: React.FC<{ route: Route }> = ({ route }) => {
   return (
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">
-        {formatDuration(route.durationMin, i18n.language)}
-      </span>
+      <div className="flex items-center gap-[6px]">
+        <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">
+          {formatDuration(route.durationMin, i18n.language)}
+        </span>
+        <span className="font-normal text-[14px] leading-[1.4] text-neutral-300">|</span>
+        <span className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
+        </span>
+      </div>
       <span className="font-semibold text-[14px] leading-[1.4] text-neutral-900">{route.arrivalTime}</span>
     </div>
   )
@@ -587,6 +595,29 @@ function mergeConsecutiveWalkSegments(segments: RouteSegment[]): RouteSegment[] 
     }
   }
   return merged
+}
+
+function adaptSegments(segments: Route['segments'], forceAccessible = false): TimelineSegment[] {
+  const mapped: TimelineSegment[] = []
+  for (const seg of segments) {
+    if (seg.type === 'walk') {
+      const last = mapped[mapped.length - 1]
+      if (last?.type === 'walking') {
+        last.durationMinutes += seg.durationMin
+      } else {
+        mapped.push({ type: 'walking', durationMinutes: seg.durationMin })
+      }
+    } else {
+      mapped.push({
+        type: 'transport',
+        mode: seg.type as 'bus' | 'tram' | 'metro' | 'car',
+        routeNumber: seg.line,
+        accessibility: forceAccessible ? 'accessible' : seg.accessible === true ? 'accessible' : seg.accessible === false ? 'inaccessible' : 'unknown',
+        durationMinutes: seg.durationMin,
+      })
+    }
+  }
+  return mapped
 }
 
 function SegmentTimeline({ route, isCarTab }: { route: Route; isCarTab: boolean }) {
@@ -666,7 +697,7 @@ function SegmentTimeline({ route, isCarTab }: { route: Route; isCarTab: boolean 
 
 // ── Transit / walking card ─────────────────────────────────────────────────
 
-const RouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => (
+const RouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void; mobilityAid: MobilityAid }> = ({ route, onSelect, mobilityAid }) => (
   <button
     type="button"
     onClick={() => onSelect(route)}
@@ -677,87 +708,72 @@ const RouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
       'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
     ].join(' ')}
   >
-    <BadgeRow route={route} />
     <TimeRow route={route} />
-    <SegmentTimeline route={route} isCarTab={false} />
+    <RouteTimeline segments={adaptSegments(route.segments)} mobilityAid={mobilityAid} />
   </button>
 )
 
 // ── Car tab — own car card ─────────────────────────────────────────────────
 
-const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
-  const { t, i18n } = useTranslation()
+const StandardRouteCard: React.FC<{ route: Route; onSelect: (r: Route) => void; mobilityAid: MobilityAid }> = ({ route, onSelect, mobilityAid }) => {
+  const { i18n } = useTranslation()
   return (
   <button
     type="button"
     onClick={() => onSelect(route)}
     className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0 w-full text-left transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
   >
-    {/* Badge row */}
-    <div className="flex items-center gap-[10px]">
-      <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
-        <span className="text-[12px] font-medium text-primary-700 tracking-[0.12px]">
-          {formatDistance(route.distanceKm * 1000, i18n.language)}
-        </span>
-      </div>
-      {route.barrierCount > 0 && (
-        <div className="flex items-center gap-[8px] bg-warning-100 px-[8px] py-[4px] rounded-[24px]">
-          <Construction size={16} strokeWidth={1.5} className="text-warning-500" />
-          <span className="text-[12px] font-medium text-warning-500 tracking-[0.12px]">
-            {t('map.barriers', { count: route.barrierCount })}
-          </span>
-        </div>
-      )}
-    </div>
-
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-        {formatDuration(route.durationMin, i18n.language)}
-      </span>
+      <div className="flex items-center gap-[6px]">
+        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+          {formatDuration(route.durationMin, i18n.language)}
+        </span>
+        <span className="font-normal text-[14px] text-neutral-300">|</span>
+        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
+        </span>
+      </div>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
     {/* Timeline */}
-    <SegmentTimeline route={route} isCarTab={true} />
+    <RouteTimeline segments={adaptSegments(route.segments)} mobilityAid={mobilityAid} />
   </button>
   )
 }
 
 // ── Car tab — Uklon card ───────────────────────────────────────────────────
 
-const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
+const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void; mobilityAid: MobilityAid }> = ({ route, onSelect, mobilityAid }) => {
   const { t, i18n } = useTranslation()
   return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
-    {/* Top row: distance badge left, Uklon logo right */}
-    <div className="flex items-center justify-between">
-      <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
-        <span className="text-[12px] font-medium text-primary-700 tracking-[0.12px]">
-          {formatDistance(route.distanceKm * 1000, i18n.language)}
-        </span>
-      </div>
-      <img
-        src="/src/assets/icons/Uklon_Logo_2018.png"
-        alt={t('routePlanning.uklonAlt')}
-        className="h-[16px] object-contain"
-      />
-    </div>
+    {/* Logo */}
+    <img
+      src="/src/assets/icons/Uklon_Logo_2018.png"
+      alt={t('routePlanning.uklonAlt')}
+      className="h-[16px] object-contain self-start"
+    />
 
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-        {formatDuration(route.durationMin, i18n.language)}
-      </span>
+      <div className="flex items-center gap-[6px]">
+        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+          {formatDuration(route.durationMin, i18n.language)}
+        </span>
+        <span className="font-normal text-[14px] text-neutral-300">|</span>
+        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
+        </span>
+      </div>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
-    {/* Timeline — taxi icon centered */}
-    <div className="bg-primary-500 h-[36px] rounded-[48px] w-full flex items-center justify-center">
-      <CarTaxiFront size={20} strokeWidth={1.5} className="text-neutral-0" />
-    </div>
+    {/* Timeline */}
+    <RouteTimeline segments={adaptSegments(route.segments, true)} mobilityAid={mobilityAid} />
 
     {/* CTA */}
     <button
@@ -774,37 +790,34 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ r
 
 // ── Car tab — Social Taxi card ─────────────────────────────────────────────
 
-const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void }> = ({ route, onSelect }) => {
+const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void; mobilityAid: MobilityAid }> = ({ route, onSelect, mobilityAid }) => {
   const { t, i18n } = useTranslation()
   return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
-    {/* Top row: distance badge left, Social Taxi logo right */}
-    <div className="flex items-center justify-between">
-      <div className="bg-primary-100 px-[8px] py-[4px] rounded-[24px]">
-        <span className="text-[12px] font-medium text-primary-700 tracking-[0.12px]">
-          {formatDistance(route.distanceKm * 1000, i18n.language)}
-        </span>
-      </div>
-      <img
-        src="/src/assets/icons/SocialTaxi_Logo.png"
-        alt={t('routePlanning.socialTaxiAlt')}
-        className="h-[24px] object-contain"
-      />
-    </div>
+    {/* Logo */}
+    <img
+      src="/src/assets/icons/SocialTaxi_Logo.png"
+      alt={t('routePlanning.socialTaxiAlt')}
+      className="h-[24px] object-contain self-start"
+    />
 
     {/* Time row */}
     <div className="flex items-center justify-between">
       <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-        {formatDuration(route.durationMin, i18n.language)}
-      </span>
+      <div className="flex items-center gap-[6px]">
+        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+          {formatDuration(route.durationMin, i18n.language)}
+        </span>
+        <span className="font-normal text-[14px] text-neutral-300">|</span>
+        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
+          {formatDistance(route.distanceKm * 1000, i18n.language)}
+        </span>
+      </div>
       <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
     </div>
 
-    {/* Timeline — taxi icon centered */}
-    <div className="bg-primary-500 h-[36px] rounded-[48px] w-full flex items-center justify-center">
-      <CarTaxiFront size={20} strokeWidth={1.5} className="text-neutral-0" />
-    </div>
+    {/* Timeline */}
+    <RouteTimeline segments={adaptSegments(route.segments, true)} mobilityAid={mobilityAid} />
 
     {/* CTA */}
     <button
@@ -963,31 +976,17 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
 
           {/* Route cards */}
           {activeTab === 'car' ? (() => {
-            // Only standard car routes are highlighted — Uklon/Social Taxi open third-party flows,
-            // not RouteDetailSheet, so they can't act as a tappable "best match" card.
-            const standardRoutes  = CAR_ROUTES.filter(r => r.cardType === 'standard')
-            const match           = mobilityAid ? getBestMatch(standardRoutes, mobilityAid) : null
-            const regularStandard = sortRoutes(
-              match ? standardRoutes.filter(r => r.id !== match.route.id) : standardRoutes,
-              routeSortValue,
-            )
+            const ownCarRoute = CAR_ROUTES.filter(r => r.cardType === 'standard').slice(0, 1)
 
             return (
               <div className="flex flex-col gap-[24px]">
 
-                {/* Best match pinned card (standard routes only) */}
-                {match && (
-                  <BestMatchCard tags={match.tags}>
-                    <StandardRouteCard route={match.route} onSelect={onRouteSelect} />
-                  </BestMatchCard>
-                )}
-
-                {/* Own car section */}
-                {regularStandard.length > 0 && (
+                {/* Own car section — single result, no best-match badge */}
+                {ownCarRoute.length > 0 && (
                   <div className="flex flex-col gap-[16px]">
                     <SectionLabel>{t('routePlanning.ownCar')}</SectionLabel>
-                    {regularStandard.map(route => (
-                      <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} />
+                    {ownCarRoute.map(route => (
+                      <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
                     ))}
                   </div>
                 )}
@@ -997,8 +996,8 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                   <SectionLabel>{t('routePlanning.taxi')}</SectionLabel>
                   {CAR_ROUTES.filter(r => r.cardType !== 'standard').map(route =>
                     route.cardType === 'uklon'
-                      ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} />
-                      : <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} />
+                      ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                      : <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
                   )}
                 </div>
 
@@ -1018,13 +1017,13 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 {/* Best match pinned card */}
                 {match && (
                   <BestMatchCard tags={match.tags}>
-                    <RouteCard route={match.route} onSelect={onRouteSelect} />
+                    <RouteCard route={match.route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
                   </BestMatchCard>
                 )}
 
                 {/* Regular sorted list */}
                 {regularRoutes.map((route) => (
-                  <RouteCard key={route.id} route={route} onSelect={onRouteSelect} />
+                  <RouteCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
                 ))}
 
               </div>

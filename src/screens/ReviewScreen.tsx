@@ -13,7 +13,7 @@ type SectionId        = 'entrance' | 'toilet' | 'inside'
 type AccessibilityVal = 'accessible' | 'partiallyAccessible' | 'inaccessible' | null
 
 interface SectionState {
-  status:             'empty' | 'analyzing' | 'done'
+  status:             'empty' | 'analyzing' | 'done' | 'skipped'
   photoSrc:           string | null
   accessibilityValue: AccessibilityVal
   aiSetAccessibility: boolean
@@ -63,7 +63,18 @@ export const ReviewScreen: React.FC = () => {
   const [sections, setSections] = useState<Record<SectionId, SectionState>>(initSections)
   const [comment,  setComment]  = useState('')
 
-  const allDone = SECTION_IDS.every(id => sections[id].status === 'done')
+  const isSectionComplete = (id: SectionId): boolean => {
+    const s = sections[id]
+    return (
+      s.status === 'done' &&
+      s.accessibilityValue !== null &&
+      s.questions.every(q => q.value !== null)
+    )
+  }
+
+  const allDone =
+    SECTION_IDS.some(id => isSectionComplete(id)) &&
+    SECTION_IDS.every(id => isSectionComplete(id) || sections[id].status === 'skipped')
 
   // ── Helpers to resolve localized question labels ─────────────────
 
@@ -123,6 +134,35 @@ export const ReviewScreen: React.FC = () => {
     }))
   }
 
+  const handleReset = (id: SectionId) => {
+    setSections(prev => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        status:             'empty',
+        photoSrc:           null,
+        accessibilityValue: null,
+        aiSetAccessibility: false,
+        isOpen:             false,
+        questions:          prev[id].questions.map(q => ({ ...q, value: null, aiSet: false })),
+      },
+    }))
+  }
+
+  const handleFillManually = (id: SectionId) => {
+    setSections(prev => ({
+      ...prev,
+      [id]: { ...prev[id], status: 'done', isOpen: true },
+    }))
+  }
+
+  const handleSkip = (id: SectionId) => {
+    setSections(prev => ({
+      ...prev,
+      [id]: { ...prev[id], status: 'skipped', isOpen: false },
+    }))
+  }
+
   const handleToggle = (id: SectionId) => {
     setSections(prev => ({
       ...prev,
@@ -178,13 +218,21 @@ export const ReviewScreen: React.FC = () => {
                 key={id}
                 icon={sectionIcons[id]}
                 label={label}
+                isComplete={isSectionComplete(id)}
                 inputLabel={t('reviewScreen.uploadPhotoFor', { section: label.toLowerCase() })}
+                skipLabel={t('reviewScreen.skipSection')}
+                fillManuallyLabel={t('reviewScreen.fillManually')}
+                resetSectionLabel={t('reviewScreen.resetSection')}
+                skippedLabel={t('reviewScreen.skipped')}
                 photoSrc={s.photoSrc}
                 status={s.status}
                 accessibilityValue={s.accessibilityValue}
                 aiSetAccessibility={s.aiSetAccessibility}
                 onAccessibilityChange={v => handleAccessibilityChange(id, v)}
                 onPhotoSelect={file => handlePhotoSelect(id, file)}
+                onFillManually={() => handleFillManually(id)}
+                onSkip={() => handleSkip(id)}
+                onReset={() => handleReset(id)}
                 questions={getQuestions(id)}
                 onQuestionChange={(qId, v) => handleQuestionChange(id, qId, v)}
                 isOpen={s.isOpen}
