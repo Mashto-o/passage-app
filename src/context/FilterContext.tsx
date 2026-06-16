@@ -22,6 +22,7 @@ type FilterContextValue = {
   setAvoidLifts: (value: boolean) => void
   setHasCompanion: (value: boolean) => void
   handleReset: () => void
+  restoreFilterState: (state: FilterState) => void
 }
 
 const FilterContext = createContext<FilterContextValue | null>(null)
@@ -62,9 +63,17 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     })
   }
 
+  const restoreFilterState = (state: FilterState) => {
+    setFilterState({
+      ...state,
+      // Fresh Set — never share the caller's reference
+      accessibility: new Set(state.accessibility),
+    })
+  }
+
   return (
     <FilterContext.Provider
-      value={{ filterState, toggleAccessibility, setAvoidLifts, setHasCompanion, handleReset }}
+      value={{ filterState, toggleAccessibility, setAvoidLifts, setHasCompanion, handleReset, restoreFilterState }}
     >
       {children}
     </FilterContext.Provider>

@@ -118,7 +118,10 @@ Under "navBar" namespace:
 - PlacePopupCard: outer card is a plain div (no role/tabIndex); the
   photo+info area is wrapped in its own <button> (onCardClick); Save/
   Share/Build-a-route remain sibling buttons with stopPropagation —
-  avoids nested-interactive violations.
+  avoids nested-interactive violations. Barrier count removed from
+  the card. Spacing: 8px gap between the accessibility badge row and
+  the text rows below it; 4px gap between the name/distance row and
+  the address row.
 - File inputs (MediaInputButton) and CommentInput textarea have
   aria-label / associated labels (translated).
 - Verified clean via: eslint-plugin-jsx-a11y (eslint.a11y.config.js,
@@ -192,9 +195,15 @@ Under "navBar" namespace:
   verifiedAt → relative time bottom-right (translated, plural).
   onPress prop makes card tappable. Internal Divider.)
 - RouteTimeline (proportional horizontal segment bar.
-  bg-primary-100 base, transport=bg-primary-500 pills.
+  bg-primary-100 base, transport pills = bg-primary-200 with
+  text-primary-500 (was bg-primary-500).
   Width proportional to durationMin. mergeConsecutiveWalkSegments
-  applied before render to avoid duplicate walk icons.)
+  applied before render to avoid duplicate walk icons.
+  RoutePlanningSheet feeds this component via an adaptSegments()
+  adapter (in RoutePlanningSheet.tsx) that converts Route segments
+  into RouteTimeline's segment shape, merges consecutive walking
+  segments, and forces accessibility: 'accessible' for Uklon/
+  Social Taxi segments.)
 - NavigationCard (3 states: default/noHazard/arrived.
   ALL states use bg-neutral-0 border border-neutral-200 — no
   colour change between states.
@@ -207,7 +216,8 @@ Under "navBar" namespace:
   {{street}} interpolation).
   Slide animation on state change: slides out downward, updates
   content, slides in from above. transition-transform duration-300.)
-- BarrierCheckModal (modal overlay during active navigation.
+- BarrierCheckModal (no longer used in the live ActiveNavigationSheet
+  flow — kept as a component for the /dev showcase only.
   Props: isOpen, barrierLabel, barrierImageSrc, onYes, onNo, onSkip.
   z-[110] — above ActiveNavigationSheet.
   Full-screen dark overlay rgba(26,26,26,0.6).
@@ -256,12 +266,18 @@ Under "navBar" namespace:
   RouteDetailSheet when open. aria-hidden backdrop + Escape listener.
   Per active tab, BestMatchCard (see below) pinned above the sorted
   list if getBestMatch() returns a result; that route is excluded
-  from the regular list.)
-- BestMatchCard (src/components/BestMatchCard.tsx) — "Best match
-  for you" badge (bg-success-100 border border-success-500,
-  success-500 pill badge), wraps standard route card content +
-  tags row (Chips: "No barriers" / "Fewest barriers ({{count}})" /
-  "Accessible throughout" / "Fastest option", success-styled).
+  from the regular list.
+  Car tab — "Own car" section shows only 1 standard route card, no
+  BestMatchCard (best-match logic does not apply to driving). Uklon/
+  Social Taxi route segments are forced to accessibility:
+  'accessible' (private/booked transport, not subject to the same
+  accessibility variance as public transit).)
+- BestMatchCard (src/components/BestMatchCard.tsx) — card:
+  rounded-[32px], bg-success-100, border-2 border-success-500,
+  wraps standard route card content. "Best match for you" badge:
+  bg-success-500 white-text pill, absolute top-0 left-[24px]
+  -translate-y-1/2 (straddles the card's top edge). Tags row
+  (Chips) removed entirely.
   Computed via src/utils/accessibilityMatch.ts → getBestMatch(routes,
   mobilityAid): scores by route.barrierCount + mobilityAid sensitivity
   (manual/electric/stroller=high, cane/prosthesis=medium,
@@ -300,15 +316,18 @@ Under "navBar" namespace:
   Slide animation on navState change: card slides out down,
   content updates, slides back in from above (300ms).
   Bottom panel: bg-neutral-0 rounded-tl/tr-[48px], compact
-  non-scrolling. Shows destination, arrivalTime, distanceKm.
-  "Report Difficulty" (secondary Button, console.log) +
-  "End route" (danger Button, calls onClose).
+  non-scrolling. Shows destinationName (flex-1) + arrivalTime/
+  distanceKm stacked flex-col shrink-0 alongside it (divider
+  between the two removed).
+  "Report barrier" (secondary Button, console.log; renamed from
+  "Report Difficulty") + "End route" (danger Button, calls onClose).
   On arrival: bottom panel slides down and disappears
   (translate-y-full, duration-500). NavigationCard remains
   visible showing arrived state.
   Auto-advancing timers (halved): default 7.5s → noHazard
   13.5s → arrived.
-  BarrierCheckModal appears at 4s (hardcoded kerb photo).
+  BarrierCheckModal is no longer wired into this flow — the
+  component file is kept only for the /dev showcase.
   onNavStateChange called on every navState change.
   onPanelHeightChange: measures bottom panel height via
   ResizeObserver.
@@ -415,20 +434,23 @@ min-h-screen overflow-y-auto, gap-xl between sections.
 ## RouteCompleteScreen (/route-complete)
 Full-page scrollable screen, bg-neutral-50. Slide-up entrance
 animation (translate-y-full → translate-y-0, duration-500).
-Receives route stats via React Router location state:
-{ distanceKm, durationMin } (formatted via formatDistance/
+Receives via React Router location state: { distanceKm, durationMin,
+placeId, placeName, placeNameUk, address, addressUk,
+destinationName } (distance/duration formatted via formatDistance/
 formatDuration).
+All content centered (flex flex-col items-center, text-center).
+64px gap between the stats block and the button stack below it.
 Sections:
+- X close button, top-right → navigate('/map')
 - Header: BadgeCheck icon (bg-primary-100 rounded-[48px] p-[16px]),
   "Route complete!" h1 (display/md), distance · duration
-- HOW WAS THE ROUTE: 3 AccessibilityCard (single select, console.log)
-- BARRIERS: barrier label + ToggleButton Yes/No (console.log)
-- ADD A COMMENT: 2 Chips (text-accent-700 on bg-accent-100 for
-  sufficient contrast), CommentInput, OR label, MediaInputButton
-- Submit (primary) → navigate('/profile')
-- Skip (ghost) → navigate('/map')
-Section labels: caption/md (14px medium tracking-[0.56px] uppercase
-neutral/700). All gaps: xl (32px) between sections (was 2xl).
+- Buttons (stacked):
+  - "Leave a review for {{name}}" (primary, name=destinationName) →
+    navigate('/review', { state: { placeId, placeName, address } })
+  - "Report a problem with this route" (ghost) → console.log
+  - "Back to map" (plain text link) → navigate('/map')
+Ratings (AccessibilityCard), barrier ToggleButton, comment section,
+and the old Submit/Skip buttons have all been removed.
 
 ## OnboardingContext (src/context/OnboardingContext.tsx)
 Stores AND persists to localStorage:
@@ -446,7 +468,10 @@ ProfileScreen (mobilityAid display),
 AccessibilityPreferencesScreen (preference selections —
 context-backed, initialized from persisted values),
 RoutePlanningSheet (getBestMatch uses mobilityAid).
-Exported MobilityAid type is single source of truth.
+Exported MobilityAid type is single source of truth. A separate,
+narrower MobilityAid type is also exported from
+src/components/RouteTimeline.tsx — same options except it uses
+'none' in place of 'no-wheelchair'.
 
 ## ProfileScreen (/profile)
 Reads mobilityAid from useOnboarding(), renders matching illustration
@@ -490,22 +515,37 @@ Entry points:
 - 3 ReviewSection accordions (Entrance/Toilet/Inside — icons:
   door-width-100 [stroke-width fixed to 1.5 to match icon set],
   wc, lucide Sofa):
-  - status: 'empty' (MediaInputButton only) → 'analyzing' (photo
-    preview + pulsing Sparkles "Analyzing photo..." card, ~1600ms)
-    → 'done' (auto-opens; photo + 3 AccessibilityCard ratings +
-    Yes/No ToggleButton questions, AI-prefilled with Sparkles badges;
-    user can override any value, removing its badge)
+  - status: 'empty' | 'analyzing' | 'done' | 'skipped'.
+  - 'empty': MediaInputButton, plus a "Fill in manually" ghost
+    button (left) + "Skip section" plain text link (right).
+    "Fill in manually" → opens the section directly in 'done' state
+    with no photo and no AI prefill (user fills ratings/answers from
+    scratch). "Skip section" → status becomes 'skipped'.
+  - 'analyzing': photo preview + pulsing Sparkles
+    "Analyzing photo..." card, ~1600ms → auto-advances to 'done'.
+  - 'done' (auto-opens): photo (if any) + 3 AccessibilityCard
+    ratings + Yes/No ToggleButton questions. When reached via AI
+    photo flow, AI-prefilled with Sparkles badges (user can override
+    any value, removing its badge); when reached via "Fill in
+    manually", all fields start unset.
+  - isComplete (derived, not stored): rating selected AND all
+    toggle questions answered for that section.
   - Mock AI (src/utils/mockAI.ts → analyzePhoto(sectionId)): predicts
     accessibility rating; answers derived from rating — accessible→
     all yes, inaccessible→all no, partiallyAccessible→half yes/half no.
     Explicitly commented as a placeholder for a real vision-model call.
   - Entrance: 4 questions, Toilet/Inside: 3 questions each.
-  - Header row shows Check (success-500) + chevron once 'done'.
+  - Header row: Check (success-500) shows only when isComplete (not
+    merely status==='done'). When status==='skipped', shows a muted
+    "Skipped" label instead of the check icon. RotateCcw reset
+    button shown in header whenever status is 'done' or 'skipped'
+    (resets section back to 'empty').
 - Comment section: "ADD A COMMENT" + MessageCircle icon, 2 Chips,
   CommentInput (280 char, aria-label).
-- Submit "Post review": enabled only when all 3 sections
-  status==='done'; console.logs all state + comment, then
-  navigate(-1). All new submissions treated as isVerified:true.
+- Submit "Post review": enabled only when every section is either
+  isComplete or status==='skipped'; console.logs all state +
+  comment, then navigate(-1). All new submissions treated as
+  isVerified:true.
 - All strings + AI banner translated EN/UK (review namespace).
 
 ## Routing
@@ -611,7 +651,9 @@ travelling with a companion).
 
 ## filterPlaces (MapScreen)
 Applies to map markers AND list. Checks getAccessibilityVariant
-against filter.accessibility Set.
+against filter.accessibility Set. When filterState.avoidLifts ===
+true, places with isLiftDependent === true are additionally
+excluded from both map markers and the place list.
 
 ## MapScreen state overview
 searchQuery, searchActive, sortValue, sortSheetOpen,
@@ -672,7 +714,11 @@ When reviewMode=true:
 - Full-screen overlay (z-[10], bg-neutral-50) with "Leave a
   review" heading + back button (variant="back") renders
 - Back button onClick: setReviewMode(false) +
-  setSearchActive(false) + setSearchQuery('') + navigate(-1)
+  setSearchActive(false) + setSearchQuery('') +
+  navigate('/map', { replace: true }) (was navigate(-1))
+- reviewMode: true is passed through FilterScreen's navigation
+  state when entering it from this flow, and read back on return,
+  so filtering during review mode doesn't drop out of review mode.
 - Search results sorted by 'nearest' when query is empty
   (sortPlaces(searchResults, 'nearest'))
 - Result tap → navigate('/review', { state: { placeId,

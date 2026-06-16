@@ -5,6 +5,8 @@ import { Sparkles, MessageCircle, Sofa, Toilet } from 'lucide-react'
 import { Button, CommentInput, ReviewSection } from '../components'
 import type { ReviewSectionQuestion } from '../components'
 import { analyzePhoto } from '../utils/mockAI'
+import { PLACES } from '../screens/MapScreen'
+import { getPlaceFeatures } from '../utils/placeFeatures'
 import DoorWidth100 from '../assets/icons/door-width-100.svg?react'
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -23,8 +25,6 @@ interface SectionState {
 
 // ── Section config (keys only — labels resolved via t()) ───────────────
 
-const SECTION_IDS: SectionId[] = ['entrance', 'toilet', 'inside']
-
 const QUESTION_KEYS: Record<SectionId, string[]> = {
   entrance: ['q1', 'q2', 'q3', 'q4'],
   toilet:   ['q1', 'q2', 'q3'],
@@ -33,9 +33,9 @@ const QUESTION_KEYS: Record<SectionId, string[]> = {
 
 // ── Initial state ──────────────────────────────────────────────────────
 
-function initSections(): Record<SectionId, SectionState> {
+function initSections(ids: SectionId[]): Record<SectionId, SectionState> {
   const out = {} as Record<SectionId, SectionState>
-  for (const id of SECTION_IDS) {
+  for (const id of ids) {
     out[id] = {
       status:             'empty',
       photoSrc:           null,
@@ -60,7 +60,15 @@ export const ReviewScreen: React.FC = () => {
     address?:   string
   }
 
-  const [sections, setSections] = useState<Record<SectionId, SectionState>>(initSections)
+  const place = PLACES.find(p => p.id === (state.placeId ?? '')) ?? null
+  const features = place ? getPlaceFeatures(place) : null
+  const activeSectionIds: SectionId[] = (
+    ['entrance', 'toilet', 'inside'] as const
+  ).filter(key => !features || features[key])
+
+  const [sections, setSections] = useState<Record<SectionId, SectionState>>(
+    () => initSections(activeSectionIds)
+  )
   const [comment,  setComment]  = useState('')
 
   const isSectionComplete = (id: SectionId): boolean => {
@@ -73,8 +81,8 @@ export const ReviewScreen: React.FC = () => {
   }
 
   const allDone =
-    SECTION_IDS.some(id => isSectionComplete(id)) &&
-    SECTION_IDS.every(id => isSectionComplete(id) || sections[id].status === 'skipped')
+    activeSectionIds.some(id => isSectionComplete(id)) &&
+    activeSectionIds.every(id => isSectionComplete(id) || sections[id].status === 'skipped')
 
   // ── Helpers to resolve localized question labels ─────────────────
 
@@ -210,7 +218,7 @@ export const ReviewScreen: React.FC = () => {
 
         {/* ── Accordion sections ──────────────────────────────── */}
         <div className="flex flex-col gap-xl">
-          {SECTION_IDS.map(id => {
+          {activeSectionIds.map(id => {
             const s = sections[id]
             const label = t(`reviewScreen.sections.${id}.label`)
             return (

@@ -218,6 +218,8 @@
   "filter": {
     "title": "Фільтр",
     "reset": "Скинути",
+    "resetConfirm": "Фільтри скинуто",
+    "undo": "Скасувати",
     "placesSection": "Місця",
     "placesSubtitle": "Які місця ви хочете бачити?",
     "avoidLifts": "Уникати місць із ліфтом",

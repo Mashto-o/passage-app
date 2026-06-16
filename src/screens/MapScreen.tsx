@@ -22,19 +22,30 @@ import type { Route } from '../components'
 
 // ── Types & data ───────────────────────────────────────────────────────────
 
+export type PlaceCategory =
+  | 'shelter' | 'hospital' | 'restaurant' | 'landmark'
+  | 'supermarket' | 'park' | 'bank' | 'toilet' | 'pharmacy'
+
+export type PlaceFeatures = {
+  entrance: boolean
+  toilet: boolean
+  inside: boolean
+}
+
 export type Place = {
   id: string
   name: string
   nameUk: string
   address: string
   addressUk: string
-  category: 'hospital' | 'restaurant' | 'landmark' | 'shelter' | 'supermarket' | 'park' | 'bank' | 'toilet' | 'pharmacy'
+  category: PlaceCategory
   coordinates: [number, number]
   accessibilityScore: number
   barrierCount: number
   distanceM: number
   verifiedAt: Date
   isLiftDependent: boolean
+  featuresOverride?: Partial<PlaceFeatures>
 }
 
 export const PLACES: Place[] = [
@@ -46,12 +57,12 @@ export const PLACES: Place[] = [
   { id: 's5',  name: 'Shelter Obolon',                    nameUk: 'Укриття Оболонь',                       address: 'prosp. Obolonsky 1',              addressUk: 'просп. Оболонський 1',               category: 'shelter',     coordinates: [30.4978, 50.5012], accessibilityScore: 88, barrierCount: 0, distanceM: 3200, verifiedAt: new Date('2026-02-27T08:00:00'), isLiftDependent: false },
   { id: 's6',  name: 'Shelter Sviatoshyn',                nameUk: 'Укриття Святошин',                      address: 'vul. Peremohy 90',                addressUk: 'вул. Перемоги 90',                   category: 'shelter',     coordinates: [30.3912, 50.4567], accessibilityScore: 45, barrierCount: 4, distanceM: 4100, verifiedAt: new Date('2026-01-14T16:00:00'), isLiftDependent: false },
   // Hospitals
-  { id: 'h1',  name: 'Pharmacy Liky',                     nameUk: 'Аптека Ліки',                          address: 'vul. Khreschyatyk 22',            addressUk: 'вул. Хрещатик 22',                   category: 'hospital',    coordinates: [30.5238, 50.4494], accessibilityScore: 90, barrierCount: 0, distanceM: 300,  verifiedAt: new Date('2026-06-04T09:00:00'), isLiftDependent: false },
+  { id: 'h1',  name: 'Pharmacy Liky',                     nameUk: 'Аптека Ліки',                          address: 'vul. Khreschyatyk 22',            addressUk: 'вул. Хрещатик 22',                   category: 'pharmacy',    coordinates: [30.5238, 50.4494], accessibilityScore: 90, barrierCount: 0, distanceM: 300,  verifiedAt: new Date('2026-06-04T09:00:00'), isLiftDependent: false },
   { id: 'h2',  name: 'Oleksandrivska Hospital',           nameUk: 'Олександрівська лікарня',               address: 'bulv. Tarasa Shevchenka 17',      addressUk: 'бульв. Тараса Шевченка 17',          category: 'hospital',    coordinates: [30.5106, 50.4478], accessibilityScore: 55, barrierCount: 4, distanceM: 1100, verifiedAt: new Date('2026-03-18T11:00:00'), isLiftDependent: true  },
   { id: 'h3',  name: 'Kyiv City Clinical Hospital 1',     nameUk: 'Київська міська клінічна лікарня №1',   address: 'vul. Heroyiv Dnipra 37',          addressUk: 'вул. Героїв Дніпра 37',              category: 'hospital',    coordinates: [30.4889, 50.5023], accessibilityScore: 62, barrierCount: 3, distanceM: 3500, verifiedAt: new Date('2026-05-05T11:00:00'), isLiftDependent: true  },
-  { id: 'h4',  name: 'Pharmacy 911',                      nameUk: 'Аптека 911',                            address: 'vul. Baseyna 12',                 addressUk: 'вул. Басейна 12',                    category: 'hospital',    coordinates: [30.5201, 50.4445], accessibilityScore: 85, barrierCount: 1, distanceM: 800,  verifiedAt: new Date('2026-05-29T14:00:00'), isLiftDependent: false },
+  { id: 'h4',  name: 'Pharmacy 911',                      nameUk: 'Аптека 911',                            address: 'vul. Baseyna 12',                 addressUk: 'вул. Басейна 12',                    category: 'pharmacy',    coordinates: [30.5201, 50.4445], accessibilityScore: 85, barrierCount: 1, distanceM: 800,  verifiedAt: new Date('2026-05-29T14:00:00'), isLiftDependent: false },
   { id: 'h5',  name: 'Dobrobut Clinic',                   nameUk: 'Клініка Добробут',                      address: 'vul. Velyka Vasylkivska 55',      addressUk: 'вул. Велика Васильківська 55',       category: 'hospital',    coordinates: [30.5178, 50.4356], accessibilityScore: 91, barrierCount: 0, distanceM: 1600, verifiedAt: new Date('2026-04-30T10:00:00'), isLiftDependent: true  },
-  { id: 'h6',  name: 'Pharmacy D.S.',                     nameUk: 'Аптека Д.С.',                           address: 'prosp. Peremohy 12',              addressUk: 'просп. Перемоги 12',                 category: 'hospital',    coordinates: [30.4934, 50.4521], accessibilityScore: 70, barrierCount: 2, distanceM: 2000, verifiedAt: new Date('2026-01-14T16:00:00'), isLiftDependent: false },
+  { id: 'h6',  name: 'Pharmacy D.S.',                     nameUk: 'Аптека Д.С.',                           address: 'prosp. Peremohy 12',              addressUk: 'просп. Перемоги 12',                 category: 'pharmacy',    coordinates: [30.4934, 50.4521], accessibilityScore: 70, barrierCount: 2, distanceM: 2000, verifiedAt: new Date('2026-01-14T16:00:00'), isLiftDependent: false },
   // Restaurants / Cafés
   { id: 'r1',  name: 'Puzata Hata',                       nameUk: 'Пузата Хата',                          address: 'vul. Baseyna 5',                  addressUk: 'вул. Басейна 5',                     category: 'restaurant',  coordinates: [30.5189, 50.4432], accessibilityScore: 60, barrierCount: 3, distanceM: 800,  verifiedAt: new Date('2026-05-29T14:00:00'), isLiftDependent: false },
   { id: 'r2',  name: 'Veterano Pizza',                    nameUk: 'Ветерано Піца',                         address: 'vul. Horodetskoho 10',            addressUk: 'вул. Городецького 10',               category: 'restaurant',  coordinates: [30.5271, 50.4468], accessibilityScore: 75, barrierCount: 1, distanceM: 600,  verifiedAt: new Date('2026-06-03T10:00:00'), isLiftDependent: false },

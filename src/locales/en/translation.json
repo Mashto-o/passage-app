@@ -212,6 +212,8 @@
   "filter": {
     "title": "Filter",
     "reset": "Reset",
+    "resetConfirm": "Filters reset",
+    "undo": "Undo",
     "placesSection": "Places",
     "placesSubtitle": "Which places do you want to see?",
     "avoidLifts": "Avoid lift-dependent places",

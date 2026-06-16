@@ -5,11 +5,12 @@ import { formatDistance } from '../utils/formatUnits'
 import { getLocalizedField } from '../utils/localizedField'
 import {
   Bookmark, Share2, Zap, Construction,
-  DoorOpen, Sofa, ChevronUp, ChevronDown, ThumbsUp, ThumbsDown,
+  DoorOpen, Sofa, ChevronUp, ChevronDown,
   Toilet,
 } from 'lucide-react'
 import WheelchairManual from '../assets/illustrations/wheelchair-manual.svg?react'
 import { Place, getAccessibilityVariant } from '../screens/MapScreen'
+import { getPlaceFeatures } from '../utils/placeFeatures'
 import { getCategoryIcon } from '../utils/categoryIcon'
 import {
   AccessibilityBadge, StatusBadge, Button, Divider,
@@ -199,6 +200,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
   const a11yVariant  = place ? toA11yVariant(place.accessibilityScore)  : 'accessible'
   const scoreVariant = place ? toStatusVariant(place.accessibilityScore) : 'positive'
   const categoryIcon = place ? getCategoryIcon(place.category, 12) : undefined
+  const features     = place ? getPlaceFeatures(place) : null
 
   return (
     <>
@@ -332,83 +334,108 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                 </p>
               </div>
 
-              {/* Entrance section */}
-              <Section
-                icon={<DoorOpen size={16} strokeWidth={1.5} />}
-                label={t('placeDetail.sections.entrance')}
-                summary={t('placeDetail.sectionSummaries.entrance')}
-                isOpen={entranceOpen}
-                onToggle={() => setEntranceOpen(v => !v)}
-                lang={lang}
-              >
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.entrance.stepFreeTitle')}
-                  subtitle={t('placeDetail.factors.entrance.stepFreeSubtitle')} />
-                <Divider />
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.entrance.doorWidthTitle')}
-                  subtitle={t('placeDetail.factors.entrance.doorWidthSubtitle')} />
-                <Divider />
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.entrance.doorOpenTitle')}
-                  subtitle={t('placeDetail.factors.entrance.doorOpenSubtitle')} />
-                <Divider />
-                <FactorRow variant="partial"
-                  title={t('placeDetail.factors.entrance.rampSlopeTitle')}
-                  subtitle={t('placeDetail.factors.entrance.rampSlopeSubtitle')} />
-              </Section>
+              {/* Accordion sections — driven by category feature defaults + optional override */}
+              {(() => {
+                const sectionDefs = {
+                  entrance: {
+                    icon:     <DoorOpen size={16} strokeWidth={1.5} />,
+                    label:    t('placeDetail.sections.entrance'),
+                    summary:  t('placeDetail.sectionSummaries.entrance'),
+                    isOpen:   entranceOpen,
+                    onToggle: () => setEntranceOpen(v => !v),
+                    children: (
+                      <>
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.entrance.stepFreeTitle')}
+                          subtitle={t('placeDetail.factors.entrance.stepFreeSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.entrance.doorWidthTitle')}
+                          subtitle={t('placeDetail.factors.entrance.doorWidthSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.entrance.doorOpenTitle')}
+                          subtitle={t('placeDetail.factors.entrance.doorOpenSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="partial"
+                          title={t('placeDetail.factors.entrance.rampSlopeTitle')}
+                          subtitle={t('placeDetail.factors.entrance.rampSlopeSubtitle')} />
+                      </>
+                    ),
+                  },
+                  toilet: {
+                    icon:     <Toilet size={16} strokeWidth={1.5} />,
+                    label:    t('placeDetail.sections.toilet'),
+                    summary:  t('placeDetail.sectionSummaries.toilet'),
+                    isOpen:   toiletOpen,
+                    onToggle: () => setToiletOpen(v => !v),
+                    children: (
+                      <>
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.toilet.confirmedTitle')}
+                          subtitle={t('placeDetail.factors.toilet.confirmedSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.toilet.spaceTitle')}
+                          subtitle={t('placeDetail.factors.toilet.spaceSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="unknown"
+                          title={t('placeDetail.factors.toilet.grabBarsTitle')}
+                          subtitle={t('placeDetail.factors.toilet.grabBarsSubtitle')}
+                          showFirstToCheck
+                          firstToCheckLabel={t('placeDetail.beFirstToCheck')} />
+                      </>
+                    ),
+                  },
+                  inside: {
+                    icon:     <Sofa size={16} strokeWidth={1.5} />,
+                    label:    t('placeDetail.sections.inside'),
+                    summary:  t('placeDetail.sectionSummaries.inside'),
+                    isOpen:   insideOpen,
+                    onToggle: () => setInsideOpen(v => !v),
+                    children: (
+                      <>
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.inside.confirmedTitle')}
+                          subtitle={t('placeDetail.factors.inside.confirmedSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="accessible"
+                          title={t('placeDetail.factors.inside.spaceTitle')}
+                          subtitle={t('placeDetail.factors.inside.spaceSubtitle')} />
+                        <Divider />
+                        <FactorRow variant="unknown"
+                          title={t('placeDetail.factors.inside.grabBarsTitle')}
+                          subtitle={t('placeDetail.factors.inside.grabBarsSubtitle')}
+                          showFirstToCheck
+                          firstToCheckLabel={t('placeDetail.beFirstToCheck')} />
+                      </>
+                    ),
+                  },
+                } as const
 
-              <Divider />
+                const activeKeys = (
+                  ['entrance', 'toilet', 'inside'] as const
+                ).filter(key => features?.[key] && sectionDefs[key])
 
-              {/* Toilet section */}
-              <Section
-                icon={<Toilet size={16} strokeWidth={1.5} />}
-                label={t('placeDetail.sections.toilet')}
-                summary={t('placeDetail.sectionSummaries.toilet')}
-                isOpen={toiletOpen}
-                onToggle={() => setToiletOpen(v => !v)}
-                lang={lang}
-              >
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.toilet.confirmedTitle')}
-                  subtitle={t('placeDetail.factors.toilet.confirmedSubtitle')} />
-                <Divider />
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.toilet.spaceTitle')}
-                  subtitle={t('placeDetail.factors.toilet.spaceSubtitle')} />
-                <Divider />
-                <FactorRow variant="unknown"
-                  title={t('placeDetail.factors.toilet.grabBarsTitle')}
-                  subtitle={t('placeDetail.factors.toilet.grabBarsSubtitle')}
-                  showFirstToCheck
-                  firstToCheckLabel={t('placeDetail.beFirstToCheck')} />
-              </Section>
-
-              <Divider />
-
-              {/* Inside section */}
-              <Section
-                icon={<Sofa size={16} strokeWidth={1.5} />}
-                label={t('placeDetail.sections.inside')}
-                summary={t('placeDetail.sectionSummaries.inside')}
-                isOpen={insideOpen}
-                onToggle={() => setInsideOpen(v => !v)}
-                lang={lang}
-              >
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.inside.confirmedTitle')}
-                  subtitle={t('placeDetail.factors.inside.confirmedSubtitle')} />
-                <Divider />
-                <FactorRow variant="accessible"
-                  title={t('placeDetail.factors.inside.spaceTitle')}
-                  subtitle={t('placeDetail.factors.inside.spaceSubtitle')} />
-                <Divider />
-                <FactorRow variant="unknown"
-                  title={t('placeDetail.factors.inside.grabBarsTitle')}
-                  subtitle={t('placeDetail.factors.inside.grabBarsSubtitle')}
-                  showFirstToCheck
-                  firstToCheckLabel={t('placeDetail.beFirstToCheck')} />
-              </Section>
+                return activeKeys.map((key, idx) => {
+                  const def = sectionDefs[key]
+                  return (
+                    <React.Fragment key={key}>
+                      {idx > 0 && <Divider />}
+                      <Section
+                        icon={def.icon}
+                        label={def.label}
+                        summary={def.summary}
+                        isOpen={def.isOpen}
+                        onToggle={def.onToggle}
+                        lang={lang}
+                      >
+                        {def.children}
+                      </Section>
+                    </React.Fragment>
+                  )
+                })
+              })()}
 
               <Divider />
 
@@ -436,49 +463,19 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
         </div>
 
         {/* Feedback row — pinned to bottom, never scrolls */}
-        <div className="shrink-0 px-lg py-md flex gap-md items-center border-t border-neutral-200 bg-neutral-0">
-          <button
-            type="button"
-            onClick={() => place && console.log('Thumbs down', place.id)}
-            className={[
-              'w-[48px] h-[48px] shrink-0 rounded-full',
-              'bg-danger-100 border border-danger-500',
-              'flex items-center justify-center',
-              'transition-colors duration-200',
-              'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-            ].join(' ')}
-            aria-label={t('placeDetail.notHelpful')}
-          >
-            <ThumbsDown size={24} strokeWidth={1.5} className="text-danger-500" />
-          </button>
-          <button
-            type="button"
-            onClick={() => place && console.log('Thumbs up', place.id)}
-            className={[
-              'w-[48px] h-[48px] shrink-0 rounded-full',
-              'bg-success-100 border border-success-500',
-              'flex items-center justify-center',
-              'transition-colors duration-200',
-              'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none',
-            ].join(' ')}
-            aria-label={t('placeDetail.helpful')}
-          >
-            <ThumbsUp size={24} strokeWidth={1.5} className="text-success-500" />
-          </button>
-          <div className="flex-1">
-            <Button
-              variant="primary"
-              label={t('placeDetail.leaveReview')}
-              fullWidth
-              onClick={() => place && navigate('/review', {
+        <div className="shrink-0 px-lg py-md flex items-center border-t border-neutral-200 bg-neutral-0">
+          <Button
+            variant="primary"
+            label={t('placeDetail.leaveReview')}
+            fullWidth
+            onClick={() => place && navigate('/review', {
               state: {
                 placeId:   place.id,
                 placeName: getLocalizedField(place, 'name', lang),
                 address:   getLocalizedField(place, 'address', lang),
               },
             })}
-            />
-          </div>
+          />
         </div>
       </div>
     </>
