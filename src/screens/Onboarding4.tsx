@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button, PreferenceCard, OnboardingProgress } from '../components'
@@ -19,6 +19,8 @@ import SurfaceUneven      from '../assets/icons/surface-uneven.svg?react'
 import SurfaceSmooth      from '../assets/icons/surface-smooth.svg?react'
 
 export const Onboarding4: React.FC = () => {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   const navigate = useNavigate()
   const { t } = useTranslation()
   const {

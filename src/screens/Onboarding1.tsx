@@ -10,6 +10,8 @@ export const Onboarding1: React.FC = () => {
   const { t } = useTranslation()
   const [ready, setReady] = useState(false)
 
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   useEffect(() => {
     // Tiny rAF delay ensures the browser has painted the initial
     // hidden state before we trigger the transitions.

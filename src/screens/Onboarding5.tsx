@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Phone, Mail } from 'lucide-react'
@@ -7,6 +7,8 @@ import Logo from '../assets/icons/Logo.svg?react'
 import IllustrationOnboarding from '../assets/illustrations/IllustrationOnboarding.svg?react'
 
 export const Onboarding5: React.FC = () => {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   const navigate = useNavigate()
   const { t } = useTranslation()
 

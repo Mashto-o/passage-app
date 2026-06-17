@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button, PhotoCard, OnboardingProgress } from '../components'
@@ -30,6 +30,8 @@ const BARRIER_IDS = [
 ] as const
 
 export const Onboarding3: React.FC = () => {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [selected, setSelected] = useState<string[]>([])
