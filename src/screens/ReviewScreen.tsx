@@ -5,7 +5,7 @@ import { Sparkles, MessageCircle, Sofa, Toilet } from 'lucide-react'
 import { Button, CommentInput, ReviewSection } from '../components'
 import type { ReviewSectionQuestion } from '../components'
 import { analyzePhoto } from '../utils/mockAI'
-import { PLACES } from '../screens/MapScreen'
+import { PLACES } from '../data/places'
 import { getPlaceFeatures } from '../utils/placeFeatures'
 import DoorWidth100 from '../assets/icons/door-width-100.svg?react'
 

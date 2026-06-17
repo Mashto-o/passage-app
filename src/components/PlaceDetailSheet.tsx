@@ -92,11 +92,6 @@ const PLACE_REVIEWS: {
   },
 ]
 
-const SECTION_PHOTOS: { updatedAt: string; updatedAtUk: string; isVerified?: boolean }[] = [
-  { updatedAt: '1 week ago',  updatedAtUk: 'тиждень тому', isVerified: true },
-  { updatedAt: '2 weeks ago', updatedAtUk: '2 тижні тому' },
-  { updatedAt: '1 month ago', updatedAtUk: 'місяць тому'  },
-]
 
 const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggle, lang, children }) => (
   <div className="flex flex-col gap-md">
@@ -121,21 +116,8 @@ const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggl
     </button>
 
     {isOpen && (
-      <div className="flex flex-col gap-lg">
-        <div className="flex gap-lg overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {SECTION_PHOTOS.map((photo, i) => (
-            <PlacePhotoCard
-              key={i}
-              src={undefined}
-              updatedAt={getLocalizedField(photo, 'updatedAt', lang)}
-              isVerified={photo.isVerified}
-              className="w-[165px] shrink-0"
-            />
-          ))}
-        </div>
-        <div className="flex flex-col gap-sm">
-          {children}
-        </div>
+      <div className="flex flex-col gap-sm">
+        {children}
       </div>
     )}
   </div>
@@ -336,6 +318,27 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
 
               {/* Accordion sections — driven by category feature defaults + optional override */}
               {(() => {
+                const entrancePhotos = place.sections.entrance?.photos ?? []
+                const toiletPhotos   = place.sections.toilet?.photos   ?? []
+                const insidePhotos   = place.sections.inside?.photos   ?? []
+                const entranceStatus = place.sections.entrance?.accessibilityStatus
+                const toiletStatus   = place.sections.toilet?.accessibilityStatus
+                const insideStatus   = place.sections.inside?.accessibilityStatus
+
+                const renderPhoto = (photos: { src: string; isVerified: boolean; updatedAt: string; updatedAtUk: string }[]) => {
+                  const photo = photos[0]
+                  if (!photo) return null
+                  return (
+                    <div className="mb-md">
+                      <PlacePhotoCard
+                        src={photo.src}
+                        isVerified={photo.isVerified}
+                        updatedAt={getLocalizedField(photo, 'updatedAt', lang)}
+                      />
+                    </div>
+                  )
+                }
+
                 const sectionDefs = {
                   entrance: {
                     icon:     <DoorOpen size={16} strokeWidth={1.5} />,
@@ -345,7 +348,8 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     onToggle: () => setEntranceOpen(v => !v),
                     children: (
                       <>
-                        <FactorRow variant="accessible"
+                        {renderPhoto(entrancePhotos)}
+                        <FactorRow variant={entranceStatus === 'inaccessible' ? 'inaccessible' : 'accessible'}
                           title={t('placeDetail.factors.entrance.stepFreeTitle')}
                           subtitle={t('placeDetail.factors.entrance.stepFreeSubtitle')} />
                         <Divider />
@@ -371,7 +375,8 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     onToggle: () => setToiletOpen(v => !v),
                     children: (
                       <>
-                        <FactorRow variant="accessible"
+                        {renderPhoto(toiletPhotos)}
+                        <FactorRow variant={toiletStatus === 'inaccessible' ? 'inaccessible' : 'accessible'}
                           title={t('placeDetail.factors.toilet.confirmedTitle')}
                           subtitle={t('placeDetail.factors.toilet.confirmedSubtitle')} />
                         <Divider />
@@ -395,7 +400,8 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     onToggle: () => setInsideOpen(v => !v),
                     children: (
                       <>
-                        <FactorRow variant="accessible"
+                        {renderPhoto(insidePhotos)}
+                        <FactorRow variant={insideStatus === 'inaccessible' ? 'inaccessible' : 'accessible'}
                           title={t('placeDetail.factors.inside.confirmedTitle')}
                           subtitle={t('placeDetail.factors.inside.confirmedSubtitle')} />
                         <Divider />

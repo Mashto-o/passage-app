@@ -22,6 +22,7 @@ export interface PlacePopupCardProps {
   onBookmark?: () => void
   onShare?: () => void
   onCardClick?: () => void
+  coverPhoto?: string
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -41,6 +42,7 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
   onBookmark,
   onShare,
   onCardClick,
+  coverPhoto,
 }) => {
   const { t } = useTranslation()
 
@@ -79,11 +81,10 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
           className="text-left w-full bg-transparent flex flex-col gap-sm focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded-xl"
         >
           {/* Photo */}
-          <img
-            src="https://placehold.co/354x120"
-            alt={name}
-            className="h-[120px] w-full rounded-xl object-cover bg-neutral-100"
-          />
+          {coverPhoto
+            ? <img src={coverPhoto} alt={name} className="w-full h-[120px] object-cover rounded-[16px]" />
+            : <div className="w-full h-[120px] rounded-[16px] bg-neutral-200" />
+          }
 
           {/* Info section */}
           <div className="flex flex-col gap-sm pt-xs w-full">
