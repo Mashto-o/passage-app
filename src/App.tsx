@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { DevLanguageToggle } from './components'
 
 // ── Screens ────────────────────────────────────────────────────────────────
 import { Onboarding1 } from './screens/Onboarding1'
@@ -488,7 +487,7 @@ function App() {
         <Route path="/dev"            element={<DevShowcase />} />
         <Route path="*"               element={<Navigate to="/" replace />} />
       </Routes>
-      {import.meta.env.DEV && <DevLanguageToggle />}
+
     </>
   )
 }

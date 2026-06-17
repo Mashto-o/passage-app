@@ -14,8 +14,8 @@ i18n
       en: { translation: en },
       uk: { translation: uk },
     },
-    lng: savedLng ?? 'en',
-    fallbackLng: 'en',
+    lng: savedLng ?? 'uk',
+    fallbackLng: 'uk',
     interpolation: {
       escapeValue: false, // React already escapes values
     },

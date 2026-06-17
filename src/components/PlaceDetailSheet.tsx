@@ -9,6 +9,9 @@ import {
   Toilet,
 } from 'lucide-react'
 import WheelchairManual from '../assets/illustrations/wheelchair-manual.svg?react'
+import Avatar1 from '../assets/images/Discover/avatar1.png'
+import Avatar2 from '../assets/images/Discover/avatar2.png'
+import Avatar3 from '../assets/images/Discover/avatar3.png'
 import { Place, getAccessibilityVariant } from '../screens/MapScreen'
 import { getPlaceFeatures } from '../utils/placeFeatures'
 import { getCategoryIcon } from '../utils/categoryIcon'
@@ -70,12 +73,15 @@ interface SectionProps {
   children: React.ReactNode
 }
 
+const REVIEW_AVATARS = [Avatar1, Avatar2, Avatar3]
+
 const PLACE_REVIEWS: {
   authorName: string
   timestamp: string
   timestampUk: string
   reviewText: string
   isVerified?: boolean
+  avatarUrl?: string
 }[] = [
   {
     authorName:   'Name',
@@ -83,12 +89,14 @@ const PLACE_REVIEWS: {
     timestampUk:  'тиждень тому',
     reviewText:   'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
     isVerified:   true,
+    avatarUrl:    REVIEW_AVATARS[0],
   },
   {
     authorName:  'Name',
     timestamp:   '3 weeks ago',
     timestampUk: '3 тижні тому',
     reviewText:  'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
+    avatarUrl:   REVIEW_AVATARS[1],
   },
 ]
 
@@ -459,6 +467,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     timestamp={getLocalizedField(review, 'timestamp', lang)}
                     reviewText={review.reviewText}
                     isVerified={review.isVerified}
+                    avatarUrl={review.avatarUrl}
                   />
                 ))}
               </div>

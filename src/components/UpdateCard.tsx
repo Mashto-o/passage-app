@@ -11,6 +11,8 @@ export interface UpdateCardProps {
   description: string
   verifiedCount: number
   timeAgo: string
+  avatar1Src?: string
+  avatar2Src?: string
 }
 
 export const UpdateCard: React.FC<UpdateCardProps> = ({
@@ -20,6 +22,8 @@ export const UpdateCard: React.FC<UpdateCardProps> = ({
   description,
   verifiedCount,
   timeAgo,
+  avatar1Src,
+  avatar2Src,
 }) => {
   const { t } = useTranslation()
 
@@ -60,8 +64,14 @@ export const UpdateCard: React.FC<UpdateCardProps> = ({
       <div className="flex items-center gap-xs">
         {/* Two overlapping avatar circles */}
         <div className="flex items-center">
-          <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 z-10 relative" />
-          <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 -ml-[8px]" />
+          {avatar1Src
+            ? <img src={avatar1Src} className="size-[24px] rounded-full object-cover border-2 border-neutral-0 z-10 relative" />
+            : <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 z-10 relative" />
+          }
+          {avatar2Src
+            ? <img src={avatar2Src} className="size-[24px] rounded-full object-cover border-2 border-neutral-0 -ml-[8px]" />
+            : <div className="size-[24px] rounded-full bg-neutral-200 border-2 border-neutral-0 -ml-[8px]" />
+          }
         </div>
         <WheelchairManual
           width={16}

@@ -4,6 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { FilterChip, NavBar, UpdateCard, FriendActivityCard, EventCard } from '../components'
 import { getLocalizedField } from '../utils/localizedField'
 import type { MobilityAid } from '../context/OnboardingContext'
+import Avatar1 from '../assets/images/Discover/avatar1.png'
+import Avatar2 from '../assets/images/Discover/avatar2.png'
+import Avatar3 from '../assets/images/Discover/avatar3.png'
+import SupermarketCover from '../assets/images/places/supermarket_accessible_cover.jpg'
+import LandmarkCover from '../assets/images/places/landmark_accessible_cover.jpg'
 
 // ── Filter type ────────────────────────────────────────────────────
 
@@ -31,6 +36,7 @@ const UPDATES = [
     descriptionUk: 'Новий доступний вхід з автоматичними розсувними дверима та виділеним пандусом — тепер повністю доступно для візків.',
     verifiedCount: 12,
     timeAgoHours:  2,
+    imageSrc:      SupermarketCover,
   },
   {
     id: '2',
@@ -42,6 +48,7 @@ const UPDATES = [
     descriptionUk: 'Ліфт повністю відремонтовано та повернуто в експлуатацію після 3-місячного закриття.',
     verifiedCount: 8,
     timeAgoHours:  5,
+    imageSrc:      LandmarkCover,
   },
 ]
 
@@ -60,6 +67,7 @@ const FRIEND_ACTIVITY: {
   reviewText: string
   reviewTextUk: string
   isVerified?: boolean
+  avatarUrl?: string
 }[] = [
   {
     id: '1',
@@ -76,6 +84,7 @@ const FRIEND_ACTIVITY: {
     reviewText:   'Wide entrance, accessible restroom on the ground floor. Staff were very helpful!',
     reviewTextUk: 'Широкий вхід, доступний туалет на першому поверсі. Персонал був дуже привітний!',
     isVerified:   true,
+    avatarUrl:    Avatar1,
   },
   {
     id: '2',
@@ -91,6 +100,7 @@ const FRIEND_ACTIVITY: {
     accessibilityScore: 78,
     reviewText:   'Paths are smooth and wide. Some uneven sections near the fountain to watch out for.',
     reviewTextUk: 'Доріжки рівні та широкі. Є нерівні ділянки біля фонтану — слід бути обережним.',
+    avatarUrl:    Avatar2,
   },
 ]
 
@@ -171,6 +181,9 @@ export const DiscoverScreen: React.FC = () => {
                   description={getLocalizedField(item, 'description', lang)}
                   verifiedCount={item.verifiedCount}
                   timeAgo={t('placeListItem.hoursAgo', { count: item.timeAgoHours })}
+                  imageSrc={item.imageSrc}
+                  avatar1Src={Avatar1}
+                  avatar2Src={Avatar2}
                 />
               ))}
             </div>
@@ -198,6 +211,7 @@ export const DiscoverScreen: React.FC = () => {
                   accessibilityLabel={t('map.accessiblePercent', { score: item.accessibilityScore })}
                   reviewText={getLocalizedField(item, 'reviewText', lang)}
                   isVerified={item.isVerified}
+                  avatarUrl={item.avatarUrl}
                 />
               ))}
             </div>

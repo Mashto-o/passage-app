@@ -28,6 +28,7 @@ export interface FriendActivityCardProps {
   accessibilityLabel: string
   reviewText: string
   isVerified?: boolean
+  avatarUrl?: string
 }
 
 export const FriendActivityCard: React.FC<FriendActivityCardProps> = ({
@@ -39,6 +40,7 @@ export const FriendActivityCard: React.FC<FriendActivityCardProps> = ({
   accessibilityLabel,
   reviewText,
   isVerified = false,
+  avatarUrl,
 }) => {
   const mobilityIcon = MOBILITY_ICONS[mobilityAid] ?? (
     <WheelchairManual width={22} height={22} aria-hidden className="text-primary-500" />
@@ -49,8 +51,11 @@ export const FriendActivityCard: React.FC<FriendActivityCardProps> = ({
 
       {/* Friend row */}
       <div className="flex items-center gap-xs w-full">
-        {/* Avatar placeholder */}
-        <div className="size-[36px] rounded-full bg-neutral-200 shrink-0" />
+        {/* Avatar */}
+        {avatarUrl
+          ? <img src={avatarUrl} alt={friendName} className="size-[36px] rounded-full object-cover shrink-0" />
+          : <div className="size-[36px] rounded-full bg-neutral-200 shrink-0" />
+        }
         <span className="text-heading-sm text-neutral-900 whitespace-nowrap">{friendName}</span>
         <span className="shrink-0">{mobilityIcon}</span>
 
