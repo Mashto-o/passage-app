@@ -233,7 +233,7 @@ export const MapScreen: React.FC = () => {
         center: place.coordinates,
         zoom: 16,
         duration: 600,
-        offset: [0, -80],
+        offset: [0, -120],
       })
     }
 
