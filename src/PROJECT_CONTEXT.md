@@ -51,7 +51,7 @@ src/
 
 ## i18n (EN/UK)
 - react-i18next, initialized in src/i18n/index.ts. Reads
-  passage_language from localStorage, default 'en', fallback 'en'.
+  passage_language from localStorage, default 'uk', fallback 'uk'.
 - src/locales/en/translation.json and uk/translation.json — all
   user-visible strings keyed by screen/component namespace
   (common, onboarding1-5, map, searchBar, placePopup, placeDetail,
@@ -64,7 +64,9 @@ src/
   dev-only (import.meta.env.DEV), fixed bottom-[8px] right-[8px]
   z-[200] pill, cycles EN/UK via src/i18n/changeLanguage.ts
   (calls i18n.changeLanguage + persists to localStorage).
-  Rendered once in App.tsx, outside <Routes>.
+  Component file kept for reference but NOT rendered in App.tsx
+  (usage removed — default is now 'uk' so the toggle is not needed
+  for demos).
 - Plural forms (_one/_few/_many/_other) used for counts (reviews,
   friends, "X more to next level", "X going", time-ago).
 - Localized DATA content: Place gets nameUk/addressUk; Route
@@ -247,14 +249,19 @@ Under "navBar" namespace:
 - PlaceDetailSheet (overlay in MapScreen. Props: isOpen,
   place, onClose, onBuildRoute.
   top-[248px], z-[60/65]. Drag-to-close. Scroll-to-top.
-  Sticky feedback footer (thumbs/"Leave a review" →
-  navigate('/review', { state: { placeId, placeName, address } })).
-  Sections: Entrance/Toilet/Inside — collapsible, photo
-  cards (PlacePhotoCard, location prop removed, isVerified prop
-  added, updatedAt localized via *Uk suffix) + factor list.
+  Sticky footer: single full-width "Leave a review" primary Button
+  → navigate('/review', { state: { placeId, placeName, address } }).
+  Thumbs up/down removed.
+  Sections dynamic — derived via getPlaceFeatures(place): only the
+  sections whose key is true in PlaceFeatures render (e.g. pharmacy
+  shows Entrance+Inside, not Toilet). Each section's photos come
+  from place.sections[key].photos (real PlacePhoto[] from places.ts);
+  first FactorRow variant: 'inaccessible' if section status is
+  'inaccessible', else 'accessible'.
   Lift warning if isLiftDependent.
-  Review cards (ReviewCard): single-column layout, isVerified prop
-  added, timestamp localized via *Uk suffix.
+  Review cards (ReviewCard): single-column layout, isVerified +
+  avatarUrl (cycled from Avatar1/2/3 in PLACE_REVIEWS) props,
+  timestamp localized via *Uk suffix.
   No NavBar. aria-hidden backdrop + Escape listener.)
 - RoutePlanningSheet (overlay in MapScreen. Props: isOpen,
   destinationName, onClose, onRouteSelect, overrideTop.
@@ -335,11 +342,17 @@ Under "navBar" namespace:
   ActiveNavigationSheet panel when navigation is active.
   Timers cleared on close. navState resets to 'default' on open.)
 - UpdateCard, FriendActivityCard, EventCard (DiscoverScreen cards)
-  FriendActivityCard: isVerified?: boolean prop added. When true,
-  timeAgo in the friend row shows MapPinCheck icon (size 14,
-  text-primary-500) + timeAgo in text-primary-500. When false,
-  plain timeAgo in text-neutral-700. No separate badge row.
-  timeAgoUk field added to mock data, read via getLocalizedField.
+  FriendActivityCard: isVerified?: boolean prop — when true, timeAgo
+  shows MapPinCheck icon (size 14, text-primary-500) + timeAgo in
+  text-primary-500; when false, plain timeAgo in text-neutral-700.
+  avatarUrl?: string prop — renders <img> when defined, grey div
+  fallback when not. timeAgoUk field read via getLocalizedField.
+  UpdateCard: imageSrc?: string prop for place cover photo.
+  avatar1Src?: string + avatar2Src?: string props — render as
+  overlapping <img> circles (size-[24px], border-2 border-neutral-0)
+  in the footer avatar stack; grey div fallback when undefined.
+  Both avatar1Src and avatar2Src are passed as Avatar1/Avatar2
+  (from src/assets/images/Discover/) in all UpdateCard usages.
 - ReviewSection (accordion section for ReviewScreen — see below)
 - DevLanguageToggle (see i18n section above)
 
@@ -366,6 +379,12 @@ Implementation:
   specific place; real-world version would use geolocation check)
 - Mock data in PlaceDetailSheet shows mix of verified/unverified
   ReviewCards and PlacePhotoCards for demo purposes
+
+## PlacePopupCard coverPhoto
+coverPhoto?: string prop — renders <img> when defined (w-full
+h-[120px] object-cover rounded-[16px]), grey div fallback when not.
+In MapScreen, passed as:
+  coverPhoto={selectedPlace?.sections?.entrance?.photos?.[0]?.src}
 
 ## Map popup behaviour
 - Tapping a marker opens PlacePopupCard
@@ -406,7 +425,8 @@ RouteDetailSheet. Does NOT trigger route-complete flow.
   false or unmount
 
 ## Screens (src/screens/)
-Onboarding1(/), Onboarding2-5(/onboarding/2-5),
+Onboarding1(/), Onboarding2-5(/onboarding/2-5) — all five call
+window.scrollTo(0,0) in a useEffect on mount (scroll-to-top),
 DiscoverScreen(/discover), MapScreen(/map), FilterScreen(/filter),
 RouteCompleteScreen(/route-complete), ProfileScreen(/profile),
 AccessibilityPreferencesScreen(/profile/preferences),
@@ -419,7 +439,8 @@ min-h-screen overflow-y-auto, gap-xl between sections.
   Friends/Events, single-select, larger than base Chip — px-md py-sm,
   body/md). Selected chip filters which sections below are shown.
 - UPDATES: horizontal scroll row of UpdateCard (placeName, address,
-  description, verifiedCount, timeAgo, optional imageSrc placeholder).
+  description, verifiedCount, timeAgo, imageSrc from places/,
+  avatar1Src + avatar2Src from Discover/ avatars).
 - FRIENDS' ACTIVITY: stacked FriendActivityCard (friendName,
   mobilityAid → illustration icon via same lookup/fallback as
   ProfileScreen, timeAgo/timeAgoUk, placeName, address,
@@ -512,7 +533,11 @@ Entry points:
 - Header: Back button + placeName (h1, display/md) + address (body/sm)
 - AI banner: bg-primary-100 rounded-[24px] p-md, Sparkles icon +
   "AI-assisted review..." explanatory text (translated)
-- 3 ReviewSection accordions (Entrance/Toilet/Inside — icons:
+- Sections are dynamic: activeSectionIds derived from
+  getPlaceFeatures(place).filter(key => features[key]).
+  Only the active sections render. Lazy useState initializer:
+  useState(() => initSections(activeSectionIds)).
+- 3 possible ReviewSection accordions (Entrance/Toilet/Inside — icons:
   door-width-100 [stroke-width fixed to 1.5 to match icon set],
   wc, lucide Sofa):
   - status: 'empty' | 'analyzing' | 'done' | 'skipped'.
@@ -571,9 +596,13 @@ Entry points:
   shelter, wc, starting-point-icon, end-point-icon,
   Uklon_Logo_2018.png, SocialTaxi_Logo.png
 
-## Barrier photos (src/assets/images/)
-cobblestone, drain-channel, kerb, narrow-doorway,
-single-step, steep-slope
+## Asset images structure
+src/assets/images/
+  Discover/   ← avatar1.png, avatar2.png, avatar3.png
+  places/     ← place cover/toilet/inside photos by category+tier
+                 (e.g. supermarket_accessible_cover.jpg)
+  (root)      ← barrier photos: cobblestone, drain-channel, kerb,
+                 narrow-doorway, single-step, steep-slope
 
 ## Transport mode icons (lucide-react)
 transit→TrainFront, bus→Bus, tram→TramFront, metro→Train,
@@ -603,13 +632,40 @@ t('categories.' + category) in the components that render them
 (PlaceListItem, PlacePopupCard, PlaceDetailSheet) —
 categoryIcon.tsx itself stays a pure icon lookup.
 
-## Place data shape (exported from MapScreen.tsx)
+## Place data shape (src/data/places.ts — single source of truth)
+All place types + data live in src/data/places.ts.
+MapScreen.tsx re-exports everything for backward compat:
+  export type { PlaceCategory, PlaceFeatures, PlacePhoto,
+    PlaceSection, PlaceSections, Place, SortKey } from '../data/places'
+  export { PLACES, SORT_KEYS, sortPlaces } from '../data/places'
+
+type PlacePhoto = { src, isVerified, updatedAt, updatedAtUk }
+type PlaceSection = { accessibilityStatus: 'accessible'|'inaccessible',
+  photos: PlacePhoto[] }
+type PlaceSections = { entrance?, toilet?, inside? }
 type Place = {
   id, name, nameUk, address, addressUk, category,
   coordinates: [lng,lat], accessibilityScore, barrierCount,
   distance: number (metres — format via formatDistance),
-  verifiedAt: Date, isLiftDependent: boolean
+  verifiedAt: Date, isLiftDependent: boolean,
+  sections: PlaceSections
 }
+
+PLACE_DATA: 50 entries as Omit<Place,'sections'>[]
+buildSections(category, score): score >= 70 → 'accessible' tier/photos,
+  else 'inaccessible' tier/photos. COVER_IMG / TOILET_IMG / INSIDE_IMG
+  are lookup records mapping category → {accessible, inaccessible} paths.
+PLACES = PLACE_DATA.map(p => ({ ...p, sections: buildSections(...) }))
+
+## PlaceFeatures / getPlaceFeatures (src/utils/placeFeatures.ts)
+CATEGORY_FEATURE_DEFAULTS: Record<PlaceCategory, PlaceFeatures> — 9
+  categories, each specifying which of entrance/toilet/inside
+  sections are relevant (e.g. pharmacy has no toilet section).
+getPlaceFeatures(place): merges CATEGORY_FEATURE_DEFAULTS with
+  place.featuresOverride (if any). Used by PlaceDetailSheet to
+  filter which sections render, and by ReviewScreen to filter
+  which review sections appear. Imports from '../screens/MapScreen'
+  (which re-exports from places.ts — no circular dependency).
 
 ## Route data shape (exported from RoutePlanningSheet.tsx)
 type RouteSegment = {
@@ -648,6 +704,17 @@ handleReset must create new Set, never reuse DEFAULT ref.
 FilterScreen: h1 = "Filter" (translated), Toggle components have
 translated `label` props (Avoid lift-dependent places / I'm
 travelling with a companion).
+FilterContext also exposes restoreFilterState(state: FilterState)
+— sets full state from a snapshot (used by snackbar undo).
+
+FilterScreen reset uses a snackbar undo pattern:
+- "Reset" button snapshots state, calls handleReset, shows snackbar
+  for 3s (UNDO_TIMEOUT_MS = 3000), then commits.
+- Snackbar: fixed bottom-lg left-lg right-lg z-[120],
+  bg-neutral-900 text-neutral-0, Undo button text-primary-300.
+- Undo: clears timer, calls restoreFilterState(snapshot), hides
+  snackbar. Timer cleared on unmount.
+- Translation keys: filter.resetConfirm / filter.undo.
 
 ## filterPlaces (MapScreen)
 Applies to map markers AND list. Checks getAccessibilityVariant
@@ -735,7 +802,8 @@ RouteDetailSheet, SortSheet) have their own Escape listeners
 for their own onClose.
 
 ## Mapbox flyTo convention
-All marker/search flyTo calls use offset:[0,-80], zoom:16.
+Marker tap (handleMarkerClick) uses offset:[0,-120], zoom:16.
+Search result tap uses offset:[0,-80], zoom:16.
 No padding on flyTo — only fitBounds uses padding.
 map.setPadding zeros on mount and in RouteDetailSheet cleanup.
 Mapbox free tier: 50,000 map loads/month, 100,000 Directions

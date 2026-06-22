@@ -9,7 +9,10 @@
     "bookmark": "Bookmark",
     "share": "Share",
     "madeOnLocation": "Made on location",
-    "uploadedFromGallery": "Uploaded from gallery"
+    "uploadedFromGallery": "Uploaded from gallery",
+    "yes": "Yes",
+    "no": "No",
+    "verified": "Verified"
   },
   "onboarding1": {
     "title": "Passage",
@@ -268,6 +271,12 @@
   "reviewCard": {
     "reviewBy": "Review by {{author}}"
   },
+  "accessibilityCard": {
+    "accessible": "Accessible",
+    "partiallyAccessible": "Partially accessible",
+    "inaccessible": "Inaccessible",
+    "unknown": "Unknown"
+  },
   "placePhotoCard": {
     "lastUpdated": "Last updated:"
   },
@@ -339,6 +348,7 @@
     "mainBarrierChip": "The main barrier was...",
     "helpfulForChip": "Helpful for users who...",
     "postReview": "Post review",
+    "analyzingPhoto": "Analyzing photo...",
     "skipSection": "Skip this section",
     "fillManually": "Fill in manually",
     "resetSection": "Reset section",

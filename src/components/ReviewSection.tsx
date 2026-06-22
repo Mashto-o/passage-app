@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Sparkles, Check, ChevronDown, RotateCcw } from 'lucide-react'
 import { AccessibilityCard } from './AccessibilityCard'
 import { MediaInputButton } from './MediaInputButton'
@@ -63,6 +64,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   isOpen,
   onToggle,
 }) => {
+  const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +193,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
               strokeWidth={1.5}
               className="text-primary-500 animate-pulse shrink-0"
             />
-            <span className="text-body-sm text-neutral-700">Analyzing photo...</span>
+            <span className="text-body-sm text-neutral-700">{t('reviewScreen.analyzingPhoto')}</span>
           </div>
         </div>
       )}

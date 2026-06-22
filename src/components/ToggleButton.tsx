@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface ToggleButtonProps {
   value: 'yes' | 'no' | null
@@ -13,6 +14,8 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
   onChange,
   className = '',
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div className={`flex items-center gap-[8px] ${className}`}>
       {/* Yes button */}
@@ -29,7 +32,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
             : 'bg-neutral-0 border border-neutral-300 text-neutral-500',
         ].join(' ')}
       >
-        Yes
+        {t('common.yes')}
       </button>
 
       {/* No button */}
@@ -46,7 +49,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
             : 'bg-neutral-0 border border-neutral-300 text-neutral-500',
         ].join(' ')}
       >
-        No
+        {t('common.no')}
       </button>
     </div>
   )

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { AccessibilityBadge } from './AccessibilityBadge'
 
 export interface AccessibilityCardProps {
@@ -12,32 +13,32 @@ const config: Record<
   AccessibilityCardProps['accessibility'],
   {
     badgeVariant: 'accessible' | 'partial' | 'inaccessible' | 'unknown'
-    label: string
+    labelKey: string
     selectedBg: string
     selectedBorder: string
   }
 > = {
   accessible: {
     badgeVariant: 'accessible',
-    label: 'Accessible',
+    labelKey: 'accessibilityCard.accessible',
     selectedBg: 'bg-success-100',
     selectedBorder: 'border-success-500',
   },
   partiallyAccessible: {
     badgeVariant: 'partial',
-    label: 'Partially accessible',
+    labelKey: 'accessibilityCard.partiallyAccessible',
     selectedBg: 'bg-warning-100',
     selectedBorder: 'border-warning-500',
   },
   inaccessible: {
     badgeVariant: 'inaccessible',
-    label: 'Inaccessible',
+    labelKey: 'accessibilityCard.inaccessible',
     selectedBg: 'bg-danger-100',
     selectedBorder: 'border-danger-500',
   },
   unknown: {
     badgeVariant: 'unknown',
-    label: 'Unknown',
+    labelKey: 'accessibilityCard.unknown',
     selectedBg: 'bg-neutral-100',
     selectedBorder: 'border-neutral-400',
   },
@@ -49,7 +50,9 @@ export const AccessibilityCard: React.FC<AccessibilityCardProps> = ({
   onClick,
   className = '',
 }) => {
-  const { badgeVariant, label, selectedBg, selectedBorder } = config[accessibility]
+  const { t } = useTranslation()
+  const { badgeVariant, labelKey, selectedBg, selectedBorder } = config[accessibility]
+  const label = t(labelKey)
 
   const bg = selected ? selectedBg : 'bg-neutral-0'
   const border = selected ? selectedBorder : 'border-neutral-200'
