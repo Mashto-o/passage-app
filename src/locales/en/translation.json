@@ -348,6 +348,8 @@
     "mainBarrierChip": "The main barrier was...",
     "helpfulForChip": "Helpful for users who...",
     "postReview": "Post review",
+    "submitSuccess": "Review saved!",
+    "submitSuccessHint": "You can find it on your profile page",
     "analyzingPhoto": "Analyzing photo...",
     "skipSection": "Skip this section",
     "fillManually": "Fill in manually",

@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, MessageCircle, Sofa, Toilet } from 'lucide-react'
+import { Sparkles, MessageCircle, Sofa, Toilet, BadgeCheck, X } from 'lucide-react'
 import { Button, CommentInput, ReviewSection } from '../components'
 import type { ReviewSectionQuestion } from '../components'
 import { analyzePhoto } from '../utils/mockAI'
@@ -70,6 +70,14 @@ export const ReviewScreen: React.FC = () => {
     () => initSections(activeSectionIds)
   )
   const [comment,  setComment]  = useState('')
+  const [isSubmitSuccess, setIsSubmitSuccess] = useState(false)
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!isSubmitSuccess) return
+    successTimerRef.current = setTimeout(() => navigate('/map'), 2000)
+    return () => { if (successTimerRef.current) clearTimeout(successTimerRef.current) }
+  }, [isSubmitSuccess])
 
   const isSectionComplete = (id: SectionId): boolean => {
     const s = sections[id]
@@ -180,7 +188,7 @@ export const ReviewScreen: React.FC = () => {
 
   const handleSubmit = () => {
     console.log('Review submitted', { sections, comment })
-    navigate(-1)
+    setIsSubmitSuccess(true)
   }
 
   // ── Section icons ──────────────────────────────────────────────
@@ -192,6 +200,31 @@ export const ReviewScreen: React.FC = () => {
   }
 
   // ── Render ────────────────────────────────────────────────────
+
+  if (isSubmitSuccess) {
+    return (
+      <main className="relative min-h-screen bg-neutral-50 flex flex-col items-center justify-center px-lg gap-md">
+        <button
+          type="button"
+          aria-label={t('common.close')}
+          onClick={() => {
+            if (successTimerRef.current) clearTimeout(successTimerRef.current)
+            navigate('/map')
+          }}
+          className="absolute top-[24px] right-[24px] p-[8px] rounded-full text-neutral-500 hover:bg-neutral-100 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+        >
+          <X size={24} strokeWidth={1.5} aria-hidden="true" />
+        </button>
+        <div className="bg-primary-100 rounded-[48px] p-[16px]">
+          <BadgeCheck size={48} strokeWidth={1.5} className="text-primary-500" />
+        </div>
+        <div className="flex flex-col items-center gap-xs text-center">
+          <h1 className="text-display-md text-neutral-900">{t('reviewScreen.submitSuccess')}</h1>
+          <p className="text-body-md text-neutral-700">{t('reviewScreen.submitSuccessHint')}</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen overflow-y-auto bg-neutral-50 px-lg pt-[56px] pb-[120px]">
@@ -290,6 +323,7 @@ export const ReviewScreen: React.FC = () => {
           onClick={handleSubmit}
         />
       </div>
+
     </main>
   )
 }

@@ -372,6 +372,8 @@
     "mainBarrierChip": "Головна перешкода — це...",
     "helpfulForChip": "Корисно для тих, хто...",
     "postReview": "Опублікувати відгук",
+    "submitSuccess": "Відгук збережено!",
+    "submitSuccessHint": "Ви можете переглянути його у своєму профілі",
     "analyzingPhoto": "Аналіз фото...",
     "skipSection": "Пропустити цей розділ",
     "fillManually": "Заповнити вручну",
