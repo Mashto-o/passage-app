@@ -42,7 +42,7 @@ export const Onboarding4: React.FC = () => {
       <div className="flex flex-col">
 
         {/* Logo */}
-        <div className="mb-xl">
+        <div className="mb-2xl">
           <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
         </div>
 
@@ -62,7 +62,7 @@ export const Onboarding4: React.FC = () => {
                 {t('common.onboardingLabel')}
               </span>
             </button>
-            <OnboardingProgress currentStep={3} totalSteps={4} />
+            <OnboardingProgress currentStep={4} totalSteps={5} />
           </div>
 
           {/* Heading block */}

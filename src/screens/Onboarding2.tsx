@@ -24,7 +24,7 @@ export const Onboarding2: React.FC = () => {
     setMobilityAid(selected === id ? null : id)
 
   const handleNext = () => {
-    navigate('/onboarding/3')
+    navigate('/onboarding/3b')
   }
 
   return (
@@ -34,7 +34,7 @@ export const Onboarding2: React.FC = () => {
       <div className="flex flex-col">
 
         {/* Logo */}
-        <div className="mb-xl">
+        <div className="mb-2xl">
           <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
         </div>
 
@@ -46,7 +46,7 @@ export const Onboarding2: React.FC = () => {
             <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
               {t('common.onboardingLabel')}
             </span>
-            <OnboardingProgress currentStep={1} totalSteps={4} />
+            <OnboardingProgress currentStep={1} totalSteps={5} />
           </div>
 
           {/* Heading block */}

@@ -19,7 +19,7 @@ export const Onboarding5: React.FC = () => {
       <div className="px-lg pt-xl flex flex-col shrink-0">
 
         {/* Logo */}
-        <div className="mb-xl">
+        <div className="mb-2xl">
           <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
         </div>
 
@@ -39,7 +39,7 @@ export const Onboarding5: React.FC = () => {
                 {t('common.onboardingLabel')}
               </span>
             </button>
-            <OnboardingProgress currentStep={4} totalSteps={4} />
+            <OnboardingProgress currentStep={5} totalSteps={5} />
           </div>
 
           {/* Heading block */}

@@ -56,7 +56,7 @@ export const Onboarding3: React.FC = () => {
     <main className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col overflow-y-auto">
 
       {/* ── Logo ──────────────────────────────────────────────────── */}
-      <div className="mb-xl">
+      <div className="mb-2xl">
         <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
       </div>
 
@@ -74,7 +74,7 @@ export const Onboarding3: React.FC = () => {
               {t('common.onboardingLabel')}
             </span>
           </button>
-          <OnboardingProgress currentStep={2} totalSteps={4} />
+          <OnboardingProgress currentStep={3} totalSteps={5} />
         </div>
 
         {/* ── Heading block ───────────────────────────────────────── */}

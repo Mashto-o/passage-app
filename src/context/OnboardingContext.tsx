@@ -21,6 +21,9 @@ interface OnboardingContextValue {
   mobilityAid:    MobilityAid | null
   setMobilityAid: (aid: MobilityAid | null) => void
 
+  travelsWithCompanion:    boolean | null
+  setTravelsWithCompanion: (v: boolean | null) => void
+
   doorWidth:    DoorWidth | null
   setDoorWidth: (v: DoorWidth | null) => void
 
@@ -37,11 +40,12 @@ interface OnboardingContextValue {
 // ── Storage keys ───────────────────────────────────────────────────
 
 const KEYS = {
-  mobilityAid: 'passage_mobility_aid',
-  doorWidth:   'passage_pref_door_width',
-  stairs:      'passage_pref_stairs',
-  slope:       'passage_pref_slope',
-  surface:     'passage_pref_surface',
+  mobilityAid:          'passage_mobility_aid',
+  travelsWithCompanion: 'passage_travels_with_companion',
+  doorWidth:            'passage_pref_door_width',
+  stairs:               'passage_pref_stairs',
+  slope:                'passage_pref_slope',
+  surface:              'passage_pref_surface',
 } as const
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -61,6 +65,27 @@ function loadItemNullable<T extends string>(key: string): T | null {
     return stored ? (stored as T) : null
   } catch {
     return null
+  }
+}
+
+function loadBooleanNullable(key: string): boolean | null {
+  try {
+    const stored = localStorage.getItem(key)
+    return stored === null ? null : stored === 'true'
+  } catch {
+    return null
+  }
+}
+
+function persistBoolean(key: string, value: boolean | null) {
+  try {
+    if (value === null) {
+      localStorage.removeItem(key)
+    } else {
+      localStorage.setItem(key, String(value))
+    }
+  } catch {
+    // localStorage unavailable — state-only fallback
   }
 }
 
@@ -91,6 +116,15 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const setMobilityAid = (aid: MobilityAid | null) => {
     setMobilityAidState(aid)
     persist(KEYS.mobilityAid, aid)
+  }
+
+  // travelsWithCompanion — no default (user must choose)
+  const [travelsWithCompanion, setTravelsWithCompanionState] = useState<boolean | null>(
+    () => loadBooleanNullable(KEYS.travelsWithCompanion),
+  )
+  const setTravelsWithCompanion = (v: boolean | null) => {
+    setTravelsWithCompanionState(v)
+    persistBoolean(KEYS.travelsWithCompanion, v)
   }
 
   // doorWidth — defaults to '100'
@@ -132,6 +166,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   return (
     <OnboardingContext.Provider value={{
       mobilityAid, setMobilityAid,
+      travelsWithCompanion, setTravelsWithCompanion,
       doorWidth,   setDoorWidth,
       stairs,      setStairs,
       slope,       setSlope,

@@ -5,6 +5,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Onboarding1 } from './screens/Onboarding1'
 import { Onboarding2 } from './screens/Onboarding2'
 import { Onboarding3 } from './screens/Onboarding3'
+import { Onboarding3b } from './screens/Onboarding3b'
 import { Onboarding4 } from './screens/Onboarding4'
 import { Onboarding5 } from './screens/Onboarding5'
 import { MapScreen } from './screens/MapScreen'
@@ -477,6 +478,7 @@ function App() {
         <Route path="/"              element={<Onboarding1 />} />
         <Route path="/onboarding/2"  element={<Onboarding2 />} />
         <Route path="/onboarding/3"  element={<Onboarding3 />} />
+        <Route path="/onboarding/3b" element={<Onboarding3b />} />
         <Route path="/onboarding/4"  element={<Onboarding4 />} />
         <Route path="/onboarding/5"  element={<Onboarding5 />} />
         <Route path="/map"            element={<MapScreen />} />

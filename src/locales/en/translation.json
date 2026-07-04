@@ -45,6 +45,13 @@
     },
     "noneApply": "None of these apply to me"
   },
+  "onboarding3b": {
+    "title": "Do you usually travel alone or with a companion?",
+    "subtitle": "This helps us tailor routes and recommendations for you",
+    "alone": "Alone",
+    "withCompanion": "With a companion",
+    "changeableNotice": "You can change this anytime in Filters"
+  },
   "onboarding4": {
     "title": "Based on your data, we've set these preferences for you",
     "subtitle": "You can change them now or also any time in your profile",

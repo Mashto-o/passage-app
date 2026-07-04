@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
+import { useOnboarding } from './OnboardingContext'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -30,10 +31,12 @@ const FilterContext = createContext<FilterContextValue | null>(null)
 // ── Provider ───────────────────────────────────────────────────────────────
 
 export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { travelsWithCompanion } = useOnboarding()
   const [filterState, setFilterState] = useState<FilterState>({
     ...DEFAULT_FILTER_STATE,
     // Always create a new Set — never share the module-level reference
     accessibility: new Set(DEFAULT_FILTER_STATE.accessibility),
+    hasCompanion: travelsWithCompanion ?? false,
   })
 
   const toggleAccessibility = (variant: string) => {
