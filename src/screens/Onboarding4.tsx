@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ChevronLeft } from 'lucide-react'
 import { Button, PreferenceCard, OnboardingProgress } from '../components'
 import { useOnboarding } from '../context/OnboardingContext'
 import Logo from '../assets/icons/Logo.svg?react'
@@ -37,35 +38,44 @@ export const Onboarding4: React.FC = () => {
   return (
     <main className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">
 
-      {/* ── Back button ───────────────────────────────────────────── */}
-      <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
+      {/* ── Top block: Logo, Progress + Heading ───────────────────── */}
+      <div className="flex flex-col">
 
-      {/* ── Logo ──────────────────────────────────────────────────── */}
-      <div className="mb-2xl">
-        <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
-      </div>
-
-      {/* ── Progress + Heading ────────────────────────────────────── */}
-      <div className="flex flex-col gap-xl">
-
-        {/* Progress row */}
-        <div className="flex items-center justify-between">
-          <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-            {t('common.onboardingLabel')}
-          </span>
-          <OnboardingProgress currentStep={3} totalSteps={4} />
+        {/* Logo */}
+        <div className="mb-xl">
+          <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
         </div>
 
-        {/* Heading block */}
-        <div className="flex flex-col gap-xs">
-          <h1 className="text-display-lg text-neutral-900">
-            {t('onboarding4.title')}
-          </h1>
-          <p className="text-body-md text-neutral-700">
-            {t('onboarding4.subtitle')}
-          </p>
-        </div>
-      </div>{/* end Progress + Heading */}
+        {/* Progress + Heading */}
+        <div className="flex flex-col gap-xl">
+
+          {/* Progress row */}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label={t('common.back')}
+              className="flex items-center gap-xs -m-xs p-xs rounded-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            >
+              <ChevronLeft size={16} strokeWidth={1.5} aria-hidden className="text-primary-500" />
+              <span className="text-caption-md tracking-caption-md uppercase text-primary-500">
+                {t('common.onboardingLabel')}
+              </span>
+            </button>
+            <OnboardingProgress currentStep={3} totalSteps={4} />
+          </div>
+
+          {/* Heading block */}
+          <div className="flex flex-col gap-xs">
+            <h1 className="text-display-lg text-neutral-900">
+              {t('onboarding4.title')}
+            </h1>
+            <p className="text-body-md text-neutral-700">
+              {t('onboarding4.subtitle')}
+            </p>
+          </div>
+        </div>{/* end Progress + Heading */}
+      </div>{/* end Top block */}
 
       {/* ── Preference groups ─────────────────────────────────────── */}
       <div className="flex flex-col gap-lg">

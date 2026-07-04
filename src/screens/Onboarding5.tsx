@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Phone, Mail } from 'lucide-react'
+import { Phone, Mail, ChevronLeft } from 'lucide-react'
 import { Button, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
 import IllustrationOnboarding from '../assets/illustrations/IllustrationOnboarding.svg?react'
@@ -16,13 +16,10 @@ export const Onboarding5: React.FC = () => {
     <main className="min-h-screen bg-neutral-50 flex flex-col overflow-hidden relative">
 
       {/* ── Top zone ──────────────────────────────────────────────── */}
-      <div className="px-lg pt-xl flex flex-col gap-lg shrink-0">
-
-        {/* Back button */}
-        <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
+      <div className="px-lg pt-xl flex flex-col shrink-0">
 
         {/* Logo */}
-        <div className="mb-2xl">
+        <div className="mb-xl">
           <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />
         </div>
 
@@ -31,9 +28,17 @@ export const Onboarding5: React.FC = () => {
 
           {/* Progress row */}
           <div className="flex items-center justify-between">
-            <span className="text-caption-md tracking-caption-md uppercase text-neutral-700">
-              {t('common.onboardingLabel')}
-            </span>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label={t('common.back')}
+              className="flex items-center gap-xs -m-xs p-xs rounded-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            >
+              <ChevronLeft size={16} strokeWidth={1.5} aria-hidden className="text-primary-500" />
+              <span className="text-caption-md tracking-caption-md uppercase text-primary-500">
+                {t('common.onboardingLabel')}
+              </span>
+            </button>
             <OnboardingProgress currentStep={4} totalSteps={4} />
           </div>
 
