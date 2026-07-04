@@ -80,23 +80,26 @@ const PLACE_REVIEWS: {
   timestamp: string
   timestampUk: string
   reviewText: string
+  reviewTextUk: string
   isVerified?: boolean
   avatarUrl?: string
 }[] = [
   {
-    authorName:   'Name',
-    timestamp:    '1 week ago',
-    timestampUk:  'тиждень тому',
-    reviewText:   'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
-    isVerified:   true,
-    avatarUrl:    REVIEW_AVATARS[0],
+    authorName:    'Name',
+    timestamp:     '1 week ago',
+    timestampUk:   'тиждень тому',
+    reviewText:    'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
+    reviewTextUk:  'Рівний пандус при вході. Проходи всередині досить широкі для активного крісла колісного.',
+    isVerified:    true,
+    avatarUrl:     REVIEW_AVATARS[0],
   },
   {
-    authorName:  'Name',
-    timestamp:   '3 weeks ago',
-    timestampUk: '3 тижні тому',
-    reviewText:  'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
-    avatarUrl:   REVIEW_AVATARS[1],
+    authorName:   'Name',
+    timestamp:    '3 weeks ago',
+    timestampUk:  '3 тижні тому',
+    reviewText:   'Smooth ramp at the entrance. Aisles inside are wide enough for an active chair.',
+    reviewTextUk: 'Рівний пандус при вході. Проходи всередині досить широкі для активного крісла колісного.',
+    avatarUrl:    REVIEW_AVATARS[1],
   },
 ]
 
@@ -317,13 +320,6 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
 
               <Divider />
 
-              {/* Profile match banner */}
-              <div className="bg-primary-100 flex items-center justify-center p-xs rounded-[24px] w-full">
-                <p className="text-heading-sm text-neutral-900">
-                  {t('placeDetail.factorsConfirmed')}
-                </p>
-              </div>
-
               {/* Accordion sections — driven by category feature defaults + optional override */}
               {(() => {
                 const entrancePhotos = place.sections.entrance?.photos ?? []
@@ -465,7 +461,7 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                     authorName={review.authorName}
                     mobilityIcon={<WheelchairManual width={16} height={16} aria-hidden />}
                     timestamp={getLocalizedField(review, 'timestamp', lang)}
-                    reviewText={review.reviewText}
+                    reviewText={getLocalizedField(review, 'reviewText', lang)}
                     isVerified={review.isVerified}
                     avatarUrl={review.avatarUrl}
                   />

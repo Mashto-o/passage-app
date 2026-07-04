@@ -84,6 +84,8 @@ src/
   PlacePhotoCard mock data have *Uk counterparts (timestampUk,
   updatedAtUk) read via getLocalizedField — not a new utility,
   just the existing *Uk suffix pattern applied to these fields.
+- PlaceDetailSheet PLACE_REVIEWS mock data also has reviewTextUk
+  field; rendered via getLocalizedField(review, 'reviewText', lang).
 - FriendActivityCard mock data (FRIEND_ACTIVITY in DiscoverScreen)
   has timeAgoUk fields added, read via getLocalizedField.
 
@@ -93,6 +95,8 @@ Under "common" namespace:
 - madeOnLocation: "Made on location" / "Зроблено на локації"
 - uploadedFromGallery: "Uploaded from gallery" / "Завантажено з галереї"
 - verified: "Verified" / "Перевірено" (short form for tight spaces)
+- yes: "Yes" / "Так"
+- no: "No" / "Ні"
 
 Under "reviewCard" namespace:
 - verifiedAt key removed — no longer used (replaced by inline
@@ -100,6 +104,33 @@ Under "reviewCard" namespace:
 
 Under "navBar" namespace:
 - review: "Review" / Ukrainian equivalent
+
+Under "accessibilityCard" namespace (new):
+- accessible: "Accessible" / "Доступно"
+- partiallyAccessible: "Partially accessible" / "Частково доступно"
+- inaccessible: "Inaccessible" / "Недоступно"
+- unknown: "Unknown" / "Невідомо"
+
+Under "reviewScreen" namespace (additions):
+- analyzingPhoto: "Analyzing photo..." / "Аналіз фото..."
+- submitSuccess: "Review saved!" / "Відгук збережено!"
+- submitSuccessHint: "You can find it on your profile page" /
+  "Ви можете переглянути його у своєму профілі"
+
+## Ukrainian inclusive terminology
+Per the official «Без бар'єрів» vocabulary (bf.in.ua — Olena
+Zelenska's initiative), the only correct Ukrainian term for
+wheelchair is «крісло колісне». All uses of «візок/візка/візком»
+in a wheelchair context have been replaced throughout the UK locale:
+- «ручного крісла колісного» (genitive — "of a manual wheelchair")
+- «для вашого крісла колісного» (genitive — "for your wheelchair")
+- «типу крісла колісного» (genitive — "of wheelchair type")
+- «Моє крісло колісне вмістилося всередині» (review question,
+  neuter agreement — крісло is neuter in Ukrainian)
+«Візок» is still correct for stroller (onboarding2.stroller).
+onboarding2 UK labels use adjective-only ("Ручне" / "Електро")
+since the section header «КРІСЛО КОЛІСНЕ» already names the
+category — full phrase would be redundant on the card.
 
 ## Accessibility (a11y) conventions
 - src/utils/a11y.ts exports clickableCardProps(onClick) — spreads
@@ -154,7 +185,9 @@ Under "navBar" namespace:
   PlaceDetailSheet or FriendActivityCard.)
 - PreferenceCard (default/selected, custom SVG icons)
 - AccessibilityCard (accessible/partiallyAccessible/inaccessible
-  × default/selected)
+  × default/selected. Labels via t('accessibilityCard.*') —
+  labelKey stored in module-level config, resolved inside component
+  body via useTranslation so hooks are called correctly.)
 - PhotoCard (src, label, selected with primary/500 overlay)
 - PlacePhotoCard (optional src, isVerified?: boolean,
   updatedAt: string.
@@ -239,7 +272,8 @@ Under "navBar" namespace:
   Full-screen, rounded-tl/tr-[48px]. Back button. RadioButton
   per option. transition-transform duration-300. aria-hidden
   backdrop + Escape listener.)
-- ToggleButton (Yes/No pair, success/danger selected)
+- ToggleButton (Yes/No pair, success/danger selected.
+  Labels use t('common.yes') / t('common.no') — fully translated.)
 - Toggle (on/off, role="switch", aria-checked, optional `label`
   prop → aria-label, thumb slides with translate-x)
 - SearchBar (Search icon + input. searchActive: ArrowLeft
@@ -259,9 +293,10 @@ Under "navBar" namespace:
   first FactorRow variant: 'inaccessible' if section status is
   'inaccessible', else 'accessible'.
   Lift warning if isLiftDependent.
+  Profile match banner («8/10 key factors confirmed…») removed.
   Review cards (ReviewCard): single-column layout, isVerified +
   avatarUrl (cycled from Avatar1/2/3 in PLACE_REVIEWS) props,
-  timestamp localized via *Uk suffix.
+  timestamp + reviewText localized via *Uk suffix + getLocalizedField.
   No NavBar. aria-hidden backdrop + Escape listener.)
 - RoutePlanningSheet (overlay in MapScreen. Props: isOpen,
   destinationName, onClose, onRouteSelect, overrideTop.
@@ -546,8 +581,9 @@ Entry points:
     "Fill in manually" → opens the section directly in 'done' state
     with no photo and no AI prefill (user fills ratings/answers from
     scratch). "Skip section" → status becomes 'skipped'.
-  - 'analyzing': photo preview + pulsing Sparkles
-    "Analyzing photo..." card, ~1600ms → auto-advances to 'done'.
+  - 'analyzing': photo preview + pulsing Sparkles +
+    t('reviewScreen.analyzingPhoto') card, ~1600ms → auto-advances
+    to 'done'. ReviewSection uses useTranslation for this string.
   - 'done' (auto-opens): photo (if any) + 3 AccessibilityCard
     ratings + Yes/No ToggleButton questions. When reached via AI
     photo flow, AI-prefilled with Sparkles badges (user can override
@@ -569,9 +605,18 @@ Entry points:
   CommentInput (280 char, aria-label).
 - Submit "Post review": enabled only when every section is either
   isComplete or status==='skipped'; console.logs all state +
-  comment, then navigate(-1). All new submissions treated as
-  isVerified:true.
-- All strings + AI banner translated EN/UK (review namespace).
+  comment, then sets isSubmitSuccess=true. All new submissions
+  treated as isVerified:true.
+- Success state: isSubmitSuccess=true renders a full-page centred
+  view (replaces main form) with BadgeCheck icon (bg-primary-100
+  pill, text-primary-500), t('reviewScreen.submitSuccess') h1,
+  t('reviewScreen.submitSuccessHint') body. X button top-right
+  (aria-label t('common.close')) clears timer + navigates /map
+  immediately. useEffect on [isSubmitSuccess] stores a 2s
+  setTimeout in successTimerRef — auto-navigates to /map and
+  cleans up on unmount.
+- Back button (navigate(-1)) is unaffected by success flow.
+- All strings + AI banner translated EN/UK (reviewScreen namespace).
 
 ## Routing
 / /onboarding/2-5 /discover /map /filter /route-complete
