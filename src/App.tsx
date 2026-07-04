@@ -26,6 +26,7 @@ import {
 } from './components'
 import type { TransportMode } from './components'
 import type { AccessibilityBadgeProps } from './components'
+import { useOnboarding } from './context/OnboardingContext'
 
 import imgCobblestone   from './assets/images/cobblestone.png'
 import imgDrainChannel  from './assets/images/drain-channel.png'
@@ -70,6 +71,7 @@ const mobilityCards = [
 ]
 
 function DevShowcase() {
+  const { mobilityAid } = useOnboarding()
   const [selectedCard,          setSelectedCard]          = useState<string | null>(null)
   const [selectedDoor,          setSelectedDoor]          = useState<string | null>(null)
   const [selectedSlope,         setSelectedSlope]         = useState<string | null>(null)
@@ -185,11 +187,11 @@ function DevShowcase() {
         {/* ── TransportSwitcher ── */}
         <div className="bg-neutral-0 rounded-lg p-md flex flex-col gap-sm">
           <p className="text-caption-sm text-neutral-500">active: transit</p>
-          <TransportSwitcher value={transport1} onChange={setTransport1} />
+          <TransportSwitcher value={transport1} onChange={setTransport1} mobilityAid={mobilityAid ?? 'no-aid'} />
           <p className="text-caption-sm text-neutral-500">active: car</p>
-          <TransportSwitcher value={transport2} onChange={setTransport2} />
+          <TransportSwitcher value={transport2} onChange={setTransport2} mobilityAid={mobilityAid ?? 'no-aid'} />
           <p className="text-caption-sm text-neutral-500">active: walking</p>
-          <TransportSwitcher value={transport3} onChange={setTransport3} />
+          <TransportSwitcher value={transport3} onChange={setTransport3} mobilityAid={mobilityAid ?? 'no-aid'} />
         </div>
 
         <div className="h-px bg-neutral-200 my-sm" />

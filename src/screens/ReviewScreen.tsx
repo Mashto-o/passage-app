@@ -90,7 +90,9 @@ export const ReviewScreen: React.FC = () => {
 
   const allDone =
     activeSectionIds.some(id => isSectionComplete(id)) &&
-    activeSectionIds.every(id => isSectionComplete(id) || sections[id].status === 'skipped')
+    activeSectionIds.every(id =>
+      isSectionComplete(id) || sections[id].status === 'skipped' || sections[id].status === 'empty'
+    )
 
   // ── Helpers to resolve localized question labels ─────────────────
 

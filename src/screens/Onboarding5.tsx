@@ -18,6 +18,9 @@ export const Onboarding5: React.FC = () => {
       {/* ── Top zone ──────────────────────────────────────────────── */}
       <div className="px-lg pt-xl flex flex-col gap-lg shrink-0">
 
+        {/* Back button */}
+        <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
+
         {/* Logo */}
         <div className="mb-2xl">
           <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />

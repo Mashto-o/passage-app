@@ -33,7 +33,7 @@
     "noAid": "No aid"
   },
   "onboarding3": {
-    "title": "Select the barriers you can manage",
+    "title": "Which of these are difficult for you? We'll route you around them.",
     "subtitle": "This helps us filter routes that work for you",
     "barriers": {
       "kerb": "Kerb without dropped kerb",
@@ -42,7 +42,8 @@
       "steep-slope": "Steep slope / gradient",
       "single-step": "Single step at entrance",
       "drain-channel": "Drain grate"
-    }
+    },
+    "noneApply": "None of these apply to me"
   },
   "onboarding4": {
     "title": "Based on your data, we've set these preferences for you",
@@ -114,6 +115,7 @@
     }
   },
   "placeDetail": {
+    "openingHours": "Opening hours",
     "liftWarning": "This place has a lift. Check conditions before relying on it.",
     "sections": {
       "entrance": "Entrance",
@@ -181,7 +183,8 @@
     "orderUklon": "Order Uklon",
     "scheduleRide": "Schedule a ride",
     "uklonAlt": "Uklon",
-    "socialTaxiAlt": "Social Taxi"
+    "socialTaxiLabel": "Social taxi",
+    "socialTransportNotice": "Needs to be booked in advance. Get more detailed information on the website of the transport provider or via phone: <bold>{{phone}}</bold>"
   },
   "routeDetail": {
     "title": "Route details",

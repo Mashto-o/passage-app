@@ -6,7 +6,7 @@ import { getLocalizedField } from '../utils/localizedField'
 import {
   Bookmark, Share2, Zap, Construction,
   DoorOpen, Sofa, ChevronUp, ChevronDown,
-  Toilet,
+  Toilet, Clock,
 } from 'lucide-react'
 import WheelchairManual from '../assets/illustrations/wheelchair-manual.svg?react'
 import Avatar1 from '../assets/images/Discover/avatar1.png'
@@ -278,6 +278,15 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
                 <span className="text-body-sm text-neutral-900">
                   {getLocalizedField(place, 'address', lang)}
                 </span>
+
+                {place.openingHours && (
+                  <div className="flex items-center gap-2xs">
+                    <Clock size={14} strokeWidth={1.5} className="text-neutral-700" />
+                    <span className="text-body-sm text-neutral-700">
+                      {t('placeDetail.openingHours')}: {place.openingHours}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Action row */}

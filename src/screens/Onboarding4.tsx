@@ -37,6 +37,9 @@ export const Onboarding4: React.FC = () => {
   return (
     <main className="min-h-screen bg-neutral-50 px-lg pt-xl pb-xl flex flex-col gap-lg overflow-y-auto">
 
+      {/* ── Back button ───────────────────────────────────────────── */}
+      <Button variant="back" label={t('common.back')} onClick={() => navigate(-1)} />
+
       {/* ── Logo ──────────────────────────────────────────────────── */}
       <div className="mb-2xl">
         <Logo width={94} height={25} aria-label="Passage" className="text-primary-500" />

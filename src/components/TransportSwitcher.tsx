@@ -1,27 +1,34 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { TrainFront, Car, Accessibility, type LucideIcon } from 'lucide-react'
+import { TrainFront, Car, Accessibility } from 'lucide-react'
+import Walking from '../assets/icons/walking.svg?react'
+import type { MobilityAid } from '../context/OnboardingContext'
 
 export type TransportMode = 'transit' | 'car' | 'walking'
 
 export interface TransportSwitcherProps {
   value: TransportMode
   onChange: (mode: TransportMode) => void
+  mobilityAid: MobilityAid
   className?: string
 }
-
-const tabs: { id: TransportMode; Icon: LucideIcon }[] = [
-  { id: 'transit', Icon: TrainFront    },
-  { id: 'car',     Icon: Car           },
-  { id: 'walking', Icon: Accessibility },
-]
 
 export const TransportSwitcher: React.FC<TransportSwitcherProps> = ({
   value,
   onChange,
+  mobilityAid,
   className = '',
 }) => {
   const { t } = useTranslation()
+
+  const usesWheelchair = mobilityAid === 'wheelchair-manual' || mobilityAid === 'wheelchair-electric'
+  const WalkingIcon = usesWheelchair ? Accessibility : Walking
+
+  const tabs: { id: TransportMode; Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }> }[] = [
+    { id: 'transit', Icon: TrainFront   },
+    { id: 'car',     Icon: Car          },
+    { id: 'walking', Icon: WalkingIcon  },
+  ]
 
   const modeLabels: Record<TransportMode, string> = {
     transit: t('transportSwitcher.transit'),

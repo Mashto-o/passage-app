@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { formatDistance, formatDuration } from '../utils/formatUnits'
 import { Zap, Construction, Bus, TramFront, Train, Car, CarTaxiFront, Accessibility } from 'lucide-react'
 import {
@@ -20,6 +20,9 @@ const UKLON_YELLOW          = '#F5DB00'
 const UKLON_BLACK           = '#222426'
 const SOCIAL_TAXI_YELLOW    = '#FED428'
 const SOCIAL_TAXI_DARK_BLUE = '#253362'
+
+// TEMPORARY PLACEHOLDER — replace with the real Social Taxi provider number
+const SOCIAL_TAXI_PHONE = '+380 67 499 3010'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -791,30 +794,17 @@ const UklonCard: React.FC<{ route: Route; onSelect: (r: Route) => void; mobility
 // ── Car tab — Social Taxi card ─────────────────────────────────────────────
 
 const SocialTaxiCard: React.FC<{ route: Route; onSelect: (r: Route) => void; mobilityAid: MobilityAid }> = ({ route, onSelect, mobilityAid }) => {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   return (
   <div className="border border-neutral-200 rounded-[24px] p-[16px] flex flex-col gap-[12px] bg-neutral-0">
-    {/* Logo */}
-    <img
-      src="/src/assets/icons/SocialTaxi_Logo.png"
-      alt={t('routePlanning.socialTaxiAlt')}
-      className="h-[24px] object-contain self-start"
-    />
-
-    {/* Time row */}
-    <div className="flex items-center justify-between">
-      <span className="font-semibold text-[14px] text-neutral-900">{route.departureTime}</span>
-      <div className="flex items-center gap-[6px]">
-        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-          {formatDuration(route.durationMin, i18n.language)}
-        </span>
-        <span className="font-normal text-[14px] text-neutral-300">|</span>
-        <span className="font-normal text-[14px] text-neutral-700 tracking-[0.12px]">
-          {formatDistance(route.distanceKm * 1000, i18n.language)}
-        </span>
-      </div>
-      <span className="font-semibold text-[14px] text-neutral-900">{route.arrivalTime}</span>
-    </div>
+    {/* Booking notice */}
+    <p className="font-normal text-[14px] leading-[1.4] tracking-[0.12px] text-neutral-700">
+      <Trans
+        i18nKey="routePlanning.socialTransportNotice"
+        values={{ phone: SOCIAL_TAXI_PHONE }}
+        components={{ bold: <span className="font-semibold text-neutral-900" /> }}
+      />
+    </p>
 
     {/* Timeline */}
     <RouteTimeline segments={adaptSegments(route.segments, true)} mobilityAid={mobilityAid} />
@@ -970,7 +960,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
 
           {/* Transport switcher + sort control */}
           <div className="flex flex-col gap-[16px]">
-            <TransportSwitcher value={activeTab} onChange={setActiveTab} />
+            <TransportSwitcher value={activeTab} onChange={setActiveTab} mobilityAid={mobilityAid ?? 'no-aid'} />
             <SortControl value={routeSortLabel} onPress={() => setRouteSortOpen(true)} />
           </div>
 
@@ -994,11 +984,17 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 {/* Taxi section */}
                 <div className="flex flex-col gap-[16px]">
                   <SectionLabel>{t('routePlanning.taxi')}</SectionLabel>
-                  {CAR_ROUTES.filter(r => r.cardType !== 'standard').map(route =>
-                    route.cardType === 'uklon'
-                      ? <UklonCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
-                      : <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
-                  )}
+                  {CAR_ROUTES.filter(r => r.cardType === 'uklon').map(route => (
+                    <UklonCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                  ))}
+                </div>
+
+                {/* Social Taxi section */}
+                <div className="flex flex-col gap-[16px]">
+                  <SectionLabel>{t('routePlanning.socialTaxiLabel')}</SectionLabel>
+                  {CAR_ROUTES.filter(r => r.cardType === 'social-taxi').map(route => (
+                    <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                  ))}
                 </div>
 
               </div>
