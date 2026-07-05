@@ -106,6 +106,7 @@
     "startMarker": "Start",
     "endMarker": "End",
     "buildRoute": "Build a route",
+    "tapForDetails": "Tap for details",
     "barriers_one": "{{count}} barrier",
     "barriers_other": "{{count}} barriers",
     "accessiblePercent": "{{score}}% Accessible",

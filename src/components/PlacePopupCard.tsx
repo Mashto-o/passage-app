@@ -1,9 +1,35 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Bookmark, Share2 } from 'lucide-react'
 import { AccessibilityBadge } from './AccessibilityBadge'
 import { StatusBadge } from './StatusBadge'
 import { Button } from './Button'
+
+// ── "Seen once per session" hint helpers ────────────────────────────────────
+// sessionStorage (not localStorage) — the hint should reappear on a fresh
+// browser session, unlike onboarding/preference values which persist forever.
+
+const TAP_HINT_SESSION_KEY = 'passage_seen_place_popup_hint'
+
+function hasSeenTapHint(): boolean {
+  try {
+    return sessionStorage.getItem(TAP_HINT_SESSION_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+function markTapHintSeen() {
+  try {
+    sessionStorage.setItem(TAP_HINT_SESSION_KEY, 'true')
+  } catch {
+    // sessionStorage unavailable — state-only fallback
+  }
+}
+
+// Not currently rendered — kept for potential reuse elsewhere.
+// (MapScreen's marker-tap flow now navigates straight to PlaceDetailSheet
+// instead of opening this popup.)
 
 // ── Prop types ─────────────────────────────────────────────────────────────
 
@@ -45,6 +71,24 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
   coverPhoto,
 }) => {
   const { t } = useTranslation()
+
+  // Show the "Tap for details" hint the first time the popup opens in this
+  // session only — decided once per open transition so it doesn't flicker
+  // away while the same popup instance stays visible.
+  const wasVisible = useRef(false)
+  const [showTapHint, setShowTapHint] = useState(false)
+
+  useEffect(() => {
+    if (visible && !wasVisible.current) {
+      if (!hasSeenTapHint()) {
+        setShowTapHint(true)
+        markTapHintSeen()
+      } else {
+        setShowTapHint(false)
+      }
+    }
+    wasVisible.current = visible
+  }, [visible])
 
   return (
     <div
@@ -108,6 +152,11 @@ export const PlacePopupCard: React.FC<PlacePopupCardProps> = ({
                 <span className="text-body-sm text-neutral-500 flex-1">{address}</span>
               </div>
             </div>
+            {showTapHint && (
+              <span className="text-caption-sm text-primary-500">
+                {t('map.tapForDetails')}
+              </span>
+            )}
           </div>
         </button>
 

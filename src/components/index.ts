@@ -85,7 +85,7 @@ export type { SearchBarProps } from './SearchBar'
 export { TransportSwitcher } from './TransportSwitcher'
 export type { TransportSwitcherProps, TransportMode } from './TransportSwitcher'
 
-export { PlaceDetailSheet } from './PlaceDetailSheet'
+export { PlaceDetailSheet, PLACE_DETAIL_SHEET_TOP_PX } from './PlaceDetailSheet'
 
 export { RoutePlanningSheet } from './RoutePlanningSheet'
 export type { Route } from './RoutePlanningSheet'

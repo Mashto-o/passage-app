@@ -14,11 +14,12 @@ import type { FilterState } from '../context/FilterContext'
 import { useFilterContext } from '../context/FilterContext'
 import {
   SearchBar, Chip, AccessibilityBadge, NavBar, Button,
-  PlaceListItem, SortControl, Divider, PlacePopupCard, SortSheet,
+  PlaceListItem, SortControl, Divider, SortSheet,
   PlaceDetailSheet, RoutePlanningSheet, RouteDestination, RouteDetailSheet,
-  ActiveNavigationSheet,
+  ActiveNavigationSheet, PLACE_DETAIL_SHEET_TOP_PX,
 } from '../components'
 import type { Route } from '../components'
+import { spacing } from '../tokens/tokens'
 
 // ── Types & data ───────────────────────────────────────────────────────────
 // Re-exported for backward compat — downstream files import from MapScreen
@@ -56,12 +57,6 @@ function searchPlaces(places: Place[], query: string): Place[] {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function scoreVariant(score: number): 'positive' | 'warning' | 'negative' {
-  if (score >= 80) return 'positive'
-  if (score >= 40) return 'warning'
-  return 'negative'
-}
-
 export function getAccessibilityVariant(score: number): 'accessible' | 'partial' | 'inaccessible' {
   if (score >= 80) return 'accessible'
   if (score >= 40) return 'partial'
@@ -72,6 +67,19 @@ const markerColors = {
   accessible:   { outer: 'bg-success-500/20',  inner: 'bg-success-500',  ping: 'bg-success-500'  },
   partial:      { outer: 'bg-warning-500/20',   inner: 'bg-warning-500',  ping: 'bg-warning-500'  },
   inaccessible: { outer: 'bg-danger-500/20',    inner: 'bg-danger-500',   ping: 'bg-danger-500'   },
+}
+
+// Vertical clearance (Passage `2xl` spacing token) kept between a selected
+// marker's badge and the top edge of whatever sheet/panel opens beneath it.
+const MARKER_SHEET_CLEARANCE_PX = parseInt(spacing['2xl'], 10)
+
+// Computes a Mapbox flyTo `offset` that renders the flown-to marker with
+// MARKER_SHEET_CLEARANCE_PX of clear space above the top edge of the given
+// sheet — rather than a magic-number offset tuned for one specific overlay's
+// height, so it keeps working if that sheet's top position ever changes.
+function offsetAboveSheetTop(sheetTopPx: number): [number, number] {
+  const targetCenterY = sheetTopPx - MARKER_SHEET_CLEARANCE_PX
+  return [0, targetCenterY - window.innerHeight / 2]
 }
 
 
@@ -229,11 +237,16 @@ export const MapScreen: React.FC = () => {
   const handleMarkerClick = (place: Place) => {
     const doFly = () => {
       setSelectedPlace(place)
+      // Navigate straight to the place-detail view — same state used by
+      // every other entry point (search results, place list) — instead of
+      // opening PlacePopupCard.
+      setSelectedPlaceForDetail(place)
+      setPlaceDetailOpen(true)
       mapRef.current?.getMap().flyTo({
         center: place.coordinates,
         zoom: 16,
         duration: 600,
-        offset: [0, -120],
+        offset: offsetAboveSheetTop(PLACE_DETAIL_SHEET_TOP_PX),
       })
     }
 
@@ -847,44 +860,6 @@ export const MapScreen: React.FC = () => {
         </div>
       )}
 
-      {/* ── Popup backdrop ──────────────────────────────────────────── */}
-      {selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen && (
-        <div
-          aria-hidden="true"
-          className="fixed inset-0 z-[55] bg-transparent"
-          onClick={handleClosePopup}
-        />
-      )}
-
-      {/* ── Place popup card ────────────────────────────────────────── */}
-      <PlacePopupCard
-        visible={!!selectedPlace && !placeDetailOpen && !routePlanningOpen && !routeDetailOpen}
-        name={selectedPlace ? getLocalizedField(selectedPlace, 'name', lang) : ''}
-        address={selectedPlace ? getLocalizedField(selectedPlace, 'address', lang) : ''}
-        distance={selectedPlace ? formatDistance(selectedPlace.distanceM, lang) : ''}
-        barrierCount={selectedPlace?.barrierCount ?? 0}
-        accessibilityScore={selectedPlace?.accessibilityScore ?? 0}
-        accessibilityVariant={getAccessibilityVariant(selectedPlace?.accessibilityScore ?? 0)}
-        scoreVariant={scoreVariant(selectedPlace?.accessibilityScore ?? 0)}
-        categoryIcon={selectedPlace ? getCategoryIcon(selectedPlace.category, 12) : undefined}
-        coverPhoto={selectedPlace?.sections?.entrance?.photos?.[0]?.src}
-        onClose={handleClosePopup}
-        onCardClick={() => {
-          if (selectedPlace) {
-            setSelectedPlaceForDetail(selectedPlace)
-            setPlaceDetailOpen(true)
-          }
-        }}
-        onRoute={() => {
-          if (selectedPlace) {
-            setRouteDestinationName(getLocalizedField(selectedPlace, 'name', lang))
-            setRoutePlanningOpen(true)
-          }
-        }}
-        onBookmark={() => console.log('save')}
-        onShare={() => console.log('share')}
-      />
-
       {/* ── NavBar ──────────────────────────────────────────────────── */}
       {!activeNavigationOpen && (
         <div className="absolute bottom-lg left-lg right-lg z-40">
@@ -909,6 +884,7 @@ export const MapScreen: React.FC = () => {
         onClose={() => {
           setPlaceDetailOpen(false)
           setSelectedPlaceForDetail(null)
+          setSelectedPlace(null)
         }}
         onBuildRoute={(name) => {
           setRouteDestinationName(name)

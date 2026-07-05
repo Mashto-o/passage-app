@@ -106,6 +106,7 @@
     "startMarker": "Старт",
     "endMarker": "Фініш",
     "buildRoute": "Побудувати маршрут",
+    "tapForDetails": "Натисніть, щоб дізнатися більше",
     "barriers_one": "{{count}} перешкода",
     "barriers_few": "{{count}} перешкоди",
     "barriers_many": "{{count}} перешкод",

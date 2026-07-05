@@ -134,6 +134,14 @@ const Section: React.FC<SectionProps> = ({ icon, label, summary, isOpen, onToggl
   </div>
 )
 
+// Sheet's fixed top offset, in px — kept in sync with the literal
+// `top-[248px]` Tailwind class below (arbitrary-value classes must appear
+// literally in source for the JIT compiler to generate them, so this can't
+// be interpolated into the className). Exported so other screens (e.g.
+// MapScreen's marker flyTo offset) can position content relative to this
+// sheet's top edge without duplicating the raw number.
+export const PLACE_DETAIL_SHEET_TOP_PX = 248
+
 // ── Props ──────────────────────────────────────────────────────────────────
 
 type PlaceDetailSheetProps = {
@@ -293,10 +301,16 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
               <div className="flex gap-sm items-center">
                 <div className="flex-1">
                   <Button
-                    variant="primary"
-                    label={t('map.buildRoute')}
+                    variant="secondary"
+                    label={t('placeDetail.leaveReview')}
                     fullWidth
-                    onClick={() => onBuildRoute(getLocalizedField(place, 'name', lang))}
+                    onClick={() => place && navigate('/review', {
+                      state: {
+                        placeId:   place.id,
+                        placeName: getLocalizedField(place, 'name', lang),
+                        address:   getLocalizedField(place, 'address', lang),
+                      },
+                    })}
                   />
                 </div>
                 <button
@@ -482,19 +496,13 @@ export const PlaceDetailSheet: React.FC<PlaceDetailSheetProps> = ({ place, isOpe
           )}
         </div>
 
-        {/* Feedback row — pinned to bottom, never scrolls */}
+        {/* Build route CTA — pinned to bottom, never scrolls */}
         <div className="shrink-0 px-lg py-md flex items-center border-t border-neutral-200 bg-neutral-0">
           <Button
             variant="primary"
-            label={t('placeDetail.leaveReview')}
+            label={t('map.buildRoute')}
             fullWidth
-            onClick={() => place && navigate('/review', {
-              state: {
-                placeId:   place.id,
-                placeName: getLocalizedField(place, 'name', lang),
-                address:   getLocalizedField(place, 'address', lang),
-              },
-            })}
+            onClick={() => place && onBuildRoute(getLocalizedField(place, 'name', lang))}
           />
         </div>
       </div>
