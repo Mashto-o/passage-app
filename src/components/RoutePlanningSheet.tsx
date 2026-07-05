@@ -1008,11 +1008,16 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
             )
 
             return (
-              <div className="flex flex-col gap-md">
+              // mt-lg on top of the parent's own gap-[24px]: BestMatchCard's
+              // "Recommended" badge is absolutely positioned above its card
+              // (top-0 -translate-y-1/2), so without this extra clearance
+              // the badge's actual visible top edge — not the card box —
+              // would crowd the "Sort by" row above.
+              <div className="flex flex-col gap-md mt-lg">
 
                 {/* Best match pinned card */}
                 {match && (
-                  <BestMatchCard tags={match.tags}>
+                  <BestMatchCard tags={match.tags} sortValue={routeSortValue} mobilityAid={mobilityAid ?? 'no-aid'}>
                     <RouteCard route={match.route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'no-aid'} />
                   </BestMatchCard>
                 )}

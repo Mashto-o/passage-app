@@ -216,7 +216,9 @@
     "startRoute": "Start route"
   },
   "bestMatch": {
-    "badge": "Best match for you",
+    "recommendedFewestBarriers": "Recommended — fewest barriers",
+    "recommendedFlattest": "Recommended — flattest",
+    "recommendedFastest": "Recommended — fastest",
     "noBarriers": "No barriers",
     "fewestBarriers": "Fewest barriers ({{count}})",
     "accessibleThroughout": "Accessible throughout",

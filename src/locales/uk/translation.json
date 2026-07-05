@@ -222,7 +222,9 @@
     "startRoute": "Почати маршрут"
   },
   "bestMatch": {
-    "badge": "Найкращий збіг",
+    "recommendedFewestBarriers": "Рекомендовано — найменше перешкод",
+    "recommendedFlattest": "Рекомендовано — найрівніший",
+    "recommendedFastest": "Рекомендовано — найшвидший",
     "noBarriers": "Без перешкод",
     "fewestBarriers": "Найменше перешкод ({{count}})",
     "accessibleThroughout": "Доступний по всьому маршруту",
