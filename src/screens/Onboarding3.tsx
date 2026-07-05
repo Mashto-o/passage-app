@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft } from 'lucide-react'
 import { Button, PhotoCard, OnboardingProgress } from '../components'
 import Logo from '../assets/icons/Logo.svg?react'
+import { useOnboarding } from '../context/OnboardingContext'
 
 import imgKerb          from '../assets/images/kerb.png'
 import imgCobblestone   from '../assets/images/cobblestone.png'
@@ -38,15 +39,15 @@ export const Onboarding3: React.FC = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
   // selected = barriers the user CANNOT manage (question polarity inverted)
-  const [selected, setSelected] = useState<string[]>([])
+  const { unmanageableBarriers: selected, setUnmanageableBarriers: setSelected } = useOnboarding()
 
   const toggle = (id: string) =>
-    setSelected(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev.filter(s => s !== NONE_APPLY_ID), id]
+    setSelected(
+      selected.includes(id) ? selected.filter(s => s !== id) : [...selected.filter(s => s !== NONE_APPLY_ID), id]
     )
 
   const toggleNoneApply = () =>
-    setSelected(prev => (prev.includes(NONE_APPLY_ID) ? [] : [NONE_APPLY_ID]))
+    setSelected(selected.includes(NONE_APPLY_ID) ? [] : [NONE_APPLY_ID])
 
   const handleNext = () => {
     navigate('/onboarding/4')

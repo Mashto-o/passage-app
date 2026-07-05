@@ -270,7 +270,7 @@ function DevShowcase() {
           <p className="text-caption-sm text-neutral-500">bus + walk + taxi</p>
           <RouteTimeline segments={[{ type: 'transport', mode: 'bus', routeNumber: '12', accessibility: 'unknown', durationMinutes: 7 }, { type: 'walking', durationMinutes: 6 }, { type: 'transport', mode: 'taxi', accessibility: 'accessible', durationMinutes: 7 }]} mobilityAid="cane" />
           <p className="text-caption-sm text-neutral-500">fully by car</p>
-          <RouteTimeline segments={[{ type: 'transport', mode: 'car', accessibility: 'accessible', durationMinutes: 20 }]} mobilityAid="none" />
+          <RouteTimeline segments={[{ type: 'transport', mode: 'car', accessibility: 'accessible', durationMinutes: 20 }]} mobilityAid="no-aid" />
         </div>
 
         <div className="h-px bg-neutral-200 my-sm" />

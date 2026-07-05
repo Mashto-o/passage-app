@@ -7,16 +7,11 @@ import Stroller           from '../assets/illustrations/stroller.svg?react'
 import Prosthesis         from '../assets/illustrations/prosthesis.svg?react'
 import NoWheelchair       from '../assets/illustrations/no-wheelchair.svg?react'
 import { AccessibilityBadge } from './AccessibilityBadge'
+import type { MobilityAid } from '../context/OnboardingContext'
+
+export type { MobilityAid }
 
 // ── Types ──────────────────────────────────────────────────────────────────
-
-export type MobilityAid =
-  | 'wheelchair-manual'
-  | 'wheelchair-electric'
-  | 'cane'
-  | 'stroller'
-  | 'prosthesis'
-  | 'none'
 
 export type TransportSegment = {
   type: 'transport'
@@ -47,7 +42,7 @@ const mobilityIllustrations: Record<MobilityAid, React.FC<React.SVGProps<SVGSVGE
   'cane':                Cane,
   'stroller':            Stroller,
   'prosthesis':          Prosthesis,
-  'none':                NoWheelchair,
+  'no-aid':              NoWheelchair,
 }
 
 const transportIcons: Record<TransportSegment['mode'], LucideIcon> = {

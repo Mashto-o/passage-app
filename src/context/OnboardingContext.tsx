@@ -35,6 +35,9 @@ interface OnboardingContextValue {
 
   surface:    Surface | null
   setSurface: (v: Surface | null) => void
+
+  unmanageableBarriers:    string[]
+  setUnmanageableBarriers: (v: string[]) => void
 }
 
 // ── Storage keys ───────────────────────────────────────────────────
@@ -46,6 +49,7 @@ const KEYS = {
   stairs:               'passage_pref_stairs',
   slope:                'passage_pref_slope',
   surface:              'passage_pref_surface',
+  unmanageableBarriers: 'passage_unmanageable_barriers',
 } as const
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -96,6 +100,23 @@ function persist(key: string, value: string | null) {
     } else {
       localStorage.setItem(key, value)
     }
+  } catch {
+    // localStorage unavailable — state-only fallback
+  }
+}
+
+function loadArray(key: string, fallback: string[]): string[] {
+  try {
+    const stored = localStorage.getItem(key)
+    return stored ? (JSON.parse(stored) as string[]) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function persistArray(key: string, value: string[]) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
   } catch {
     // localStorage unavailable — state-only fallback
   }
@@ -163,6 +184,15 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     persist(KEYS.surface, v)
   }
 
+  // unmanageableBarriers — defaults to empty array
+  const [unmanageableBarriers, setUnmanageableBarriersState] = useState<string[]>(
+    () => loadArray(KEYS.unmanageableBarriers, []),
+  )
+  const setUnmanageableBarriers = (v: string[]) => {
+    setUnmanageableBarriersState(v)
+    persistArray(KEYS.unmanageableBarriers, v)
+  }
+
   return (
     <OnboardingContext.Provider value={{
       mobilityAid, setMobilityAid,
@@ -171,6 +201,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       stairs,      setStairs,
       slope,       setSlope,
       surface,     setSurface,
+      unmanageableBarriers, setUnmanageableBarriers,
     }}>
       {children}
     </OnboardingContext.Provider>

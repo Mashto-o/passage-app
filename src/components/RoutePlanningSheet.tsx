@@ -976,7 +976,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                   <div className="flex flex-col gap-[16px]">
                     <SectionLabel>{t('routePlanning.ownCar')}</SectionLabel>
                     {ownCarRoute.map(route => (
-                      <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                      <StandardRouteCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'no-aid'} />
                     ))}
                   </div>
                 )}
@@ -985,7 +985,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 <div className="flex flex-col gap-[16px]">
                   <SectionLabel>{t('routePlanning.taxi')}</SectionLabel>
                   {CAR_ROUTES.filter(r => r.cardType === 'uklon').map(route => (
-                    <UklonCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                    <UklonCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'no-aid'} />
                   ))}
                 </div>
 
@@ -993,7 +993,7 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 <div className="flex flex-col gap-[16px]">
                   <SectionLabel>{t('routePlanning.socialTaxiLabel')}</SectionLabel>
                   {CAR_ROUTES.filter(r => r.cardType === 'social-taxi').map(route => (
-                    <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                    <SocialTaxiCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'no-aid'} />
                   ))}
                 </div>
 
@@ -1013,13 +1013,13 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
                 {/* Best match pinned card */}
                 {match && (
                   <BestMatchCard tags={match.tags}>
-                    <RouteCard route={match.route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                    <RouteCard route={match.route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'no-aid'} />
                   </BestMatchCard>
                 )}
 
                 {/* Regular sorted list */}
                 {regularRoutes.map((route) => (
-                  <RouteCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'none'} />
+                  <RouteCard key={route.id} route={route} onSelect={onRouteSelect} mobilityAid={mobilityAid ?? 'no-aid'} />
                 ))}
 
               </div>
