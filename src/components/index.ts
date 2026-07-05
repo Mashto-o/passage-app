@@ -108,8 +108,8 @@ export type { EventCardProps } from './EventCard'
 export { FilterChip } from './FilterChip'
 export type { FilterChipProps } from './FilterChip'
 
-export { ReviewSection } from './ReviewSection'
-export type { ReviewSectionProps, ReviewSectionQuestion } from './ReviewSection'
+export { ReviewSection, deriveSectionAccessibility } from './ReviewSection'
+export type { ReviewSectionProps, ReviewSectionQuestion, SectionAccessibility } from './ReviewSection'
 
 export { BestMatchCard } from './BestMatchCard'
 export type { BestMatchCardProps } from './BestMatchCard'

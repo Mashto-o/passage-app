@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Sparkles, Check, ChevronDown, RotateCcw } from 'lucide-react'
-import { AccessibilityCard } from './AccessibilityCard'
+import { AccessibilityBadge } from './AccessibilityBadge'
 import { MediaInputButton } from './MediaInputButton'
 import { ToggleButton } from './ToggleButton'
 import { Divider } from './Divider'
@@ -15,6 +15,23 @@ export interface ReviewSectionQuestion {
   aiSet: boolean
 }
 
+export type SectionAccessibility = 'accessible' | 'partiallyAccessible' | 'inaccessible'
+
+// ── Derived accessibility ────────────────────────────────────────────
+// The overall section status is never picked independently — it's always
+// computed from the sub-question answers: all yes → accessible, all no →
+// inaccessible, mixed → partial. Returns null until every question has an
+// answer (nothing to derive from yet).
+
+export function deriveSectionAccessibility(
+  questions: ReviewSectionQuestion[],
+): SectionAccessibility | null {
+  if (questions.length === 0 || questions.some(q => q.value === null)) return null
+  if (questions.every(q => q.value === 'yes')) return 'accessible'
+  if (questions.every(q => q.value === 'no')) return 'inaccessible'
+  return 'partiallyAccessible'
+}
+
 export interface ReviewSectionProps {
   icon: React.ReactNode
   label: string
@@ -25,9 +42,6 @@ export interface ReviewSectionProps {
   skippedLabel?: string
   photoSrc: string | null
   status: 'empty' | 'analyzing' | 'done' | 'skipped'
-  accessibilityValue: 'accessible' | 'partiallyAccessible' | 'inaccessible' | null
-  aiSetAccessibility: boolean
-  onAccessibilityChange: (value: 'accessible' | 'partiallyAccessible' | 'inaccessible') => void
   onPhotoSelect: (file: File) => void
   onFillManually?: () => void
   onSkip?: () => void
@@ -51,9 +65,6 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   skippedLabel,
   photoSrc,
   status,
-  accessibilityValue,
-  aiSetAccessibility,
-  onAccessibilityChange,
   onPhotoSelect,
   onFillManually,
   onSkip,
@@ -215,27 +226,26 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
               />
             )}
 
-            {/* Accessibility cards */}
-            <div className="flex gap-sm">
-              {(['accessible', 'partiallyAccessible', 'inaccessible'] as const).map(variant => {
-                const isSelected = accessibilityValue === variant
-                return (
-                  <div key={variant} className="relative flex-1 min-w-0">
-                    <AccessibilityCard
-                      accessibility={variant}
-                      selected={isSelected}
-                      onClick={() => onAccessibilityChange(variant)}
-                      className="w-full"
-                    />
-                    {isSelected && aiSetAccessibility && (
-                      <div className="absolute top-xs right-xs pointer-events-none">
-                        <Sparkles size={12} strokeWidth={1.5} className="text-primary-500" />
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+            {/* Accessibility status — derived from the sub-answers below,
+                read-only. Not a manual choice: it's recomputed every time
+                an answer changes (all yes → accessible, all no →
+                inaccessible, mixed → partial), and shows nothing until
+                every question has an answer. */}
+            {(() => {
+              const derived = deriveSectionAccessibility(questions)
+              if (!derived) return null
+              return (
+                <div className="flex items-center gap-sm">
+                  <AccessibilityBadge
+                    variant={derived === 'partiallyAccessible' ? 'partial' : derived}
+                    size="sm"
+                  />
+                  <span className="text-body-md text-neutral-900">
+                    {t(`accessibilityCard.${derived}`)}
+                  </span>
+                </div>
+              )
+            })()}
 
             {/* Questions */}
             <div className="flex flex-col">

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Sparkles, MessageCircle, Sofa, Toilet, BadgeCheck, X } from 'lucide-react'
-import { Button, CommentInput, ReviewSection } from '../components'
+import { Button, CommentInput, ReviewSection, deriveSectionAccessibility } from '../components'
 import type { ReviewSectionQuestion } from '../components'
 import { analyzePhoto } from '../utils/mockAI'
 import { PLACES } from '../data/places'
@@ -11,16 +11,13 @@ import DoorWidth100 from '../assets/icons/door-width-100.svg?react'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
-type SectionId        = 'entrance' | 'toilet' | 'inside'
-type AccessibilityVal = 'accessible' | 'partiallyAccessible' | 'inaccessible' | null
+type SectionId = 'entrance' | 'toilet' | 'inside'
 
 interface SectionState {
-  status:             'empty' | 'analyzing' | 'done' | 'skipped'
-  photoSrc:           string | null
-  accessibilityValue: AccessibilityVal
-  aiSetAccessibility: boolean
-  isOpen:             boolean
-  questions:          ReviewSectionQuestion[]
+  status:    'empty' | 'analyzing' | 'done' | 'skipped'
+  photoSrc:  string | null
+  isOpen:    boolean
+  questions: ReviewSectionQuestion[]
 }
 
 // ── Section config (keys only — labels resolved via t()) ───────────────
@@ -37,12 +34,10 @@ function initSections(ids: SectionId[]): Record<SectionId, SectionState> {
   const out = {} as Record<SectionId, SectionState>
   for (const id of ids) {
     out[id] = {
-      status:             'empty',
-      photoSrc:           null,
-      accessibilityValue: null,
-      aiSetAccessibility: false,
-      isOpen:             false,
-      questions:          QUESTION_KEYS[id].map(qKey => ({ id: qKey, label: qKey, value: null, aiSet: false })),
+      status:    'empty',
+      photoSrc:  null,
+      isOpen:    false,
+      questions: QUESTION_KEYS[id].map(qKey => ({ id: qKey, label: qKey, value: null, aiSet: false })),
     }
   }
   return out
@@ -81,11 +76,7 @@ export const ReviewScreen: React.FC = () => {
 
   const isSectionComplete = (id: SectionId): boolean => {
     const s = sections[id]
-    return (
-      s.status === 'done' &&
-      s.accessibilityValue !== null &&
-      s.questions.every(q => q.value !== null)
-    )
+    return s.status === 'done' && deriveSectionAccessibility(s.questions) !== null
   }
 
   const allDone =
@@ -116,10 +107,8 @@ export const ReviewScreen: React.FC = () => {
         ...prev,
         [id]: {
           ...prev[id],
-          status:             'done',
-          isOpen:             true,
-          accessibilityValue: result.accessibility,
-          aiSetAccessibility: true,
+          status: 'done',
+          isOpen: true,
           questions: prev[id].questions.map((q, i) => ({
             ...q,
             value: result.answers[i] ? 'yes' : 'no',
@@ -128,16 +117,6 @@ export const ReviewScreen: React.FC = () => {
         },
       }))
     }, 1600)
-  }
-
-  const handleAccessibilityChange = (
-    id:    SectionId,
-    value: 'accessible' | 'partiallyAccessible' | 'inaccessible',
-  ) => {
-    setSections(prev => ({
-      ...prev,
-      [id]: { ...prev[id], accessibilityValue: value, aiSetAccessibility: false },
-    }))
   }
 
   const handleQuestionChange = (id: SectionId, qId: string, value: 'yes' | 'no') => {
@@ -157,12 +136,10 @@ export const ReviewScreen: React.FC = () => {
       ...prev,
       [id]: {
         ...prev[id],
-        status:             'empty',
-        photoSrc:           null,
-        accessibilityValue: null,
-        aiSetAccessibility: false,
-        isOpen:             false,
-        questions:          prev[id].questions.map(q => ({ ...q, value: null, aiSet: false })),
+        status:    'empty',
+        photoSrc:  null,
+        isOpen:    false,
+        questions: prev[id].questions.map(q => ({ ...q, value: null, aiSet: false })),
       },
     }))
   }
@@ -269,9 +246,6 @@ export const ReviewScreen: React.FC = () => {
                 skippedLabel={t('reviewScreen.skipped')}
                 photoSrc={s.photoSrc}
                 status={s.status}
-                accessibilityValue={s.accessibilityValue}
-                aiSetAccessibility={s.aiSetAccessibility}
-                onAccessibilityChange={v => handleAccessibilityChange(id, v)}
                 onPhotoSelect={file => handlePhotoSelect(id, file)}
                 onFillManually={() => handleFillManually(id)}
                 onSkip={() => handleSkip(id)}
