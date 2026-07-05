@@ -1,0 +1,98 @@
+[
+  {
+    "file": "screenshot_01.png",
+    "screen": "Onboarding1 (/) — welcome screen"
+  },
+  {
+    "file": "screenshot_02.png",
+    "screen": "Onboarding2 (/onboarding/2) — mobility aid selection"
+  },
+  {
+    "file": "screenshot_03.png",
+    "screen": "Onboarding3b (/onboarding/3b) — travel companion question"
+  },
+  {
+    "file": "screenshot_04.png",
+    "screen": "Onboarding3 (/onboarding/3) — barrier selection"
+  },
+  {
+    "file": "screenshot_05.png",
+    "screen": "Onboarding4 (/onboarding/4) — accessibility preferences"
+  },
+  {
+    "file": "screenshot_06.png",
+    "screen": "Onboarding5 (/onboarding/5) — sign-up / continue as guest"
+  },
+  {
+    "file": "screenshot_07.png",
+    "screen": "MapScreen (/map) — default state"
+  },
+  {
+    "file": "screenshot_08.png",
+    "screen": "MapScreen (/map) — category bottom sheet (place list)"
+  },
+  {
+    "file": "screenshot_09.png",
+    "screen": "MapScreen (/map) — PlacePopupCard overlay"
+  },
+  {
+    "file": "screenshot_10.png",
+    "screen": "MapScreen (/map) — PlaceDetailSheet overlay"
+  },
+  {
+    "file": "screenshot_11.png",
+    "screen": "MapScreen (/map) — RoutePlanningSheet overlay"
+  },
+  {
+    "file": "screenshot_12.png",
+    "screen": "MapScreen (/map) — RouteDetailSheet overlay"
+  },
+  {
+    "file": "screenshot_13.png",
+    "screen": "MapScreen (/map) — ActiveNavigationSheet (default nav state)"
+  },
+  {
+    "file": "screenshot_14.png",
+    "screen": "MapScreen (/map) — ActiveNavigationSheet (noHazard nav state)"
+  },
+  {
+    "file": "screenshot_15.png",
+    "screen": "MapScreen (/map) — ActiveNavigationSheet (arrived nav state)"
+  },
+  {
+    "file": "screenshot_16.png",
+    "screen": "RouteCompleteScreen (/route-complete)"
+  },
+  {
+    "file": "screenshot_17.png",
+    "screen": "ReviewScreen (/review) — empty AI-assisted accordion"
+  },
+  {
+    "file": "screenshot_18.png",
+    "screen": "ReviewScreen (/review) — section filled in, ready to submit"
+  },
+  {
+    "file": "screenshot_19.png",
+    "screen": "ReviewScreen (/review) — submission success state"
+  },
+  {
+    "file": "screenshot_20.png",
+    "screen": "DiscoverScreen (/discover)"
+  },
+  {
+    "file": "screenshot_21.png",
+    "screen": "ProfileScreen (/profile)"
+  },
+  {
+    "file": "screenshot_22.png",
+    "screen": "AccessibilityPreferencesScreen (/profile/preferences)"
+  },
+  {
+    "file": "screenshot_23.png",
+    "screen": "FilterScreen (/filter)"
+  },
+  {
+    "file": "screenshot_24.png",
+    "screen": "DevShowcase (/dev) — component library reference"
+  }
+]

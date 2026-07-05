@@ -51,10 +51,12 @@ src/
 
 ## i18n (EN/UK)
 - react-i18next, initialized in src/i18n/index.ts. Reads
-  passage_language from localStorage, default 'uk', fallback 'uk'.
+  passage_language from localStorage, default 'en', fallback 'en'
+  (default changed from 'uk' → 'en'; only affects users with no
+  stored preference — existing localStorage values still win).
 - src/locales/en/translation.json and uk/translation.json — all
   user-visible strings keyed by screen/component namespace
-  (common, onboarding1-5, map, searchBar, placePopup, placeDetail,
+  (common, onboarding1-5, onboarding3b, map, searchBar, placePopup, placeDetail,
   sort.places/sort.routes, routePlanning, routeDestination,
   transportSwitcher, routeDetail, bestMatch, filter, navBar,
   placeListItem, categories, navigationCard, discover, updateCard,
@@ -116,6 +118,34 @@ Under "reviewScreen" namespace (additions):
 - submitSuccess: "Review saved!" / "Відгук збережено!"
 - submitSuccessHint: "You can find it on your profile page" /
   "Ви можете переглянути його у своєму профілі"
+
+Under "onboarding3" namespace:
+- title reworded (see Onboarding3 section above)
+- noneApply: "None of these apply to me" /
+  "Жодне з переліченого мене не стосується"
+
+Under "onboarding3b" namespace (new):
+- title: "Do you usually travel alone or with a companion?" /
+  "Ви зазвичай подорожуєте самостійно чи з супутником?"
+- subtitle, alone ("Alone"/"Самостійно"), withCompanion
+  ("With a companion"/"З супутником" — "супутник" matches the term
+  already used in filter.companion, not a new translation)
+- changeableNotice: "You can change this anytime in Filters" /
+  "Ви можете змінити це будь-коли у Фільтрах"
+
+Under "placeDetail" namespace:
+- openingHours: "Opening hours" / "Години роботи" (label for
+  Place.openingHours, see Place data shape section)
+
+Under "routePlanning" namespace:
+- socialTaxiAlt (Social Taxi logo alt text) REMOVED — logo deleted
+- socialTaxiLabel: "Social taxi" / "Соціальне таксі" (plain caption
+  label, replaces the logo)
+- socialTransportNotice: booking-in-advance notice with {{phone}}
+  interpolation + <bold> Trans component tag (see RoutePlanningSheet
+  section above) — "Needs to be booked in advance. Get more detailed
+  information on the website of the transport provider or via
+  phone: <bold>{{phone}}</bold>" / Ukrainian equivalent
 
 ## Ukrainian inclusive terminology
 Per the official «Без бар'єрів» vocabulary (bf.in.ua — Olena
@@ -301,11 +331,13 @@ category — full phrase would be redundant on the card.
 - RoutePlanningSheet (overlay in MapScreen. Props: isOpen,
   destinationName, onClose, onRouteSelect, overrideTop.
   z-[70/75]. Drag-to-close. Power outage banner always shown.
-  TransportSwitcher 3 tabs. SortSheet dynamic height via ref.
+  TransportSwitcher 3 tabs (passes mobilityAid ?? 'no-aid' — see
+  TransportSwitcher section above). SortSheet dynamic height via ref.
   SegmentTimeline per card. Car tab: "Own car" + "Taxi"
-  sections. Uklon (yellow) + Social Taxi (dark blue) cards
-  with brand colours + CTAs. overrideTop syncs height with
-  RouteDetailSheet when open. aria-hidden backdrop + Escape listener.
+  sections. Uklon (yellow, unchanged — logo + time row + timeline
+  + CTA) and Social Taxi (dark blue) cards with brand colours + CTAs.
+  overrideTop syncs height with RouteDetailSheet when open.
+  aria-hidden backdrop + Escape listener.
   Per active tab, BestMatchCard (see below) pinned above the sorted
   list if getBestMatch() returns a result; that route is excluded
   from the regular list.
@@ -313,7 +345,26 @@ category — full phrase would be redundant on the card.
   BestMatchCard (best-match logic does not apply to driving). Uklon/
   Social Taxi route segments are forced to accessibility:
   'accessible' (private/booked transport, not subject to the same
-  accessibility variance as public transit).)
+  accessibility variance as public transit).
+  Taxi section structure: SectionLabel "Taxi" (caption style,
+  font-medium text-[12px] tracking-[0.56px] uppercase text-neutral-700)
+  above Uklon card(s); a second, identical SectionLabel reading
+  "Social taxi" (t('routePlanning.socialTaxiLabel')) sits above the
+  Social Taxi card(s), both as direct siblings in the same
+  gap-[16px] flex column (kept as plain SectionLabel — NOT a
+  smaller/lighter variant — for the labels to look identical).
+  SocialTaxiCard (src/components/RoutePlanningSheet.tsx) no longer
+  shows a logo image (SocialTaxi_Logo.png deleted) or a time/
+  duration row (departure/arrival time + duration/distance removed
+  — doesn't make sense for a ride that must be booked ahead). Card
+  body is now: booking notice → RouteTimeline → "Schedule a ride"
+  CTA. Booking notice is rendered via <Trans i18nKey=
+  "routePlanning.socialTransportNotice" values={{phone:
+  SOCIAL_TAXI_PHONE}} components={{bold: <span className=
+  "font-semibold text-neutral-900" />}} /> — phone is interpolated
+  from a module-level SOCIAL_TAXI_PHONE constant (marked TEMPORARY
+  PLACEHOLDER, '+380 67 499 3010'), rendered bold inline within the
+  otherwise muted (text-[14px] text-neutral-700) notice paragraph.)
 - BestMatchCard (src/components/BestMatchCard.tsx) — card:
   rounded-[32px], bg-success-100, border-2 border-success-500,
   wraps standard route card content. "Best match for you" badge:
@@ -460,12 +511,83 @@ RouteDetailSheet. Does NOT trigger route-complete flow.
   false or unmount
 
 ## Screens (src/screens/)
-Onboarding1(/), Onboarding2-5(/onboarding/2-5) — all five call
+Onboarding1(/), Onboarding2(/onboarding/2), Onboarding3b
+(/onboarding/3b), Onboarding3(/onboarding/3), Onboarding4
+(/onboarding/4), Onboarding5(/onboarding/5) — all six call
 window.scrollTo(0,0) in a useEffect on mount (scroll-to-top),
 DiscoverScreen(/discover), MapScreen(/map), FilterScreen(/filter),
 RouteCompleteScreen(/route-complete), ProfileScreen(/profile),
 AccessibilityPreferencesScreen(/profile/preferences),
 ReviewScreen(/review)
+
+## Onboarding flow order, back-nav, and progress numbering
+Flow order (note: NOT filesystem/route-name order — Onboarding3b
+sits BEFORE Onboarding3 in the actual flow, despite the "3b" name):
+Onboarding1 → Onboarding2 → Onboarding3b → Onboarding3 →
+Onboarding4 → Onboarding5. handleNext navigate() targets:
+Onboarding2→'/onboarding/3b', Onboarding3b→'/onboarding/3',
+Onboarding3→'/onboarding/4', Onboarding4→'/onboarding/5',
+Onboarding5 CTAs→'/map'.
+OnboardingProgress currentStep/totalSteps (totalSteps=5 everywhere):
+Onboarding2=1, Onboarding3b=2, Onboarding3=3, Onboarding4=4,
+Onboarding5=5. OnboardingProgress.tsx itself is unchanged — fill %
+and step counter are computed dynamically from these props.
+Back-navigation pattern (Onboarding3b/3/4/5 — NOT Onboarding2,
+which has "nothing meaningful to return to" as the first real
+choice screen): the progress row's ONBOARDING caption + an inline
+ChevronLeft (16px, matching the icon-to-caption-text ratio used
+elsewhere e.g. PlaceDetailSheet's Section header, not the larger
+24px chevron inside Button's "back" variant) are wrapped together
+in a single <button onClick={() => navigate(-1)}
+aria-label={t('common.back')}>. Both turn text-primary-500 (was
+text-neutral-700); OnboardingProgress's bar fill + step counter are
+untouched. Touch target enlarged via `-m-xs p-xs` (negative-margin/
+padding pair, Passage `xs` token = 8px) so the invisible hit area
+grows without shifting the visible icon/text position. Focus ring:
+focus-visible:outline-none focus-visible:ring-2
+focus-visible:ring-primary-500 focus-visible:ring-offset-2 (same
+classes as Button.tsx). Onboarding2's progress row stays a plain,
+non-interactive <span> (text-neutral-700, no back-nav).
+This replaced an earlier iteration that used a standalone
+Button variant="back" row below the Logo — removed entirely.
+Logo→progress-row spacing: Logo div uses mb-2xl (48px, Passage
+token) on all five onboarding screens (2, 3b, 3, 4, 5) — bumped up
+from mb-xl (32px) for a bigger gap; kept identical across all five
+so onboarding content always starts from the same vertical point.
+
+## Onboarding3 (/onboarding/3) — barrier question
+title reworded to "Which of these are difficult for you? We'll
+route you around them." (two-part: question, then explanation of
+what happens with the answer — UK translation mirrors that
+structure, not a literal translation). subtitle/barriers.* keys
+unchanged. `selected` state comment clarifies polarity: barriers
+the user CANNOT manage. Added a 7th option, "None of these apply to
+me" (onboarding3.noneApply), mutually exclusive with the six
+PhotoCard barrier options — rendered as a plain full-width bordered
+button (no photo; a photo doesn't make sense for "none"), not a
+PhotoCard. Selecting it clears any selected barriers and selects
+only itself; selecting any barrier while it's active deselects it
+(toggle() strips the sentinel id; toggleNoneApply() replaces the
+whole selection). Next button's disabled={selected.length === 0}
+needed no change — selecting "none" still populates the array.
+
+## Onboarding3b (/onboarding/3b) — companion question
+New screen, modeled on Onboarding3's structure (Logo, back-nav
+progress row, heading, spacer, Next button). Single question: does
+the user usually travel alone or with a companion — two
+SelectionCard options (icon left + label right, no rebuild), lucide
+User ("Alone") / Users ("With a companion") icons since there's no
+dedicated illustration asset for this. State is context-backed via
+useOnboarding().travelsWithCompanion (not local state) — selecting
+a card calls setTravelsWithCompanion(false|true) directly, same
+pattern as Onboarding2's mobilityAid selection. Below the two
+options: a changeable-later notice (t('onboarding3b.changeableNotice'),
+"You can change this anytime in Filters") styled text-body-md
+text-neutral-500 (bumped up from text-caption-sm — was too small).
+Next button disabled={selected === null}. Deliberately does NOT
+have a third "I am a caregiver" option — that's a separate, larger
+design question (who is using the app, not just whether they're
+accompanied), tracked separately.
 
 ## DiscoverScreen (/discover)
 Full-page route, bg-neutral-50, px-lg, pt-[56px], pb-[144px],
@@ -513,17 +635,28 @@ Stores AND persists to localStorage:
 - mobilityAid (key: passage_mobility_aid) — type MobilityAid =
   wheelchair-manual | wheelchair-electric | no-wheelchair | cane |
   stroller | prosthesis. setMobilityAid(null) removes the key.
+- travelsWithCompanion (key: passage_travels_with_companion) —
+  boolean | null, no default (user must choose). Same nullable/
+  persisted pattern as mobilityAid, but needs dedicated
+  loadBooleanNullable/persistBoolean helpers since the existing
+  loadItem/loadItemNullable helpers are typed <T extends string>
+  and can't serialize a boolean (stored as the string 'true'/
+  'false', read back via `stored === 'true'`).
+  setTravelsWithCompanion(null) removes the key. Set by Onboarding3b.
 - doorWidth, stairs, slope, surface (keys: passage_pref_door_width,
   passage_pref_stairs, passage_pref_slope, passage_pref_surface) —
   same option types as Onboarding4's PreferenceCard groups.
   setX(null) removes the key.
 Exposes useOnboarding() with all values + setters.
-Used by: Onboarding2 (mobilityAid selection), Onboarding4
-(preference selections — context-backed, not local state),
-ProfileScreen (mobilityAid display),
-AccessibilityPreferencesScreen (preference selections —
-context-backed, initialized from persisted values),
-RoutePlanningSheet (getBestMatch uses mobilityAid).
+Used by: Onboarding2 (mobilityAid selection), Onboarding3b
+(travelsWithCompanion selection), Onboarding4 (preference
+selections — context-backed, not local state), ProfileScreen
+(mobilityAid display), AccessibilityPreferencesScreen (preference
+selections — context-backed, initialized from persisted values),
+RoutePlanningSheet (getBestMatch uses mobilityAid; TransportSwitcher
+walking-tab icon uses mobilityAid), FilterContext (FilterProvider
+seeds hasCompanion from travelsWithCompanion — see Filter state
+section below).
 Exported MobilityAid type is single source of truth. A separate,
 narrower MobilityAid type is also exported from
 src/components/RouteTimeline.tsx — same options except it uses
@@ -603,10 +736,14 @@ Entry points:
     (resets section back to 'empty').
 - Comment section: "ADD A COMMENT" + MessageCircle icon, 2 Chips,
   CommentInput (280 char, aria-label).
-- Submit "Post review": enabled only when every section is either
-  isComplete or status==='skipped'; console.logs all state +
-  comment, then sets isSubmitSuccess=true. All new submissions
-  treated as isVerified:true.
+- Submit "Post review": enabled when at least one section
+  isComplete AND every section is isComplete, status==='skipped',
+  OR status==='empty' (allDone in ReviewScreen.tsx — untouched
+  sections no longer block submission; the manual "Skip section"
+  link still works exactly as before, it's just no longer a hard
+  requirement). console.logs all state + comment, then sets
+  isSubmitSuccess=true. All new submissions treated as
+  isVerified:true.
 - Success state: isSubmitSuccess=true renders a full-page centred
   view (replaces main form) with BadgeCheck icon (bg-primary-100
   pill, text-primary-500), t('reviewScreen.submitSuccess') h1,
@@ -619,8 +756,12 @@ Entry points:
 - All strings + AI banner translated EN/UK (reviewScreen namespace).
 
 ## Routing
-/ /onboarding/2-5 /discover /map /filter /route-complete
+/ /onboarding/2 /onboarding/3b /onboarding/3 /onboarding/4
+/onboarding/5 /discover /map /filter /route-complete
 /review /profile /profile/preferences /dev (component showcase)
+(route list ordered to match actual flow order — see Onboarding
+flow section above; /onboarding/3b comes before /onboarding/3
+despite the name)
 
 ## Context providers (main.tsx)
 <BrowserRouter><LanguageProvider><OnboardingProvider><FilterProvider>
@@ -638,8 +779,10 @@ Entry points:
   door-width-90/100/120, slope-none/moderate/steep,
   stairs-avoided/single/multiple,
   surface-smooth/uneven/cobblestone,
-  shelter, wc, starting-point-icon, end-point-icon,
-  Uklon_Logo_2018.png, SocialTaxi_Logo.png
+  shelter, wc, starting-point-icon, end-point-icon, walking,
+  Uklon_Logo_2018.png
+  (SocialTaxi_Logo.png deleted — Social Taxi card no longer shows
+  a brand logo, see RoutePlanningSheet section below)
 
 ## Asset images structure
 src/assets/images/
@@ -651,7 +794,21 @@ src/assets/images/
 
 ## Transport mode icons (lucide-react)
 transit→TrainFront, bus→Bus, tram→TramFront, metro→Train,
-taxi→CarTaxiFront, car→Car, walking→Accessibility
+taxi→CarTaxiFront, car→Car, walking→Accessibility (RouteTimeline/
+SegmentTimeline — always Accessibility regardless of mobility aid;
+this is about the walking segment icon in route timelines, not the
+TransportSwitcher walking tab — see below)
+
+## TransportSwitcher walking-tab icon (mobility-aid aware)
+TransportSwitcherProps now requires `mobilityAid: MobilityAid`
+(from OnboardingContext). The `walking` tab icon is chosen per
+render: lucide Accessibility for 'wheelchair-manual'/
+'wheelchair-electric', else a custom src/assets/icons/walking.svg
+(imported ?react; stroke fixed to currentColor — was hardcoded
+#3F3F47, corrected to match SVG convention). `transit`/`car` tabs
+unchanged (TrainFront/Car). Call sites: RoutePlanningSheet.tsx
+(mobilityAid={mobilityAid ?? 'no-aid'}) and App.tsx's /dev
+showcase (same fallback pattern).
 
 ## Sort options
 - Places: Most accessible first (default), Nearest first,
@@ -693,8 +850,17 @@ type Place = {
   coordinates: [lng,lat], accessibilityScore, barrierCount,
   distance: number (metres — format via formatDistance),
   verifiedAt: Date, isLiftDependent: boolean,
-  sections: PlaceSections
+  openingHours?: string, sections: PlaceSections
 }
+openingHours format: "09:00–20:00" (en dash, 24h) or "24/7" for
+always-open categories. Assigned per category, not per-place:
+shelter/hospital/park→24/7 (emergency/medical/unrestricted),
+restaurant→10:00–22:00, landmark→09:00–18:00 (museums),
+supermarket→08:00–22:00, bank→09:00–18:00, toilet→06:00–22:00,
+pharmacy→09:00–21:00. Rendered in PlaceDetailSheet below the
+address (Clock icon, size 14, text-neutral-700) only when defined,
+labelled via t('placeDetail.openingHours') ("Opening hours") since
+a bare time range isn't self-explanatory without a label.
 
 PLACE_DATA: 50 entries as Omit<Place,'sections'>[]
 buildSections(category, score): score >= 70 → 'accessible' tier/photos,
@@ -742,8 +908,15 @@ Shared via React Context between MapScreen + FilterScreen.
 type FilterState = {
   accessibility: Set<string>, avoidLifts, hasCompanion
 }
-DEFAULT: accessibility=new Set(['accessible','inaccessible',
-'partial']), avoidLifts=false, hasCompanion=false.
+DEFAULT_FILTER_STATE: accessibility=new Set(['accessible',
+'inaccessible','partial']), avoidLifts=false, hasCompanion=false
+— unchanged, still the reset/fallback shape.
+FilterProvider's initial useState, however, seeds hasCompanion from
+useOnboarding().travelsWithCompanion ?? false (calls useOnboarding()
+inside FilterProvider — works because OnboardingProvider wraps
+FilterProvider in main.tsx). Only the provider's initial state is
+affected; DEFAULT_FILTER_STATE, handleReset, and restoreFilterState
+still hard-reset hasCompanion to false.
 CRITICAL: always create new Set on update, never mutate.
 handleReset must create new Set, never reuse DEFAULT ref.
 FilterScreen: h1 = "Filter" (translated), Toggle components have
