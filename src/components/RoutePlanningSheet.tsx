@@ -13,7 +13,7 @@ import { getBestMatch } from '../utils/accessibilityMatch'
 
 // ── Sort key type ──────────────────────────────────────────────────────────
 
-export type RouteSortKey = 'fewest-barriers' | 'shortest-distance' | 'fastest' | 'flattest'
+export type RouteSortKey = 'fewest-barriers' | 'fastest' | 'flattest'
 
 // Third-party brand colours — hardcoded intentionally, not Passage tokens
 const UKLON_YELLOW          = '#F5DB00'
@@ -474,13 +474,12 @@ const WALKING_ROUTES: Route[] = [
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-const ROUTE_SORT_KEYS: RouteSortKey[] = ['fewest-barriers', 'shortest-distance', 'fastest', 'flattest']
+const ROUTE_SORT_KEYS: RouteSortKey[] = ['fewest-barriers', 'fastest', 'flattest']
 
 function sortRoutes(routes: Route[], sortKey: RouteSortKey): Route[] {
   const sorted = [...routes]
   switch (sortKey) {
     case 'fewest-barriers':   return sorted.sort((a, b) => a.barrierCount - b.barrierCount)
-    case 'shortest-distance': return sorted.sort((a, b) => a.distanceKm - b.distanceKm)
     case 'fastest':           return sorted.sort((a, b) => a.durationMin - b.durationMin)
     case 'flattest':          return sorted.sort((a, b) => a.barrierCount - b.barrierCount)
     default: return sorted
@@ -851,7 +850,16 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   overrideTop,
   maxHeight,
 }) => {
-  const [routeSortValue, setRouteSortValue] = useState<RouteSortKey>('fewest-barriers')
+  const { mobilityAid } = useOnboarding()
+
+  // Initial sort category only — wheelchair users start on the category
+  // most relevant to them; every other mobility aid (cane, prosthesis,
+  // stroller, no-aid) keeps the pre-existing 'fewest-barriers' default.
+  // Once set, this is plain state — a manual change by the user sticks
+  // for the rest of the session and is never forced back.
+  const [routeSortValue, setRouteSortValue] = useState<RouteSortKey>(
+    () => mobilityAid === 'wheelchair-electric' ? 'flattest' : 'fewest-barriers'
+  )
   const [routeSortOpen,  setRouteSortOpen]  = useState(false)
   const [activeTab,      setActiveTab]      = useState<'transit' | 'car' | 'walking'>('transit')
   const [dragStartY,     setDragStartY]     = useState(0)
@@ -859,7 +867,6 @@ export const RoutePlanningSheet: React.FC<RoutePlanningSheetProps> = ({
   const [sheetHeight,    setSheetHeight]    = useState(() => window.innerHeight)
   const DRAG_THRESHOLD = 80
 
-  const { mobilityAid } = useOnboarding()
   const { t } = useTranslation()
 
   const routeSortOptions = ROUTE_SORT_KEYS.map(key => ({ key, label: t(`sort.${key}`) }))

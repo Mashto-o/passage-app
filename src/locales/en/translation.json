@@ -91,7 +91,6 @@
     "nearest": "Nearest first",
     "recently-verified": "Recently verified",
     "fewest-barriers": "Fewest barriers",
-    "shortest-distance": "Shortest distance",
     "fastest": "Fastest",
     "flattest": "Flattest route"
   },
@@ -182,7 +181,7 @@
   },
   "routePlanning": {
     "routesTo": "Routes to {{destination}}",
-    "powerOutageWarning": "Power outage expected in ~30 min. We recommend the shortest route.",
+    "powerOutageWarning": "Power outage expected in ~30 min. We recommend the fastest route.",
     "ownCar": "Own car",
     "taxi": "Taxi",
     "accessibleVehicle": "Accessible vehicle",
