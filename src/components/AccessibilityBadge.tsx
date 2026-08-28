@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, X, AlertTriangle, HelpCircle } from 'lucide-react'
+import { Check, X, AlertTriangle, HelpCircle, type LucideProps } from 'lucide-react'
 
 export interface AccessibilityBadgeProps {
   variant: 'accessible' | 'inaccessible' | 'partial' | 'partiallyAccessible' | 'unknown'
@@ -16,7 +16,7 @@ type VariantConfig = {
   outerBg:   string
   innerBg:   string
   iconClass?: string
-  Icon: React.ComponentType<{ size: number; className?: string; 'aria-hidden'?: boolean }>
+  Icon: React.ComponentType<LucideProps>
 }
 
 const variantConfig: Record<CanonicalVariant, VariantConfig> = {

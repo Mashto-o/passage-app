@@ -146,6 +146,37 @@ Under "routePlanning" namespace:
   section above) — "Needs to be booked in advance. Get more detailed
   information on the website of the transport provider or via
   phone: <bold>{{phone}}</bold>" / Ukrainian equivalent
+- powerOutageWarning reworded: was "...We recommend the shortest
+  route." → now "...We recommend the fastest route." (uk:
+  "...Рекомендуємо найшвидший маршрут.") — "shortest" no longer
+  exists as a sort category (see Sort options section below), so
+  the banner was pointed at the closest remaining equivalent,
+  "fastest". Flagged as an assumption worth revisiting — a power
+  outage plausibly also breaks lifts (an accessibility barrier,
+  not just a speed issue), so "fewest barriers" could arguably fit
+  the scenario better; kept as "fastest" pending a decision.
+
+Under "map" namespace:
+- tapForDetails: "Tap for details" / "Натисніть, щоб дізнатися
+  більше" — microcopy hint on PlacePopupCard, shown once per
+  browser session (see PlacePopupCard section below). Currently
+  dormant along with the rest of PlacePopupCard (component not
+  rendered anywhere — see Map popup / marker-tap behaviour below).
+
+Under "bestMatch" namespace:
+- badge REMOVED — was a static "Best match for you" / "Найкращий
+  збіг". Replaced by three reason-specific keys (see BestMatchCard
+  section below): recommendedFewestBarriers ("Recommended — fewest
+  barriers" / "Рекомендовано — найменше перешкод"),
+  recommendedFlattest ("Recommended — flattest" / "Рекомендовано —
+  найрівніший"), recommendedFastest ("Recommended — fastest" /
+  "Рекомендовано — найшвидший").
+
+Under "sort" namespace:
+- shortest-distance REMOVED (was "Shortest distance" /
+  "Найкоротший шлях") — see Sort options section below. Routes now
+  sort by exactly three categories: fewest-barriers, fastest,
+  flattest.
 
 ## Ukrainian inclusive terminology
 Per the official «Без бар'єрів» vocabulary (bf.in.ua — Olena
@@ -217,7 +248,10 @@ category — full phrase would be redundant on the card.
 - AccessibilityCard (accessible/partiallyAccessible/inaccessible
   × default/selected. Labels via t('accessibilityCard.*') —
   labelKey stored in module-level config, resolved inside component
-  body via useTranslation so hooks are called correctly.)
+  body via useTranslation so hooks are called correctly. No longer
+  used by ReviewSection (see ReviewScreen section below — that
+  status is now derived + read-only, shown via AccessibilityBadge
+  instead); only remaining usage is App.tsx's /dev showcase.)
 - PhotoCard (src, label, selected with primary/500 overlay)
 - PlacePhotoCard (optional src, isVerified?: boolean,
   updatedAt: string.
@@ -312,8 +346,21 @@ category — full phrase would be redundant on the card.
   activeTab + onTabChange, each tab has translated aria-label)
 - PlaceDetailSheet (overlay in MapScreen. Props: isOpen,
   place, onClose, onBuildRoute.
-  top-[248px], z-[60/65]. Drag-to-close. Scroll-to-top.
-  Sticky footer: single full-width "Leave a review" primary Button
+  Exports PLACE_DETAIL_SHEET_TOP_PX = 248 (also re-exported from
+  components/index.ts) — the sheet's top offset, kept as a plain
+  numeric constant alongside the literal `top-[248px]` Tailwind
+  class (arbitrary-value classes must stay literal for the JIT
+  compiler; the constant exists so other screens — currently
+  MapScreen's marker flyTo — can position content relative to this
+  sheet's top edge without duplicating the raw number). z-[60/65].
+  Drag-to-close. Scroll-to-top.
+  Sticky footer: single full-width "Build a route" primary Button
+  → onBuildRoute(placeName). This used to be "Leave a review" —
+  swapped so the map's marker-tap flow (which now opens this sheet
+  directly, see Map popup / marker-tap behaviour below) always has
+  an always-visible route CTA. "Leave a review" moved up into the
+  scrollable action row instead, as a `secondary`-variant Button
+  (bordered, fully labeled — not icon-only) next to bookmark/share
   → navigate('/review', { state: { placeId, placeName, address } }).
   Thumbs up/down removed.
   Sections dynamic — derived via getPlaceFeatures(place): only the
@@ -330,7 +377,26 @@ category — full phrase would be redundant on the card.
   No NavBar. aria-hidden backdrop + Escape listener.)
 - RoutePlanningSheet (overlay in MapScreen. Props: isOpen,
   destinationName, onClose, onRouteSelect, overrideTop.
-  z-[70/75]. Drag-to-close. Power outage banner always shown.
+  z-[70/75]. Drag-to-close. Power outage banner always shown
+  (text now says "...recommend the fastest route" — see Translation
+  keys section above for why).
+  routeSortValue (RouteSortKey: 'fewest-barriers'|'fastest'|
+  'flattest' — 'shortest-distance' removed, see Sort options
+  section below) initial value is now mobility-aid-aware instead of
+  a flat hardcoded default: useOnboarding() is called before the
+  useState so its lazy initializer can branch on mobilityAid —
+  'wheelchair-electric' → 'flattest', every other mobility aid
+  (wheelchair-manual, cane, prosthesis, stroller, no-aid, null)
+  keeps the pre-existing 'fewest-barriers' default. This only sets
+  the INITIAL value — a manual sort change afterward is plain
+  setState and is never forced back.
+  Non-car route-list wrapper div has mt-lg (Passage lg token, 24px)
+  in addition to the parent's own gap-[24px]: BestMatchCard's badge
+  is absolutely positioned above its own card box (top-0
+  -translate-y-1/2), so the badge's actual visible top edge sits
+  higher than the card box it wraps — without the extra mt-lg, that
+  badge crowded the "Sort by" row above it. Only the transit/walking
+  branch needs this (car tab never renders a BestMatchCard).
   TransportSwitcher 3 tabs (passes mobilityAid ?? 'no-aid' — see
   TransportSwitcher section above). SortSheet dynamic height via ref.
   SegmentTimeline per card. Car tab: "Own car" + "Taxi"
@@ -367,16 +433,30 @@ category — full phrase would be redundant on the card.
   otherwise muted (text-[14px] text-neutral-700) notice paragraph.)
 - BestMatchCard (src/components/BestMatchCard.tsx) — card:
   rounded-[32px], bg-success-100, border-2 border-success-500,
-  wraps standard route card content. "Best match for you" badge:
-  bg-success-500 white-text pill, absolute top-0 left-[24px]
-  -translate-y-1/2 (straddles the card's top edge). Tags row
-  (Chips) removed entirely.
+  wraps standard route card content. Badge: bg-success-500
+  white-text pill, absolute top-0 left-[24px] -translate-y-1/2
+  (straddles the card's top edge). Tags row (Chips) removed entirely.
+  Badge text now states WHY the route is recommended, mirroring
+  RoutePlanningSheet's active sort category (routeSortValue) rather
+  than a generic label — props: tags, sortValue: RouteSortKey,
+  mobilityAid: MobilityAid. Switches on sortValue: 'fewest-barriers'→
+  t('bestMatch.recommendedFewestBarriers'), 'flattest'→
+  recommendedFlattest, 'fastest'→recommendedFastest. No 'shortest-
+  distance' case exists any more (removed — see Sort options
+  section) but the switch keeps a default branch that falls back to
+  the mobilityAid-driven wording (wheelchair-manual/electric→
+  flattest wording, else fastest wording) — now unreachable dead
+  code kept intentionally rather than deleted, since a prior task
+  explicitly said not to touch this file's "Recommended" labeling
+  logic when "Shortest" was removed.
   Computed via src/utils/accessibilityMatch.ts → getBestMatch(routes,
   mobilityAid): scores by route.barrierCount + mobilityAid sensitivity
   (manual/electric/stroller=high, cane/prosthesis=medium,
   no-wheelchair=low → returns null, no badge shown). NOT based on
   crowd/review data for this specific route (statistically meaningless
   for one-off A-to-B routes) — purely profile-vs-route-data driven.
+  This scoring/selection logic is unchanged — only the badge's own
+  text changed.
 - RouteDetailSheet (overlay in MapScreen. Props: isOpen,
   route, destinationName, onClose, onStartRoute.
   Two snap points: SNAP_SHORT=52vh, SNAP_FULL=0.
@@ -466,20 +546,74 @@ Implementation:
 - Mock data in PlaceDetailSheet shows mix of verified/unverified
   ReviewCards and PlacePhotoCards for demo purposes
 
-## PlacePopupCard coverPhoto
-coverPhoto?: string prop — renders <img> when defined (w-full
-h-[120px] object-cover rounded-[16px]), grey div fallback when not.
-In MapScreen, passed as:
-  coverPhoto={selectedPlace?.sections?.entrance?.photos?.[0]?.src}
-
-## Map popup behaviour
-- Tapping a marker opens PlacePopupCard
-- Tapping the photo/info area (a <button>, see a11y notes) →
-  opens PlaceDetailSheet for that place
+## PlacePopupCard — currently unused, kept for reuse
+src/components/PlacePopupCard.tsx is NOT rendered anywhere in the
+app any more (see Map marker-tap behaviour below — marker taps now
+navigate straight to PlaceDetailSheet instead of opening this
+popup). File intentionally kept intact + still exported from
+components/index.ts, with a comment above its prop types
+("Not currently rendered — kept for potential reuse elsewhere").
+Do not delete; do not re-wire it into MapScreen without deliberate
+intent.
+- coverPhoto?: string prop — renders <img> when defined (w-full
+  h-[120px] object-cover rounded-[16px]), grey div fallback when not.
+- "Tap for details" hint (t('map.tapForDetails')): shown under the
+  address, primary-500, only the first time the popup opens in a
+  browser session. Tracked via sessionStorage (NOT localStorage —
+  deliberately resets each new browser session, unlike onboarding/
+  preference values) under key passage_seen_place_popup_hint, with
+  try/catch-wrapped helpers matching the style of OnboardingContext's
+  loadItem/persist helpers. Decided once per visible-prop transition
+  (closed→open), not on every render, so it can't flicker away while
+  the same popup instance stays open. Since the component is
+  currently unrendered, this hint doesn't fire in the live app today
+  — it's proven to work (verified before the popup was disconnected)
+  and will apply automatically whenever PlacePopupCard is reused.
 - Save / Share buttons: stopPropagation + console.log only
 - "Build a route" button: stopPropagation + opens RoutePlanningSheet
 - Close (X) button: stopPropagation + closes popup
 - Popup hidden when selectedPlace is null
+
+## Map marker-tap behaviour (MapScreen)
+Tapping a marker (handleMarkerClick) now navigates straight to
+PlaceDetailSheet — it no longer opens PlacePopupCard (that popup
+component still exists, see above, just isn't wired into this flow).
+- setSelectedPlace(place) — still set, still drives the marker's
+  own selected/highlighted badge visual (PlaceMarker's `selected`
+  prop, the size-up + pulsing-halo state) — this state's meaning as
+  "which marker is visually selected" is unchanged, only its
+  downstream UI consequence (popup vs. sheet) changed.
+- setSelectedPlaceForDetail(place) + setPlaceDetailOpen(true) —
+  same state pair used by every other PlaceDetailSheet entry point
+  (search results, category place list) — no separate/duplicate
+  path was built for this.
+- flyTo zoom (16) and duration (600) are unchanged. The offset,
+  however, is no longer a hardcoded [0, -120] magic number tuned for
+  the old popup's short, bottom-anchored footprint. It's computed by
+  offsetAboveSheetTop(sheetTopPx) (module-level helper in
+  MapScreen.tsx): places the marker's screen-space center
+  MARKER_SHEET_CLEARANCE_PX (Passage `2xl` token, 48px) above
+  whatever sheet-top value it's given — currently
+  PLACE_DETAIL_SHEET_TOP_PX (248, imported from PlaceDetailSheet).
+  This exists because PlaceDetailSheet covers much more of the
+  screen (fixed top-[248px]) than the old bottom-anchored popup
+  did, so the old fixed offset left the marker rendered underneath
+  the now-taller sheet (confirmed empirically: marker center landed
+  at y≈302 vs. the sheet's top at y=248 — inside the covered area).
+  Ties the marker position to "top of whatever sheet is open" rather
+  than one overlay's specific height, so it stays correct if
+  PlaceDetailSheet's top value ever changes.
+- selectedPlace reset bug (fixed): PlaceDetailSheet's onClose prop
+  (the single callback backing ALL FOUR of the sheet's internal
+  dismiss paths — back/X button, swipe-down drag, backdrop tap, and
+  the Escape-key listener, since they all funnel into that one prop)
+  used to reset placeDetailOpen/selectedPlaceForDetail but never
+  selectedPlace — so the marker stayed visually "selected" (halo +
+  enlarged badge) after the sheet closed. Fixed by adding
+  setSelectedPlace(null) to that same onClose callback in
+  MapScreen.tsx; since every close path shares it, one fix covers
+  all four. (ActiveNavigationSheet's arrival flow already cleared
+  selectedPlace directly and was never affected by this bug.)
 
 ## Route completion flow
 When navState reaches 'arrived' in ActiveNavigationSheet:
@@ -560,15 +694,18 @@ title reworded to "Which of these are difficult for you? We'll
 route you around them." (two-part: question, then explanation of
 what happens with the answer — UK translation mirrors that
 structure, not a literal translation). subtitle/barriers.* keys
-unchanged. `selected` state comment clarifies polarity: barriers
-the user CANNOT manage. Added a 7th option, "None of these apply to
-me" (onboarding3.noneApply), mutually exclusive with the six
-PhotoCard barrier options — rendered as a plain full-width bordered
-button (no photo; a photo doesn't make sense for "none"), not a
-PhotoCard. Selecting it clears any selected barriers and selects
-only itself; selecting any barrier while it's active deselects it
-(toggle() strips the sentinel id; toggleNoneApply() replaces the
-whole selection). Next button's disabled={selected.length === 0}
+unchanged. `selected` (now `unmanageableBarriers` from
+useOnboarding(), not local useState — see OnboardingContext section
+above) comment clarifies polarity: barriers the user CANNOT manage.
+Added a 7th option, "None of these apply to me" (onboarding3.noneApply),
+mutually exclusive with the six PhotoCard barrier options — rendered
+as a plain full-width bordered button (no photo; a photo doesn't
+make sense for "none"), not a PhotoCard. Selecting it clears any
+selected barriers and selects only itself; selecting any barrier
+while it's active deselects it (toggle() strips the sentinel id;
+toggleNoneApply() replaces the whole selection — both now call
+setUnmanageableBarriers(newArray) directly rather than a functional
+setState updater). Next button's disabled={selected.length === 0}
 needed no change — selecting "none" still populates the array.
 
 ## Onboarding3b (/onboarding/3b) — companion question
@@ -647,20 +784,40 @@ Stores AND persists to localStorage:
   passage_pref_stairs, passage_pref_slope, passage_pref_surface) —
   same option types as Onboarding4's PreferenceCard groups.
   setX(null) removes the key.
+- unmanageableBarriers: string[] (key: passage_unmanageable_barriers)
+  — barriers the user selected in Onboarding3, persisted as a JSON
+  string via new loadArray/persistArray helpers (JSON.stringify/
+  parse — the existing loadItem/persist helpers are typed
+  <T extends string> and can't serialize an array, same reason
+  travelsWithCompanion needed its own boolean helpers). Defaults to
+  [] (no stored value). setUnmanageableBarriers(v) replaces the
+  helpers.
 Exposes useOnboarding() with all values + setters.
 Used by: Onboarding2 (mobilityAid selection), Onboarding3b
-(travelsWithCompanion selection), Onboarding4 (preference
-selections — context-backed, not local state), ProfileScreen
-(mobilityAid display), AccessibilityPreferencesScreen (preference
-selections — context-backed, initialized from persisted values),
-RoutePlanningSheet (getBestMatch uses mobilityAid; TransportSwitcher
-walking-tab icon uses mobilityAid), FilterContext (FilterProvider
+(travelsWithCompanion selection), Onboarding3 (unmanageableBarriers
+selection — context-backed, replacing local useState; toggle()/
+toggleNoneApply() now read/write via context instead of a functional
+setState updater, since context setters take a value not an updater
+function), Onboarding4 (preference selections — context-backed, not
+local state), ProfileScreen (mobilityAid display),
+AccessibilityPreferencesScreen (preference selections — context-
+backed, initialized from persisted values), RoutePlanningSheet
+(getBestMatch uses mobilityAid; TransportSwitcher walking-tab icon
+uses mobilityAid; initial routeSortValue branches on mobilityAid —
+see RoutePlanningSheet section above), FilterContext (FilterProvider
 seeds hasCompanion from travelsWithCompanion — see Filter state
 section below).
-Exported MobilityAid type is single source of truth. A separate,
-narrower MobilityAid type is also exported from
-src/components/RouteTimeline.tsx — same options except it uses
-'none' in place of 'no-wheelchair'.
+Exported MobilityAid type is the single source of truth everywhere
+now. src/components/RouteTimeline.tsx used to export its own
+separate, narrower MobilityAid type with 'none' in place of
+'no-aid' — that mismatch caused real `tsc -b` type errors at every
+RoutePlanningSheet call site (`mobilityAid ?? 'none'`). Fixed:
+RouteTimeline.tsx now imports MobilityAid from OnboardingContext and
+re-exports it (`export type { MobilityAid }`) so existing consumers
+(RoutePlanningSheet.tsx, components/index.ts) don't need import-path
+changes; its mobilityIllustrations lookup key changed from 'none' to
+'no-aid'; all 5 `mobilityAid ?? 'none'` fallbacks in
+RoutePlanningSheet.tsx became `?? 'no-aid'`.
 
 ## ProfileScreen (/profile)
 Reads mobilityAid from useOnboarding(), renders matching illustration
@@ -717,13 +874,38 @@ Entry points:
   - 'analyzing': photo preview + pulsing Sparkles +
     t('reviewScreen.analyzingPhoto') card, ~1600ms → auto-advances
     to 'done'. ReviewSection uses useTranslation for this string.
-  - 'done' (auto-opens): photo (if any) + 3 AccessibilityCard
-    ratings + Yes/No ToggleButton questions. When reached via AI
-    photo flow, AI-prefilled with Sparkles badges (user can override
-    any value, removing its badge); when reached via "Fill in
-    manually", all fields start unset.
-  - isComplete (derived, not stored): rating selected AND all
-    toggle questions answered for that section.
+  - 'done' (auto-opens): photo (if any) + a single READ-ONLY
+    accessibility status row + Yes/No ToggleButton questions. The
+    overall status is NO LONGER a separate manual choice — the old
+    row of 3 clickable AccessibilityCard tiles (accessible/
+    partiallyAccessible/inaccessible, independently selectable) is
+    gone. It's now purely derived from the sub-question answers via
+    an exported pure helper, deriveSectionAccessibility(questions)
+    (src/components/ReviewSection.tsx, re-exported from
+    components/index.ts): all "yes" → accessible, all "no" →
+    inaccessible, mixed → partiallyAccessible, and null (shows
+    nothing) until every question has an answer. Displayed as a
+    single AccessibilityBadge + translated label
+    (t(`accessibilityCard.${derived}`), reusing the same
+    accessibilityCard.* keys the old AccessibilityCard component
+    used — no new strings needed) — recomputed on every answer
+    change, never independently editable.
+    aiSetAccessibility (the sparkle badge that used to mark "AI set
+    this overall rating") was removed entirely along with it — since
+    the status is always arithmetic over the answers (which already
+    carry their own per-question aiSet sparkles), a third aggregate
+    "AI set this" indicator had no independent meaning left. When
+    reached via AI photo flow, questions are AI-prefilled with
+    Sparkles badges (user can override any value, removing its
+    badge); when reached via "Fill in manually", all fields start
+    unset — this part is unchanged. mockAI.ts's analyzePhoto() still
+    returns both `accessibility` and `answers`, generated
+    consistently with each other, but ReviewScreen no longer
+    consumes the `accessibility` field directly — only `answers`,
+    since the aggregate is now always derived from them.
+  - isComplete (derived, not stored): deriveSectionAccessibility(...)
+    !== null (equivalent to "all toggle questions answered" — the
+    two conditions are now the same check) AND status === 'done'.
   - Mock AI (src/utils/mockAI.ts → analyzePhoto(sectionId)): predicts
     accessibility rating; answers derived from rating — accessible→
     all yes, inaccessible→all no, partiallyAccessible→half yes/half no.
@@ -813,8 +995,14 @@ showcase (same fallback pattern).
 ## Sort options
 - Places: Most accessible first (default), Nearest first,
   Recently verified
-- Routes: Fewest barriers (default), Shortest distance,
-  Fastest, Flattest route
+- Routes: Fewest barriers, Fastest, Flattest route ("Shortest
+  distance" REMOVED entirely — type, options array, sort-fn branch,
+  and translation keys all deleted; see RouteSortKey in
+  RoutePlanningSheet section above and Translation keys section).
+  Initial default is mobility-aid-aware: 'wheelchair-electric' →
+  Flattest, every other mobility aid → Fewest barriers (the
+  pre-existing default, unchanged) — see RoutePlanningSheet section
+  above. A manual change afterward is not force-reset.
 All sort option labels translated (sort.places.* / sort.routes.*).
 
 ## Sort logic (MapScreen)
@@ -956,7 +1144,10 @@ to NavBar.
 
 ## MapScreen overlay z-index stack (bottom to top)
 Map:z-0, chips backdrop:z-[45], bottom sheet:z-[50],
-popup backdrop:z-[55], popup:z-[60],
+popup backdrop:z-[55], popup:z-[60] (PlacePopupCard's own JSX —
+dormant: neither the popup nor its backdrop are rendered in
+MapScreen any more, see Map marker-tap behaviour above; z-index
+values are only meaningful again if it's reused),
 PlaceDetailSheet backdrop:z-[55] sheet:z-[60],
 RoutePlanningSheet backdrop:z-[65] sheet:z-[70],
 RouteDetailSheet backdrop:z-[75] sheet:z-[80],
@@ -1020,8 +1211,12 @@ RouteDetailSheet, SortSheet) have their own Escape listeners
 for their own onClose.
 
 ## Mapbox flyTo convention
-Marker tap (handleMarkerClick) uses offset:[0,-120], zoom:16.
-Search result tap uses offset:[0,-80], zoom:16.
+Marker tap (handleMarkerClick): zoom:16, duration:600. offset is
+NO LONGER the fixed [0,-120] — see Map marker-tap behaviour section
+above for offsetAboveSheetTop(), which derives it from
+PLACE_DETAIL_SHEET_TOP_PX + a Passage-token clearance instead.
+Search result tap uses offset:[0,-80], zoom:16 (unchanged, separate
+entry point, not touched by the above).
 No padding on flyTo — only fitBounds uses padding.
 map.setPadding zeros on mount and in RouteDetailSheet cleanup.
 Mapbox free tier: 50,000 map loads/month, 100,000 Directions
@@ -1084,6 +1279,41 @@ which one is tapped, calls navigate('/map').
   reviews. New review author: "You" (translated), mobilityIcon
   from useOnboarding().mobilityAid, timestamp: t('common.justNow'),
   isVerified: true (hardcoded).
+- BLOCKED — toilet-category factor split (wheelchair vs. parent/
+  stroller needs): a task asked to split the shared "toilet" section
+  (currently one accessibility factor set — step-free/space/grab
+  bars, all wheelchair-oriented — used identically for every user
+  profile) into two distinct factors: "Toilet accessibility"
+  (wheelchair) vs. "Changing tables"/"Child-friendly amenities"
+  (parents/stroller users), per what the task described as "the
+  project's Accessibility Factors catalogue." No such catalogue,
+  nor any existing changing-table/parent-oriented data or copy,
+  exists anywhere in this repo (code, PROJECT_CONTEXT.md, or
+  locales) — confirmed by search before stopping. Doing this would
+  mean inventing a whole new factor set (category label, section
+  label, question copy, translation strings, which place categories
+  get it, how/whether it interacts with travelsWithCompanion) from
+  nothing, not adapting an existing source. Explicitly parked,
+  pending either a real source for that catalogue's content, or a
+  decision to have it authored from scratch. Do NOT attempt this
+  without one of those first — places.ts / PlaceFeatures /
+  getPlaceFeatures / PlaceDetailSheet's toilet FactorRows /
+  ReviewScreen's toilet question set are all untouched.
+
+## Dev tooling
+- scripts/capture-screenshots.mjs (npm run screenshots
+  <output-dir>): Playwright script for thesis before/after
+  documentation. Requires the dev server already running. Walks
+  the real onboarding→map→review flow (not deep-links, since most
+  screens depend on OnboardingContext/router state) with plausible
+  answers, capturing one full-page screenshot per distinct screen/
+  overlay state (24 total, incl. every ActiveNavigationSheet nav
+  state and both empty/filled/submitted ReviewScreen states) into
+  screenshot_NN.png files + a manifest.json mapping filename→screen.
+  Viewport 390x844 (no reference viewport defined elsewhere in the
+  project, so a standard mobile size was used). Best-effort per
+  step (wrapped in try/catch) so one flaky interaction doesn't abort
+  the whole run.
 
 ## Research alignment (for thesis write-up)
 - RQ3 (Collaborative feedback): addressed via ReviewScreen's
@@ -1121,3 +1351,5 @@ which one is tapped, calls navigate('/map').
 Terminal 1: npm run dev. Terminal 2: git.
 Phone: npm run dev -- --host → open Network URL.
 Commit after each screen/feature. Push via Cursor terminal.
+npm run screenshots <output-dir> — see Dev tooling section above
+(dev server must already be running).
